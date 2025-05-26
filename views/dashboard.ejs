@@ -1,0 +1,400 @@
+<style>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: none;
+        background-color: #fff;
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        background-color: #f5f5f5;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 1rem;
+        text-align: center;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #222;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .table {
+        font-size: 0.95rem;
+        color: #222;
+    }
+
+    .table th {
+        background-color: #f0f0f0;
+        font-weight: 600;
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    .table td {
+        vertical-align: middle;
+        padding: 0.5rem;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f9f9f9;
+    }
+
+    .table tbody tr:hover {
+        background-color: #eef6ff;
+        cursor: pointer;
+    }
+
+    .align-middle {
+        vertical-align: middle !important;
+    }
+
+    .text-neutral {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    .content-wrapper {
+        flex: 1;
+        padding: 20px;
+        background-color: #f4f6f9;
+    }
+
+    .content-header h3 {
+        font-weight: 700;
+        color: #111;
+        margin-bottom: 0.5rem;
+    }
+
+    #tanggal {
+        font-size: 1rem;
+        color: #555;
+        font-weight: 500;
+    }
+
+    .app-content-footer {
+        padding-top: 1rem;
+        font-size: 0.9rem;
+        color: #777;
+    }
+
+    .pagination {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .pagination a,
+    .pagination span {
+        display: inline-block;
+        padding: 8px 16px;
+        margin: 0 4px;
+        color: #3490dc;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    .pagination a:hover {
+        background-color: #e2e8f0;
+    }
+
+    .pagination .disabled {
+        color: #999;
+        cursor: default;
+    }
+
+    #loading-indicator {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        font-weight: 600;
+        z-index: 1000;
+    }
+
+    @media (max-width: 768px) {
+        .card {
+            margin-bottom: 30px;
+            /* Tambahkan jarak lebih pada layar kecil */
+        }
+    }
+</style>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+
+    <div class="wrapper">
+        <%- include('layout/header') %>
+        <%- include('layout/sidebar') %>
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <h3 class="mb-0 text-blue-color">Order Status</h3>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <div class="text-center text-blue-color">
+                                <div id="tanggal"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="content">
+                <div class="app-content">
+                    <div class="container-fluid">
+                        <div class="row">
+
+                            <!-- Picked -->
+                            <div class="col-md-4">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h3 class="card-title align-center"><b>Picked</b></h3>
+                                    </div>
+                                    <div class="card-body table-responsive">
+                                        <table id="tbl_picked" class="table table-sm table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>NO SO / NO DO</th>
+                                                    <th>Location</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (pickedData.length === 0) { %>
+                                                <tr>
+                                                    <td colspan="2" class="text-center text-muted">No data available
+                                                    </td>
+                                                </tr>
+                                                <% } else { %>
+                                                <% pickedData.forEach(item => { %>
+                                                <tr class="align-middle">
+                                                    <td><%= item.sales_order_number %> /
+                                                        <%= item.delivery_order_number %></td>
+                                                    <td><%= item.location_warehouse %></td>
+                                                </tr>
+                                                <% }) %>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                        <div class="pagination">
+                                            <span id="currentPagePicked" class="badge bg-info">Picked Page 1</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Packed -->
+                            <div class="col-md-4">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h3 class="card-title align-center"><b>Packed</b></h3>
+                                    </div>
+                                    <div class="card-body table-responsive">
+                                        <table id="tbl_packed" class="table table-sm table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>NO SO / NO DO</th>
+                                                    <th>Location</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (packedData.length === 0) { %>
+                                                <tr>
+                                                    <td colspan="2" class="text-center text-muted">No data available
+                                                    </td>
+                                                </tr>
+                                                <% } else { %>
+                                                <% packedData.forEach(item => { %>
+                                                <tr class="align-middle">
+                                                    <td><%= item.sales_order_number %> /
+                                                        <%= item.delivery_order_number %></td>
+                                                    <td><%= item.location_warehouse %></td>
+                                                </tr>
+                                                <% }) %>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                        <div class="pagination">
+                                            <span id="currentPagePacked" class="badge bg-info">Packed Page 1</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Shipped -->
+                            <div class="col-md-4">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h3 class="card-title align-center"><b>Shipped</b></h3>
+                                    </div>
+                                    <div class="card-body table-responsive">
+                                        <table id="tbl_shipped" class="table table-sm table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>NO SO / NO DO</th>
+                                                    <th>Location</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (shippedData.length === 0) { %>
+                                                <tr>
+                                                    <td colspan="2" class="text-center text-muted">No data available
+                                                    </td>
+                                                </tr>
+                                                <% } else { %>
+                                                <% shippedData.forEach(item => { %>
+                                                <tr class="align-middle">
+                                                    <td><%= item.sales_order_number %> /
+                                                        <%= item.delivery_order_number %></td>
+                                                    <td><%= item.location_warehouse %></td>
+                                                </tr>
+                                                <% }) %>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                        <div class="pagination">
+                                            <span id="currentPageShipped" class="badge bg-info">Shipped Page 1</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="app-content-footer">
+                    <div class="container-fluid">
+                        <div class="col-md-12 text-center">
+                            <p class="text-blue-color">#Weworkbettertogether</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- Loading indicator -->
+        <div id="loading-indicator">Loading next page...</div>
+    </div>
+</body>
+<%- include('layout/footer') %>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    let currentPagePicked = 1;
+    let currentPagePacked = 1;
+    let currentPageShipped = 1;
+
+    function updateTable(tableId, data) {
+        const tbody = document.querySelector(`#${tableId} tbody`);
+        tbody.innerHTML = '';
+
+        if (data.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td colspan="2" class="text-center text-muted">No data available</td>`;
+            tbody.appendChild(tr);
+        } else {
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.classList.add('align-middle');
+                tr.innerHTML = `
+                    <td>${item.sales_order_number} / ${item.delivery_order_number}</td>
+                    <td>${item.location_warehouse}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    }
+
+    function paginateStatus() {
+    fetch(`/dashboardData?pagePicked=${currentPagePicked}&pagePacked=${currentPagePacked}&pageShipped=${currentPageShipped}`)
+        .then(res => res.json())
+        .then(data => {
+            // Picked
+            if (data.pickedData.length === 0) {
+                currentPagePicked = 1;
+                paginateStatus(); // Langsung panggil lagi setelah reset
+                return; // Stop lanjutkan eksekusi agar tidak double update
+            } else {
+                updateTable('tbl_picked', data.pickedData);
+                document.getElementById('currentPagePicked').textContent = `Picked Page ${currentPagePicked}`;
+                currentPagePicked++;
+            }
+
+            // Packed
+            if (data.packedData.length === 0) {
+                currentPagePacked = 1;
+                paginateStatus(); // Langsung panggil lagi setelah reset
+                return; // Stop lanjutkan eksekusi agar tidak double update
+            } else {
+                updateTable('tbl_packed', data.packedData);
+                document.getElementById('currentPagePacked').textContent = `Packed Page ${currentPagePacked}`;
+                currentPagePacked++;
+            }
+
+            // Shipped
+            if (data.shippedData.length === 0) {
+                currentPageShipped = 1;
+                paginateStatus(); // Langsung panggil lagi setelah reset
+                return; // Stop lanjutkan eksekusi agar tidak double update
+            } else {
+                updateTable('tbl_shipped', data.shippedData);
+                document.getElementById('currentPageShipped').textContent = `Shipped Page ${currentPageShipped}`;
+                currentPageShipped++;
+            }
+
+            // Show loading indicator
+            document.getElementById('loading-indicator').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('loading-indicator').style.display = 'none';
+            }, 2000);
+        })
+        .catch(err => console.error('Error fetching data:', err));
+    }
+
+
+    // Auto-paginate setiap 30 detik
+    setInterval(paginateStatus, 30000);
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Format tanggal hari ini
+        const hariNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const bulanNames = ["January", "February", "March", "April", "May", "June", "July", "August",
+            "September", "October", "November", "December"];
+        const today = new Date();
+        const hari = hariNames[today.getDay()];
+        const tanggal = today.getDate();
+        const bulan = bulanNames[today.getMonth()];
+        const tahun = today.getFullYear();
+
+        const suffix = (tanggal) => {
+            if (tanggal % 10 === 1 && tanggal % 100 !== 11) return 'st';
+            if (tanggal % 10 === 2 && tanggal % 100 !== 12) return 'nd';
+            if (tanggal % 10 === 3 && tanggal % 100 !== 13) return 'rd';
+            return 'th';
+        };
+
+        const formattedDate = `${hari}, ${bulan} ${tanggal}${suffix(tanggal)} ${tahun}`;
+        document.getElementById('tanggal').textContent = formattedDate;
+
+        // ⏩ Langsung panggil pagination pertama kali
+        paginateStatus();
+    });
+
+</script>

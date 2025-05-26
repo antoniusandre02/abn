@@ -1,0 +1,144 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+
+<div class="content-wrapper p-3">
+  <h3>Edit SO / DO</h3>
+  <form action="/soDo/update/<%= item.id_monitoring_data %>" method="POST">
+    <div class="form-group">
+      <label>Warehouse Location</label>
+      <% if (role == 8) { %>
+      <input type="text" class="form-control"
+        value="<%= optionWarehouseLocation.find(w => w.id_warehouse === item.warehouse_location)?.location_warehouse %>"
+        readonly>
+      <input type="hidden" name="warehouse_location" value="<%= item.warehouse_location %>">
+      <% } else { %>
+      <select name="warehouse_location" class="form-control">
+        <% optionWarehouseLocation.forEach(warehouse => { %>
+        <option value="<%= warehouse.id_warehouse %>"
+          <%= warehouse.id_warehouse === item.warehouse_location ? 'selected' : '' %>>
+          <%= warehouse.location_warehouse %>
+        </option>
+        <% }) %>
+      </select>
+      <% } %>
+    </div>
+
+    <div class="form-group">
+      <label>Sales Order Number</label>
+      <input type="text" class="form-control" name="sales_order_number" value="<%= item.sales_order_number %>"
+        <% if (user.role === 8) { %> readonly <% } %>>
+    </div>
+
+    <div class="form-group">
+      <label>Sales Order Date</label>
+      <input type="date" class="form-control" name="sales_order_date"
+        value="<%= item.sales_order_date.toISOString().split('T')[0] %>" <% if (user.role === 8) { %> readonly <% } %>>
+    </div>
+
+    <div class="form-group">
+      <label>Delivery Order Number</label>
+      <input type="text" class="form-control" name="delivery_order_number" value="<%= item.delivery_order_number %>"
+        <% if (user.role === 8) { %> readonly <% } %>>
+    </div>
+
+    <div class="form-group">
+      <label>Delivery Order Barcode</label>
+      <div>
+        <% if (item.barcode_do) { %>
+        <img src="data:image/png;base64,<%= item.barcode_do %>" alt="Barcode DO" style="width: 180px; height: 60px;">
+        <% } else { %>
+        <p class="text-muted">Barcode belum tersedia</p>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Delivery Order Date</label>
+      <input type="date" class="form-control" name="delivery_order_date"
+        value="<%= item.delivery_order_date.toISOString().split('T')[0] %>" <% if (user.role === 8) { %> readonly
+        <% } %>>
+    </div>
+
+    <div class="form-group">
+      <label>Customer Name</label>
+      <input type="text" class="form-control" name="customer_name" value="<%= item.customer_name %>"
+        <% if (user.role === 8) { %> readonly <% } %>>
+    </div>
+
+    <div class="form-group">
+      <label>Division</label>
+      <% if (role == 8) { %>
+      <input type="text" class="form-control"
+        value="<%= optionDivision.find(w => w.id_division === item.division_team)?.name_division%>" readonly>
+      <input type="hidden" name="division_team" value="<%= item.division_team %>">
+      <% } else { %>
+      <select name="division_team" class="form-control">
+        <% optionDivision.forEach(division => { %>
+        <option value="<%= division.id_division%>" <%= division.id_division === item.division_team ? 'selected' : '' %>>
+          <%= division.name_division%>
+        </option>
+        <% }) %>
+      </select>
+      <% } %>
+    </div>
+
+    <div class="form-group">
+      <label>Ship By</label>
+      <input type="text" class="form-control" name="ship_by" value="<%= item.ship_by %>" <% if (user.role === 8) { %>
+        readonly <% } %>>
+    </div>
+
+    <div class="form-group">
+      <label>Ekspedisi Note</label>
+      <input type="text" class="form-control" name="ekspedisi_note" value="<%= item.ekspedisi_note %>"
+        <% if (user.role === 8) { %> readonly <% } %>>
+    </div>
+
+    <div class="form-group">
+      <label>Resi Number</label>
+      <input type="text" class="form-control" name="resi_number" value="<%= item.resi_number %>"
+        <% if (user.role === 8) { %> readonly <% } %>>
+    </div>
+
+    <div class="form-group">
+      <label>Weight (Kg)</label>
+      <input type="text" class="form-control" name="weight" value="<%= item.weight %>" <% if (user.role === 8) { %>
+        readonly <% } %>>
+    </div>
+
+    <div class="form-group">
+      <label>Shipping Price (Rp)</label>
+      <input type="text" class="form-control" name="price" value="<%= item.price %>" <% if (user.role === 8) { %>
+        readonly <% } %>>
+    </div>
+
+    <div class="form-group">
+      <label>Shipped Date</label>
+      <input type="date" class="form-control" name="eta"
+        value="<%= item.eta ? item.eta.toISOString().split('T')[0] : '' %>" <% if (user.role === 8) { %> readonly
+        <% } %>>
+    </div>
+
+    <div class="form-group">
+      <label>Nama Penerima</label>
+      <input type="text" class="form-control" name="receive_name" value="<%= item.receive_name %>"
+        <% if (user.role === 8) { %> readonly <% } %>>
+    </div>
+
+    <% if (user && (user.role === 1 || user.role === 8)) { %>
+    <div class="form-group">
+      <label>Invoicing Date</label>
+      <input type="date" class="form-control" id="invoicingDate" name="invoicing_date"
+        value="<%= item.invoicing_date ? item.invoicing_date.toISOString().split('T')[0] : '' %>" required>
+    </div>
+    <% } %>
+
+
+    <div class="form-group text-right">
+      <a href="/soDo" class="btn btn-secondary">Batal</a>
+      <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+    </div>
+  </form>
+</div>
+
+<%- include('layout/footer') %>

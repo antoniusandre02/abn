@@ -1,0 +1,73 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+<div class="content-wrapper">
+      <div class="row p-3">
+        <div class="col-12">
+            <div class="container mt-4">
+                <h2>Scan Barcode DO</h2>
+                <form id="scanForm" action="/scanBarcode/scanBarcode" method="POST">
+                    <input type="text" id="barcodeInput" name="barcode_do" class="form-control" placeholder="Scan barcode DO..." autofocus />
+                </form>
+                <% if (message) { %>
+                    <div class="alert alert-info mt-3"><%= message %></div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+    
+
+<%- include('layout/footer') %>
+<script>
+  const input = document.getElementById("barcodeInput");
+  const form = document.getElementById("scanForm");
+
+  let buffer = "";
+  let lastKeyTime = Date.now();
+
+  input.addEventListener("keydown", function (e) {
+    const currentTime = Date.now();
+    const timeDiff = currentTime - lastKeyTime;
+
+    if (timeDiff > 1000) {
+      // Jika jeda ketik lebih dari 100ms, dianggap bukan dari scanner
+      buffer = "";
+    }
+
+    lastKeyTime = currentTime;
+
+    if (e.key.length === 1 && e.key.match(/[\w\d]/)) {
+      e.preventDefault(); // blok input manual
+      buffer += e.key;
+    }
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      let corrected = buffer;
+      if (/^DO\d+$/i.test(buffer)) {
+        corrected = buffer.replace(/^DO/, 'DO-');
+      }
+      input.value = corrected;
+      buffer = "";
+      form.submit(); // kirim form setelah scan
+    }
+  });
+
+  // Cegah paste manual
+  input.addEventListener("paste", function (e) {
+    e.preventDefault();
+  });
+
+  // Cegah klik kanan → paste
+  input.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+  });
+  input.addEventListener("drop", e => e.preventDefault());
+  input.addEventListener("input", e => {
+    // Reset nilai jika bukan hasil dari script (prevent manual ketik)
+    if (e.inputType !== null) {
+      input.value = '';
+    }
+  });
+</script>
+

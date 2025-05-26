@@ -1,0 +1,102 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+
+<div class="content-wrapper p-3">
+  <h3>Detail SO / DO</h3>
+
+  <form action="/soDo/update/<%= item.id %>" method="POST">
+    <div class="form-group">
+      <label>Warehouse Location</label>
+      <input type="text" class="form-control" name="warehouse_location" value="<%= item.location_warehouse%>" disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Sales Order Number</label>
+      <input type="text" class="form-control" name="sales_order_number" value="<%= item.sales_order_number %>" disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Sales Order Date</label>
+      <input type="date" class="form-control" name="sales_order_date"
+        value="<%= item.sales_order_date.toISOString().split('T')[0] %>" disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Delivery Order Number</label>
+      <input type="text" class="form-control" name="delivery_order_number" value="<%= item.delivery_order_number %>"
+        disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Delivery Order Barcode</label>
+      <div>
+        <% if (item.barcode_do) { %>
+        <img src="data:image/png;base64,<%= item.barcode_do %>" alt="Barcode DO" style="width: 180px; height: 60px;">
+        <% } else { %>
+        <p class="text-muted">Barcode belum tersedia</p>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Delivery Order Date</label>
+      <input type="date" class="form-control" name="delivery_order_date"
+        value="<%= item.delivery_order_date.toISOString().split('T')[0] %>" disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Customer Name</label>
+      <input type="text" class="form-control" name="customer_name" value="<%= item.customer_name %>" disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Division</label>
+      <input type="text" class="form-control" name="name_division" value="<%= item.name_division %>" disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Ship By</label>
+      <input type="text" class="form-control" name="ship_by" value="<%= item.ship_by %>" disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Resi Number</label>
+      <input type="text" class="form-control" name="resi_number" value="<%= item.resi_number %>" disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Weight (Kg)</label>
+      <input type="text" class="form-control" name="weight" value="<%= item.weight %>" disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Shipping Price (Rp)</label>
+      <input type="text" class="form-control" name="price" value="<%= item.price %>" disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Shipped Date</label>
+      <input type="date" class="form-control" name="eta"
+        value="<%= item.eta ? item.eta.toISOString().split('T')[0] : '' %>" disabled>
+    </div>
+
+    <div class="form-group">
+      <label>Nama Penerima</label>
+      <input type="text" class="form-control" name="receive_name" value="<%= item.receive_name %>" disabled>
+    </div>
+
+    <% if (user && (user.role === 1 || user.role === 8)) { %>
+    <div class="form-group">
+      <label>Invoicing Date</label>
+      <input type="date" class="form-control" id="invoicingDate" name="invoicing_date"
+        value="<%= item.invoicing_date ? item.invoicing_date.toISOString().split('T')[0] : '' %>" disabled>
+    </div>
+    <% } %>
+
+    <div class="form-group text-right">
+      <a href="/soDo" class="btn btn-primary">Kembali</a>
+    </div>
+  </form>
+</div>
+
+<%- include('layout/footer') %>

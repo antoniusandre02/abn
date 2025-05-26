@@ -1,0 +1,47 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+<div class="content-wrapper">
+    <div class="row p-3">
+        <div class="col-12">
+            <div class="container mt-4">
+                <h2>Upload SO / DO Bulk</h2>
+                <form action="/soDo/upload" method="POST" enctype="multipart/form-data">
+                    <% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+                    <div class="alert alert-success"><%= successMessage %></div>
+                    <% } %>
+                    <% if (typeof errorMessage !== 'undefined' && errorMessage.length > 0) { %>
+                    <div class="alert alert-danger"><%= errorMessage %></div>
+                    <% } %>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="csvFile" id="csvFile" accept=".csv"
+                                    required>
+                                <label class="custom-file-label" for="csvFile">Choose CSV file</label>
+                            </div>
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-primary">Upload</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('layout/footer') %>
+
+<script>
+    document.querySelector('.custom-file-input').addEventListener('change', function (e) {
+        const fileName = e.target.files[0]?.name;
+        const label = e.target.nextElementSibling;
+        if (label && fileName) {
+            label.innerText = fileName;
+        }
+    });
+
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(el => el.style.display = 'none');
+    }, 7000); // sembunyikan dalam 7 detik
+</script>

@@ -1,0 +1,71 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+<div class="content-wrapper">
+    <div class="row p-3">
+        <div class="col-12">
+
+            <% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= successMessage[0] %>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <% } %>
+
+            <% if (typeof errorMessage !== 'undefined' && errorMessage.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= errorMessage[0] %>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <% } %>
+
+            <h3>Edit Account User</h3>
+            <form action="/auth/edit/<%= item.id %>" method="POST">
+                <div class="form-group">
+                    <label>Nama</label>
+                    <input type="text" class="form-control" name="name" value="<%= item.name %>">
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" class="form-control" name="email" value="<%= item.email %>">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="text" class="form-control" name="password" placeholder="Biarkan kosong jika tidak ingin mengubah">
+                </div>
+
+
+                <div class="form-group">
+                    <label>User Role</label>
+                    <select class="form-control" name="id_role">
+                        <% optionRoleAccounts.forEach(role => { %>
+                        <option value="<%= role.id_role %>" <%= role.id_role === item.id_role ? 'selected' : '' %>>
+                            <%= role.role_name %>
+                        </option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Is Deleted</label>
+                    <select class="form-control" name="is_deleted">
+                        <option value="false" <%= item.is_deleted === false ? 'selected' : '' %>>False</option>
+                        <option value="true" <%= item.is_deleted === true ? 'selected' : '' %>>True</option>
+                    </select>
+                </div>
+
+                <div class="form-group text-right">
+                    <a href="/createAccounts" class="btn btn-secondary">Batal</a>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('layout/footer') %>

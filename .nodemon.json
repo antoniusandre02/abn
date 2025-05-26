@@ -1,0 +1,5 @@
+{
+  "watch": ["routes", "views", "public", "app.js", "index.js"],
+  "ignore": ["*.log", "node_modules", "cache", "tmp", "data.json", "offset", "utils"],
+  "ext": "js,ejs,json"
+}
