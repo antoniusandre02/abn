@@ -440,6 +440,11 @@
       alert("Data tidak ditemukan!");
       return;
     }
+    const cells = Array.from(row.querySelectorAll('td'));
+    const [
+      no, soNumber, soDate, doNumber, doDate,
+      invoicingDate, customer, location, status, shipBy, eta
+    ] = cells.map(cell => cell.innerText.trim());
 
     const barcodeImg = row.querySelector("img");
     if (!barcodeImg || !barcodeImg.src.startsWith("data:image")) {
@@ -448,10 +453,10 @@
     }
 
     const imgProps = doc.getImageProperties(barcodeImg.src);
-    const imgWidth = 35; // 35mm lebar barcode
+    const imgWidth = 38; // 35mm lebar barcode
     const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
     const xCenter = (45 - imgWidth) / 2;
-    const yCenter = (15 - imgHeight) / 2;
+    const yCenter = (18 - imgHeight) / 2;
 
     doc.addImage(barcodeImg.src, 'PNG', xCenter, yCenter, imgWidth, imgHeight);
 
