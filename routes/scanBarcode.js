@@ -5,12 +5,12 @@ const moment = require('moment');
 const checkRole = require('../middlewares/roleMiddleware');
 
 const statusRoleMap = {
-  'Picked': [1, 2, 3],
-  'Packed': [1, 4, 5],
-  'Shipped': [1, 6, 7]
+  'Picked': [1, 2, 3, 12],
+  'Packed': [1, 4, 5, 12],
+  'Shipped': [1, 6, 7, 12]
 };
 
-router.post('/scanBarcode', checkRole([1, 2, 3, 4, 5, 6, 7]), async (req, res) => {
+router.post('/scanBarcode', checkRole([1, 2, 3, 4, 5, 6, 7, 12]), async (req, res) => {
   const { barcode_do } = req.body;
   const userSession = req.session.user;
   const user_id = userSession?.user_id;
@@ -20,8 +20,6 @@ router.post('/scanBarcode', checkRole([1, 2, 3, 4, 5, 6, 7]), async (req, res) =
   if (!barcode_do || !user_id || !user_role) {
     return res.render('scanBarcode', { message: 'Barcode atau user tidak valid.' });
   }
-
-  console.log("ini barcode", barcode_do);
 
   try {
     const result = await pool.query(
@@ -73,6 +71,7 @@ router.post('/scanBarcode', checkRole([1, 2, 3, 4, 5, 6, 7]), async (req, res) =
         SET status = 'Picked', picked_date = $1, picked_by = $2, update_at = now()
         WHERE delivery_order_number = $3
       `;
+      req.io.emit('dataUpdateTrigger');
       updateMessage = 'Status berhasil diupdate: Picked';
     } else if (nextStatus === 'Packed') {
       updateQuery = `
@@ -80,6 +79,7 @@ router.post('/scanBarcode', checkRole([1, 2, 3, 4, 5, 6, 7]), async (req, res) =
         SET status = 'Packed', packed_date = $1, packed_by = $2, update_at = now()
         WHERE delivery_order_number = $3
       `;
+      req.io.emit('dataUpdateTrigger');
       updateMessage = 'Status berhasil diupdate: Packed';
     } else if (nextStatus === 'Shipped') {
       updateQuery = `
@@ -87,6 +87,7 @@ router.post('/scanBarcode', checkRole([1, 2, 3, 4, 5, 6, 7]), async (req, res) =
         SET status = 'Shipped', shipped_date = $1, shipped_by = $2, is_done = true, update_at = now()
         WHERE delivery_order_number = $3
       `;
+      req.io.emit('dataUpdateTrigger');
       updateMessage = 'Status berhasil diupdate: Shipped';
     }
 

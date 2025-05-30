@@ -1,7 +1,9 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
   <!-- Brand Logo -->
   <a href="/" class="brand-link">
-    <img src="/adminlte/dist/img/logoabn.png" alt="logo" style="width: 100%; max-width: 150px; height: auto; display: block;">
+    <img src="/adminlte/dist/img/logoabn.png" alt="logo"
+      style="width: 100%; max-width: 150px; height: auto; display: block; margin: 0 auto;">
+
   </a>
 
   <!-- Sidebar -->
@@ -9,7 +11,7 @@
     <!-- Sidebar Menu -->
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" role="menu" data-accordion="false">
-        
+
         <% if ([1].includes(user.role)) { %>
         <!-- Create Account: Admin  -->
         <li class="nav-item">
@@ -19,7 +21,7 @@
           </a>
         </li>
         <% } %>
-        
+
         <% if ([1].includes(user.role)) { %>
         <li class="nav-item">
           <a href="/uploadSODO" class="nav-link">
@@ -28,7 +30,7 @@
           </a>
         </li>
         <% } %>
-        
+
         <li class="nav-item">
           <a href="/dashboard" class="nav-link">
             <i class="nav-icon fas fa-tv"></i>
@@ -36,7 +38,7 @@
           </a>
         </li>
 
-        <% if ([1, 8, 10, 11].includes(user.role)) { %>
+        <% if ([1, 8, 10, 11, 12].includes(user.role)) { %>
         <!-- SO / DO: Admin, Finance, Admin Gudang -->
         <li class="nav-item">
           <a href="/soDo" class="nav-link">
@@ -46,7 +48,7 @@
         </li>
         <% } %>
 
-        <% if ([1, 2, 3, 4, 5, 6, 7].includes(user.role)) { %>
+        <% if ([1, 2, 3, 4, 5, 6, 7, 12].includes(user.role)) { %>
         <!-- Scan Barcode: Admin dan semua Operator -->
         <li class="nav-item">
           <a href="/scanBarcode" class="nav-link">

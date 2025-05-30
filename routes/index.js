@@ -106,7 +106,7 @@ router.get('/dashboard', async (req, res) => {
   const offset = (page - 1) * limit;
 
   const [pickedResult, packedResult, shippedResult] = await Promise.all([
-    pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Picked' AND picked_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY picked_date DESC LIMIT $1 OFFSET $2`, [limit, offset]),
+    pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Picked' AND picked_date IS NOT NULL AND packed_date IS NULL AND picked_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY picked_date DESC LIMIT $1 OFFSET $2`, [limit, offset]),
     pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Packed' AND packed_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY packed_date DESC LIMIT $1 OFFSET $2`, [limit, offset]),
     pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Shipped' AND shipped_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY shipped_date DESC LIMIT $1 OFFSET $2`, [limit, offset]),
   ]);
@@ -118,6 +118,7 @@ router.get('/dashboard', async (req, res) => {
   });
 });
 
+// API: Dashboard paginated data with total count
 router.get('/dashboardData', async (req, res) => {
   const limit = 10;
   const pagePicked = parseInt(req.query.pagePicked) || 1;
@@ -127,12 +128,15 @@ router.get('/dashboardData', async (req, res) => {
   const offsetPicked = (pagePicked - 1) * limit;
   const offsetPacked = (pagePacked - 1) * limit;
   const offsetShipped = (pageShipped - 1) * limit;
+  console.log("Query pageShipped:", pageShipped, "Offset:", offsetShipped);
 
-  const [pickedResult, packedResult, shippedResult] = await Promise.all([
+  const [pickedResult, packedResult, shippedResult, pickedCount, packedCount, shippedCount] = await Promise.all([
     pool.query(`
       SELECT * FROM monitoring_data 
       JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse 
       WHERE status = 'Picked' 
+        AND picked_date IS NOT NULL 
+        AND packed_date IS NULL 
         AND picked_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() 
       ORDER BY picked_date DESC 
       LIMIT $1 OFFSET $2
@@ -155,27 +159,32 @@ router.get('/dashboardData', async (req, res) => {
       ORDER BY shipped_date DESC 
       LIMIT $1 OFFSET $2
     `, [limit, offsetShipped]),
+
+    pool.query(`SELECT COUNT(*) FROM monitoring_data WHERE status = 'Picked' AND picked_date IS NOT NULL AND packed_date IS NULL AND picked_date BETWEEN NOW() - INTERVAL '7 days' AND NOW()`),
+    pool.query(`SELECT COUNT(*) FROM monitoring_data WHERE status = 'Packed' AND packed_date BETWEEN NOW() - INTERVAL '7 days' AND NOW()`),
+    pool.query(`SELECT COUNT(*) FROM monitoring_data WHERE status = 'Shipped' AND shipped_date BETWEEN NOW() - INTERVAL '7 days' AND NOW()`),
   ]);
 
   res.json({
     pickedData: pickedResult.rows,
     packedData: packedResult.rows,
-    shippedData: shippedResult.rows
+    shippedData: shippedResult.rows,
+    pickedTotal: parseInt(pickedCount.rows[0].count),
+    packedTotal: parseInt(packedCount.rows[0].count),
+    shippedTotal: parseInt(shippedCount.rows[0].count)
   });
 });
 
 
-
-
 // Scan Barcode
-router.get('/scanBarcode', checkRole([1, 2, 3, 4, 5, 6, 7]), (req, res) => {
+router.get('/scanBarcode', checkRole([1, 2, 3, 4, 5, 6, 7, 12]), (req, res) => {
   res.render('scanBarcode', {
     message: null
   });
 });
 
 // SO/DO Page
-router.get('/soDo', checkRole([1, 8, 10, 11]), async (req, res) => {
+router.get('/soDo', checkRole([1, 8, 10, 11, 12]), async (req, res) => {
   try {
     const { search = '', filterDateStart = '', filterDateEnd = '', page = 1 } = req.query;
     const limit = 100;
@@ -247,7 +256,7 @@ router.get('/soDo', checkRole([1, 8, 10, 11]), async (req, res) => {
 });
 
 
-router.get('/soDoEdit/:id', checkRole([1, 8, 10, 11]), async (req, res) => {
+router.get('/soDoEdit/:id', checkRole([1, 8, 10, 11, 12]), async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -275,7 +284,7 @@ router.get('/soDoEdit/:id', checkRole([1, 8, 10, 11]), async (req, res) => {
   }
 });
 
-router.get('/soDoView/:id', checkRole([1, 8, 10, 11]), async (req, res) => {
+router.get('/soDoView/:id', checkRole([1, 8, 10, 11, 12]), async (req, res) => {
   try {
     const id = req.params.id;
 

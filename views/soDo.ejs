@@ -68,7 +68,7 @@
     <div class="row p-3">
       <div class="col-12">
         <!-- Tombol Add di atas card -->
-        <% if (role === 1 || role === 10 || role === 11) { %>
+        <% if (role === 1 || role === 10 || role === 11 || role === 12) { %>
         <div class="mb-2 text-right">
           <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-lg">Add SO / DO</button>
         </div>
@@ -313,7 +313,7 @@
                       <a href="/soDoEdit/<%= item.id_monitoring_data %>" class="btn btn-sm btn-warning" title="Edit">
                         <i class="fas fa-edit"></i>
                       </a>
-                      <% } else if (user && (user.role === 10 || user.role === 11)) { %>
+                      <% } else if (user && (user.role === 10 || user.role === 11 || user.role === 12)) { %>
                       <!-- Role Admin Gudang Kopo & Saleh hanya bisa lihat detail -->
                       <a href="/soDoView/<%= item.id_monitoring_data %>" class="btn btn-sm btn-secondary" title="Detail">
                         <i class="fas fa-eye"></i>

@@ -21,11 +21,15 @@ io.on('connection', (socket) => {
   });
 });
 
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 setInterval(async () => {
   const limit = 10;
 
   const [pickedResult, packedResult, shippedResult] = await Promise.all([
-    pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Picked' AND picked_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY picked_date DESC LIMIT $1`, [limit]),
+    pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Picked' AND picked_date IS NOT NULL AND packed_date IS NULL AND picked_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY picked_date DESC LIMIT $1`, [limit]),
     pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Packed' AND packed_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY packed_date DESC LIMIT $1`, [limit]),
     pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Shipped' AND shipped_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY shipped_date DESC LIMIT $1`, [limit]),
   ]);
@@ -35,9 +39,10 @@ setInterval(async () => {
     packedData: packedResult.rows,
     shippedData: shippedResult.rows
   });
-
+  // untuk refresh data per statusnya 
   console.log('Sent updated data to client');
-}, 90 * 1000); // 90 second
+  console.log('Timer triggered for refresh data')
+}, 77 * 1000);
 
 // === Middleware ===
 app.use(express.urlencoded({ extended: true }));

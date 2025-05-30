@@ -173,12 +173,13 @@
                                                 <tr>
                                                     <th>NO SO / NO DO</th>
                                                     <th>Location</th>
+                                                    <th>Customer Name</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <% if (pickedData.length === 0) { %>
                                                 <tr>
-                                                    <td colspan="2" class="text-center text-muted">No data available
+                                                    <td colspan="3" class="text-center text-muted">No data available
                                                     </td>
                                                 </tr>
                                                 <% } else { %>
@@ -187,6 +188,7 @@
                                                     <td><%= item.sales_order_number %> /
                                                         <%= item.delivery_order_number %></td>
                                                     <td><%= item.location_warehouse %></td>
+                                                    <td><%= item.customer_name %></td>
                                                 </tr>
                                                 <% }) %>
                                                 <% } %>
@@ -211,12 +213,13 @@
                                                 <tr>
                                                     <th>NO SO / NO DO</th>
                                                     <th>Location</th>
+                                                    <th>Customer Name</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <% if (packedData.length === 0) { %>
                                                 <tr>
-                                                    <td colspan="2" class="text-center text-muted">No data available
+                                                    <td colspan="3" class="text-center text-muted">No data available
                                                     </td>
                                                 </tr>
                                                 <% } else { %>
@@ -225,6 +228,7 @@
                                                     <td><%= item.sales_order_number %> /
                                                         <%= item.delivery_order_number %></td>
                                                     <td><%= item.location_warehouse %></td>
+                                                    <td><%= item.customer_name %></td>
                                                 </tr>
                                                 <% }) %>
                                                 <% } %>
@@ -249,12 +253,13 @@
                                                 <tr>
                                                     <th>NO SO / NO DO</th>
                                                     <th>Location</th>
+                                                    <th>Customer Name</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <% if (shippedData.length === 0) { %>
                                                 <tr>
-                                                    <td colspan="2" class="text-center text-muted">No data available
+                                                    <td colspan="3" class="text-center text-muted">No data available
                                                     </td>
                                                 </tr>
                                                 <% } else { %>
@@ -263,6 +268,7 @@
                                                     <td><%= item.sales_order_number %> /
                                                         <%= item.delivery_order_number %></td>
                                                     <td><%= item.location_warehouse %></td>
+                                                    <td><%= item.customer_name %></td>
                                                 </tr>
                                                 <% }) %>
                                                 <% } %>
@@ -293,11 +299,20 @@
     </div>
 </body>
 <%- include('layout/footer') %>
+<!-- ... HTML dan styles atas tetap sama ... -->
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
     let currentPagePicked = 1;
     let currentPagePacked = 1;
     let currentPageShipped = 1;
+
+    let totalPagesPicked = 1;
+    let totalPagesPacked = 1;
+    let totalPagesShipped = 1;
+
+    let isSocketUpdateInProgress = false;
+    let initialDataLoaded = false;
 
     function updateTable(tableId, data) {
         const tbody = document.querySelector(`#${tableId} tbody`);
@@ -305,7 +320,7 @@
 
         if (data.length === 0) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td colspan="2" class="text-center text-muted">No data available</td>`;
+            tr.innerHTML = `<td colspan="3" class="text-center text-muted">No data available</td>`;
             tbody.appendChild(tr);
         } else {
             data.forEach(item => {
@@ -314,66 +329,83 @@
                 tr.innerHTML = `
                     <td>${item.sales_order_number} / ${item.delivery_order_number}</td>
                     <td>${item.location_warehouse}</td>
+                    <td>${item.customer_name}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
     }
 
-    function paginateStatus() {
-    fetch(`/dashboardData?pagePicked=${currentPagePicked}&pagePacked=${currentPagePacked}&pageShipped=${currentPageShipped}`)
-        .then(res => res.json())
-        .then(data => {
-            // Picked
-            if (data.pickedData.length === 0) {
-                currentPagePicked = 1;
-                paginateStatus(); // Langsung panggil lagi setelah reset
-                return; // Stop lanjutkan eksekusi agar tidak double update
-            } else {
-                updateTable('tbl_picked', data.pickedData);
-                document.getElementById('currentPagePicked').textContent = `Picked Page ${currentPagePicked}`;
-                currentPagePicked++;
-            }
-
-            // Packed
-            if (data.packedData.length === 0) {
-                currentPagePacked = 1;
-                paginateStatus(); // Langsung panggil lagi setelah reset
-                return; // Stop lanjutkan eksekusi agar tidak double update
-            } else {
-                updateTable('tbl_packed', data.packedData);
-                document.getElementById('currentPagePacked').textContent = `Packed Page ${currentPagePacked}`;
-                currentPagePacked++;
-            }
-
-            // Shipped
-            if (data.shippedData.length === 0) {
-                currentPageShipped = 1;
-                paginateStatus(); // Langsung panggil lagi setelah reset
-                return; // Stop lanjutkan eksekusi agar tidak double update
-            } else {
-                updateTable('tbl_shipped', data.shippedData);
-                document.getElementById('currentPageShipped').textContent = `Shipped Page ${currentPageShipped}`;
-                currentPageShipped++;
-            }
-
-            // Show loading indicator
-            document.getElementById('loading-indicator').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('loading-indicator').style.display = 'none';
-            }, 2000);
-        })
-        .catch(err => console.error('Error fetching data:', err));
+    function updatePaginationUI() {
+        document.getElementById('currentPagePicked').textContent = `Picked Page ${currentPagePicked}`;
+        document.getElementById('currentPagePacked').textContent = `Packed Page ${currentPagePacked}`;
+        document.getElementById('currentPageShipped').textContent = `Shipped Page ${currentPageShipped}`;
     }
 
+    function paginateStatus() {
+        if (!initialDataLoaded || isSocketUpdateInProgress) {
+            isSocketUpdateInProgress = false;
+            return;
+        }
 
-    // Auto-paginate setiap 30 detik
-    setInterval(paginateStatus, 30000);
-</script>
+        const url = `/dashboardData?pagePicked=${currentPagePicked}&pagePacked=${currentPagePacked}&pageShipped=${currentPageShipped}`;
+        console.log("Fetching:", url);
+        fetch(url)
+        .then(res => res.json())
+            .then(data => {
+                totalPagesPicked = Math.ceil(data.pickedTotal / 10);
+                totalPagesPacked = Math.ceil(data.packedTotal / 10);
+                totalPagesShipped = Math.ceil(data.shippedTotal / 10);
 
-<script>
+                console.log('Auto-paginate total pages =>', totalPagesPicked, totalPagesPacked, totalPagesShipped);
+                console.log(`📦 Fetching Picked ${currentPagePicked}, Packed ${currentPagePacked}, Shipped ${currentPageShipped}`);
+
+                // Update Table
+                updateTable('tbl_picked', data.pickedData);
+                updateTable('tbl_packed', data.packedData);
+                updateTable('tbl_shipped', data.shippedData);
+
+                // Update UI before incrementing
+                updatePaginationUI();
+
+                // Increment pages after displaying
+                currentPagePicked = totalPagesPicked > 1 && currentPagePicked < totalPagesPicked ? currentPagePicked + 1 : 1;
+                currentPagePacked = totalPagesPacked > 1 && currentPagePacked < totalPagesPacked ? currentPagePacked + 1 : 1;
+                currentPageShipped = totalPagesShipped > 1 && currentPageShipped < totalPagesShipped ? currentPageShipped + 1 : 1;
+
+                document.getElementById('loading-indicator').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('loading-indicator').style.display = 'none';
+                }, 1000);
+            })
+            .catch(err => {
+                console.error('Pagination fetch error:', err);
+            });
+    }
+
+    const socket = io();
+    socket.on('dataUpdate', (data) => {
+        isSocketUpdateInProgress = true;
+        initialDataLoaded = true;
+
+        updateTable('tbl_picked', data.pickedData);
+        updateTable('tbl_packed', data.packedData);
+        updateTable('tbl_shipped', data.shippedData);
+
+        currentPagePicked = 1;
+        currentPagePacked = 1;
+        currentPageShipped = 1;
+
+        updatePaginationUI();
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
-        // Format tanggal hari ini
+        setTimeout(() => {
+            initialDataLoaded = true;
+        }, 1000);
+
+        setInterval(paginateStatus, 20000);
+
         const hariNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         const bulanNames = ["January", "February", "March", "April", "May", "June", "July", "August",
             "September", "October", "November", "December"];
@@ -392,9 +424,5 @@
 
         const formattedDate = `${hari}, ${bulan} ${tanggal}${suffix(tanggal)} ${tahun}`;
         document.getElementById('tanggal').textContent = formattedDate;
-
-        // ⏩ Langsung panggil pagination pertama kali
-        paginateStatus();
     });
-
 </script>
