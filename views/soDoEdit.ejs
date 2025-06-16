@@ -11,6 +11,7 @@
         value="<%= optionWarehouseLocation.find(w => w.id_warehouse === item.warehouse_location)?.location_warehouse %>"
         readonly>
       <input type="hidden" name="warehouse_location" value="<%= item.warehouse_location %>">
+      <input type="hidden" name="location_warehouse_name" value="<%= optionWarehouseLocation.find(w => w.id_warehouse === item.warehouse_location)?.location_warehouse %>">
       <% } else { %>
       <select name="warehouse_location" class="form-control">
         <% optionWarehouseLocation.forEach(warehouse => { %>
@@ -214,8 +215,8 @@
     const receiveName = getValue('receive_name');
     const eta = getValue('eta');
     const invoicingDate = getValue('invoicing_date');
-    const location = getValue('warehouse_location');
-
+    const location = getValue('location_warehouse_name');
+    
     const todayFormatted = formatDate(new Date().toISOString().split('T')[0]);
 
     // Outline
