@@ -15,3 +15,8 @@ Thumbs.db
 
 # Optional: VSCode settings
 .vscode/
+
+echo credentials.json >> .gitignore
+git add .gitignore
+git commit -m "Ignore credentials.json"
+git push origin upload-pertama

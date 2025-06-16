@@ -77,12 +77,14 @@
         <div class="modal fade" id="modal-lg">
           <div class="modal-dialog modal-lg">
             <div class="modal-content">
+              <% if (user && (user.role === 1 || user.role === 12 || user.role === 10 || user.role === 11)) { %>
               <div class="modal-header">
                 <h4 class="modal-title">Tambah SO / DO</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
+              <% } %>
               <form action="/soDo/create" method="POST">
                 <div class="modal-body">
                   <h5 class="mb-2">Lokasi Warehouse</h5>
@@ -102,16 +104,16 @@
                       <% } %>
                     </select>
                   </div>
-
+                  
+                  
                   <h5 class="mb-2">Sales Order Number</h5>
                   <div class="input-group mb-3">
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="fa fa-hashtag"></i></span>
                     </div>
-                    <input type="text" class="form-control" placeholder="Input Angka SO Saja" id="sales_order_number"
-                      name="sales_order_number" required>
+                    <input type="text" class="form-control" placeholder="Input Angka SO Saja" id="sales_order_number" name="sales_order_number" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                   </div>
-
+                
                   <h5 class="mb-2">Sales Order Date</h5>
                   <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -125,8 +127,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="fa fa-hashtag"></i></span>
                     </div>
-                    <input type="text" class="form-control" placeholder="Input Angka DO Saja" id="delivery_order_number"
-                      name="delivery_order_number" required>
+                    <input type="text" class="form-control" placeholder="Input Angka DO Saja" id="delivery_order_number" name="delivery_order_number" name="sales_order_number" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                   </div>
 
                   <h5 class="mb-2">Delivery Order Date</h5>
@@ -164,21 +165,13 @@
                     </select>
                   </div>
 
+                  <% if (user && (user.role === 1 || user.role === 12)) { %>
                   <h5 class="mb-2">Shipped By</h5>
                   <div class="input-group mb-3">
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="fa fa-file"></i></span>
                     </div>
                     <input type="text" class="form-control" placeholder="Nama Ekspedisi" id="ship_by" name="ship_by">
-                  </div>
-
-                  <h5 class="mb-2">Expedition Notes</h5>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-file"></i></span>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Catatan" id="ekspedisi_note"
-                      name="ekspedisi_note">
                   </div>
 
                   <h5 class="mb-2">Resi Number</h5>
@@ -214,7 +207,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                     </div>
-                    <input type="date" class="form-control" id="eta" name="eta" required>
+                    <input type="date" class="form-control" id="eta" name="eta">
                   </div>
 
                   <h5 class="mb-2">Nama Penerima</h5>
@@ -225,6 +218,16 @@
                     <input type="text" class="form-control" placeholder="Nama Penerima" id="receive_name"
                       name="receive_name">
                   </div>
+
+                  <h5 class="mb-2">Notes</h5>
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fa fa-file"></i></span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Catatan" id="ekspedisi_note"
+                      name="ekspedisi_note">
+                  </div>
+                  <% } %>
 
                 </div>
                 <div class="modal-footer justify-content-between">
@@ -247,7 +250,7 @@
                 <div class="form-inline row g-2">
                   <!-- <form> -->
                     <div class="col-auto">
-                      <input type="text" id="search" name="search" class="form-control form-control-sm" placeholder="Cari DO / SO">
+                      <input type="text" id="search" name="search" class="form-control form-control-sm" placeholder="Cari DO / SO / Customer">
                     </div>
                     <div class="col-auto">
                       <input type="date" id="filterDateStart" name="filterDateStart" class="form-control form-control-sm">
@@ -265,7 +268,7 @@
             <!---end card-header -->
             <!-- Table Content -->
             <div class="card-body table-responsive">
-              <table id="soDoTable" class="table table-striped table-bordered" style="width:100%">
+              <table id="soDoTable" class="table table-bordered table-striped table-hover table-sm align-middle text-nowrap" style="width:100%">
                 <thead>
                   <tr>
                     <th>No</th>
@@ -279,6 +282,7 @@
                     <th>Status</th>
                     <th>Ship By</th>
                     <th>ETA</th>
+                    <th>Nama Penerima</th>
                     <th>Barcode</th>
                     <th>Action</th>
                   </tr>
@@ -289,42 +293,91 @@
                   <tr id="row-<%= item.id_monitoring_data %>">
                     <td><%= index + 1 %></td>
                     <td><%= item.sales_order_number %></td>
-                    <td><%= item.sales_order_date.toLocaleDateString() %></td>
-                    <td><%= item.delivery_order_number %></td>
-                    <td><%= item.delivery_order_date.toLocaleDateString() %></td>
                     <td>
-                      <%= item.invoicing_date ? new Date(item.invoicing_date).toLocaleDateString('id-ID') : "Belum diinput oleh Tim Finance" %>
+                      <%= new Date(item.sales_order_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
+                    <td><%= item.delivery_order_number %></td>
+                    <td>
+                      <%= new Date(item.delivery_order_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
+                    <td>
+                      <% if (item.invoicing_date) { %>
+                        <%= new Date(item.invoicing_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
+                      <% } else { %>
+                        <span class="badge badge-danger">Belum diinput oleh Tim Finance</span>
+                      <% } %>
                     </td>
                     <td><%= item.customer_name %></td>
                     <td><%= item.location_warehouse %></td>
                     <td><%= item.status %></td>
-                    <td><%= item.ship_by %></td>
                     <td>
-                      <%= new Date(item.eta).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+                      <% if (item.ship_by) { %>
+                        <%= item.ship_by %>
+                      <% } else { %>
+                        <span class="badge badge-danger">Pengirim atau Ekspedisi belum diinput</span>
+                      <% } %>
                     </td>
+                    <td>
+                      <% if (item.eta) { %>
+                        <%= new Date(item.eta).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
+                      <% } else { %>
+                        <span class="badge badge-danger">Tanggal ETA belum diinput</span>
+                      <% } %>
+                    </td>
+                    <td><%= item.receive_name %></td>
                     <td><img src="data:image/png;base64,<%= item.barcode_do %>" alt="Barcode DO"
                         style="width: 180px; height: 60px; object-fit: contain; display: block;"> </td>
                     <td>
-                      <button onclick="exportRowToPDF(<%= item.id_monitoring_data %>)" class="btn btn-sm btn-info">
-                        <i class="fas fa-print"></i>
-                      </button>
-                      <% if (user && (user.role === 1 || user.role === 8)) { %>
-                      <!-- Role Admin & Finance bisa Edit -->
-                      <a href="/soDoEdit/<%= item.id_monitoring_data %>" class="btn btn-sm btn-warning" title="Edit">
-                        <i class="fas fa-edit"></i>
-                      </a>
-                      <% } else if (user && (user.role === 10 || user.role === 11 || user.role === 12)) { %>
-                      <!-- Role Admin Gudang Kopo & Saleh hanya bisa lihat detail -->
-                      <a href="/soDoView/<%= item.id_monitoring_data %>" class="btn btn-sm btn-secondary" title="Detail">
-                        <i class="fas fa-eye"></i>
-                      </a>
+                      <% if (user) { %>
+                        <% if (user.role === 1) { %>
+                          <!-- Admin -->
+                          <button onclick="exportRowFinanceToPDF(<%= item.id_monitoring_data %>)" class="btn btn-sm btn-info">
+                            <i class="fas fa-print"></i> Finance
+                          </button>
+                          <button onclick="exportRowToPDF(<%= item.id_monitoring_data %>)" class="btn btn-sm btn-info">
+                            <i class="fas fa-print"></i> Barcode
+                          </button>
+                          <a href="/soDoEdit/<%= item.id_monitoring_data %>" class="btn btn-sm btn-warning" title="Edit">
+                            <i class="fas fa-edit"></i>
+                          </a>
+                          <a href="/soDoView/<%= item.id_monitoring_data %>" class="btn btn-sm btn-secondary" title="view">
+                            <i class="fas fa-eye"></i>
+                          </a>
+
+                        <% } else if (user.role === 8) { %>
+                        <!-- Finance -->
+                        <% if (item.eta && item.ship_by && item.ship_by.trim() !== '') { %>
+                          <a href="/soDoEdit/<%= item.id_monitoring_data %>" class="btn btn-sm btn-warning" title="Edit">
+                            <i class="fas fa-edit"></i>
+                          </a>
+                        <% } else { %>
+                          <button class="btn btn-sm btn-secondary" title="Lengkapi ETA & Pengirim" disabled>
+                            <i class="fas fa-edit"></i>
+                          </button>
+                        <% } %>
+
+
+                        <% } else if ([10, 11, 12].includes(user.role)) { %>
+                          <!-- Admin Gudang & Supervisor-->
+                          <button onclick="exportRowToPDF(<%= item.id_monitoring_data %>)" class="btn btn-sm btn-info">
+                            <i class="fas fa-print"></i>
+                          </button>
+                          <a href="/soDoEdit/<%= item.id_monitoring_data %>" class="btn btn-sm btn-warning" title="Edit">
+                            <i class="fas fa-edit"></i>
+                          </a>
+
+                        <% } else if (user.role === 14) { %>
+                          <!-- Viewer -->
+                          <a href="/soDoView/<%= item.id_monitoring_data %>" class="btn btn-sm btn-secondary" title="View">
+                            <i class="fas fa-eye"></i>
+                          </a>
+                        <% } %>
                       <% } %>
-                    </td>
+                  </td>
+
                   </tr>
                   <% }) %>
                   <% } else { %>
                   <tr>
-                    <td colspan="11" class="text-center">Tidak ada data</td>
+                    <td colspan="14" class="text-center">Tidak ada data</td>
                   </tr>
                   <% } %>
                 </tbody>
@@ -383,10 +436,7 @@
   <script>
     document.getElementById('resetButton').addEventListener('click', function (e) {
       e.preventDefault();
-      document.getElementById('searchInput').value = '';
-      document.getElementById('startDate').value = '';
-      document.getElementById('endDate').value = '';
-      document.querySelector('form').submit();
+      window.location.href = `/soDo`;
     });
   </script>
   <script>
@@ -461,5 +511,74 @@
     doc.addImage(barcodeImg.src, 'PNG', xCenter, yCenter, imgWidth, imgHeight);
 
     doc.save(`barcode-monitoring-detail-${doNumber}.pdf`);
+  }
+</script>
+<script>
+  async function exportRowFinanceToPDF(id) {
+    const { jsPDF } = window.jspdf;
+
+    // Kertas ukuran 70mm x 35mm (label kecil)
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: [70, 35]
+    });
+
+    const row = document.querySelector(`#row-${id}`);
+    if (!row) {
+      alert("Data tidak ditemukan!");
+      return;
+    }
+
+    const cells = Array.from(row.querySelectorAll('td'));
+    const [
+      no, soNumber, soDate, doNumber, doDate,
+      invoicingDate, customer, location, status, shipBy, eta, receive_name
+    ] = cells.map(cell => cell.innerText.trim());
+
+    // ✅ Format tanggal dari dd/mm/yyyy → 13-Jun-2025
+    const formatDate = (str) => {
+      if (!str || str === '-') return "-";
+      const parts = str.split(/[\/\-]/); // support 11/6/2025 atau 11-6-2025
+      if (parts.length !== 3) return str;
+      const [day, month, year] = parts.map(p => parseInt(p));
+      const date = new Date(year, month - 1, day);
+      if (isNaN(date)) return str;
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit', month: 'short', year: 'numeric'
+      }).replace(/ /g, '-');
+    };
+
+    // ❑ Outline box
+    doc.setLineWidth(0.3);
+    doc.rect(2, 2, 66, 31); // (x, y, width, height)
+    
+    // Layout
+    let xLeft = 5;
+    let xRight = 65;
+    let y = 8;
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text(doNumber, xLeft, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(formatDate(eta), xRight, y, { align: "right" });
+
+    y += 5;
+    doc.text(customer, xLeft, y);
+
+    y += 5;
+    doc.text(shipBy || "-", xLeft, y);
+
+    y += 5;
+    doc.text(receive_name, xLeft, y);
+
+    y += 7;
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(8);
+    doc.text(`INFO dr GUDANG ${location} Tgl.`, xLeft, y);
+    doc.text(formatDate(invoicingDate), xRight, y, { align: "right" });
+
+    doc.save(`finance-label-${doNumber}.pdf`);
   }
 </script>

@@ -25,24 +25,24 @@ app.use((req, res, next) => {
   req.io = io;
   next();
 });
-setInterval(async () => {
-  const limit = 10;
+// setInterval(async () => {
+//   const limit = 10;
 
-  const [pickedResult, packedResult, shippedResult] = await Promise.all([
-    pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Picked' AND picked_date IS NOT NULL AND packed_date IS NULL AND picked_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY picked_date DESC LIMIT $1`, [limit]),
-    pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Packed' AND packed_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY packed_date DESC LIMIT $1`, [limit]),
-    pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Shipped' AND shipped_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY shipped_date DESC LIMIT $1`, [limit]),
-  ]);
+//   const [pickedResult, packedResult, shippedResult] = await Promise.all([
+//     pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Picked' AND picked_date IS NOT NULL AND packed_date IS NULL AND picked_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY picked_date DESC LIMIT $1`, [limit]),
+//     pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Packed' AND packed_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY packed_date DESC LIMIT $1`, [limit]),
+//     pool.query(`SELECT * FROM monitoring_data JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse WHERE status = 'Shipped' AND shipped_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() ORDER BY shipped_date DESC LIMIT $1`, [limit]),
+//   ]);
 
-  io.emit('dataUpdate', {
-    pickedData: pickedResult.rows,
-    packedData: packedResult.rows,
-    shippedData: shippedResult.rows
-  });
-  // untuk refresh data per statusnya 
-  console.log('Sent updated data to client');
-  console.log('Timer triggered for refresh data')
-}, 77 * 1000);
+//   io.emit('dataUpdate', {
+//     pickedData: pickedResult.rows,
+//     packedData: packedResult.rows,
+//     shippedData: shippedResult.rows
+//   });
+//   // untuk refresh data per statusnya 
+//   console.log('Sent updated data to client');
+//   console.log('Timer triggered for refresh data')
+// }, 317 * 1000);
 
 // === Middleware ===
 app.use(express.urlencoded({ extended: true }));
@@ -75,11 +75,13 @@ const indexRouter = require('./routes/index');
 const authRoutes = require('./routes/auth');
 const soDoRoutes = require('./routes/soDo');
 const scanBarcodeRoutes = require('./routes/scanBarcode');
+const inventoryRoutes = require('./routes/inventory');
 
 app.use('/', authRoutes);
 app.use('/', indexRouter);
 app.use('/soDo', soDoRoutes);
 app.use('/scanBarcode', scanBarcodeRoutes);
+app.use('/inventory', inventoryRoutes);
 
 // Export jika diperlukan oleh file lain
 module.exports = { app, server, io };

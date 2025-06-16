@@ -113,8 +113,11 @@
 
 <body>
   <div class="login-container">
-    <h1><span class="abadi">Abadi</span><span class="nusa">Nusa</span></h1>
-    <p class="subtitle">Data Monitoring Application</p>
+    <a href="#" class="brand-link">
+      <img src="/adminlte/dist/img/logoabn.png" alt="logo"
+        style="width: 100%; max-width: 200px; height: auto; display: block; margin: 0 auto;">
+    </a>
+    <p class="subtitle" style="padding-top: 10px;">Data Monitoring Application</p>
     <% if (errorMessage && errorMessage.length > 0) { %>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
       <%= errorMessage[0] %>

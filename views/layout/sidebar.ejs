@@ -3,7 +3,6 @@
   <a href="/" class="brand-link">
     <img src="/adminlte/dist/img/logoabn.png" alt="logo"
       style="width: 100%; max-width: 150px; height: auto; display: block; margin: 0 auto;">
-
   </a>
 
   <!-- Sidebar -->
@@ -31,14 +30,16 @@
         </li>
         <% } %>
 
+        <% if (![13].includes(user.role)) { %>
         <li class="nav-item">
           <a href="/dashboard" class="nav-link">
             <i class="nav-icon fas fa-tv"></i>
             <p>Display Monitoring</p>
           </a>
         </li>
-
-        <% if ([1, 8, 10, 11, 12].includes(user.role)) { %>
+        <% } %>
+        
+        <% if ([1, 8, 10, 11, 12, 14].includes(user.role)) { %>
         <!-- SO / DO: Admin, Finance, Admin Gudang -->
         <li class="nav-item">
           <a href="/soDo" class="nav-link">
@@ -56,6 +57,40 @@
             <p>Scan Barcode</p>
           </a>
         </li>
+        <% } %>
+
+        <% if ([1, 13].includes(user.role)) { %>
+        <!-- Inventory Asset: Admin  -->
+        <li class="nav-item has-treeview">
+          <a href="#" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+            <p>
+              Inventory
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="/karyawan" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Karyawan</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/asset" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Asset</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/pinjamAsset" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Peminjaman Asset</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+
         <% } %>
 
       </ul>

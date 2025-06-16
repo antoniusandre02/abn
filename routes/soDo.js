@@ -18,6 +18,11 @@ const upload = multer({
 // POST: Insert Monitoring Data + Generate Barcode
 router.post('/create', async (req, res) => {
   try {
+    const userSession = req.session.user;
+    const user_id = userSession?.user_id;
+    const name = userSession?.name;
+    const role_name = userSession?.role_name;
+
     let {
       warehouse_location,
       division_team,
@@ -35,10 +40,18 @@ router.post('/create', async (req, res) => {
       receive_name
     } = req.body;
 
-    const user_id = req.session.user?.user_id;
     const status = 'Draft';
     const is_done = false;
-
+    // Jika kosong, set null
+    if (!eta || eta.trim() === '') {
+      eta = null;
+    }
+    if (!weight || weight.trim() === '') {
+      weight = null;
+    }
+    if (!price || price.trim() === '') {
+      price = null;
+    }
     // Pastikan hanya angka, lalu tambahkan prefix SO- dan DO-
     sales_order_number = `SO-${sales_order_number.trim().replace(/\D/g, '')}`;
     delivery_order_number = `DO-${delivery_order_number.trim().replace(/\D/g, '')}`;
@@ -120,6 +133,13 @@ router.post('/create', async (req, res) => {
         barcode_base64
       ]);
 
+      await pool.query(
+      `INSERT INTO log_monitoring_data
+        (user_id, name, role_name, delivery_order_number_inputed, inputed_at, keterangan)
+        VALUES ($1, $2, $3, $4, NOW(), 'Created SO / DO')`,
+      [user_id, name, role_name, delivery_order_number]
+    );
+
       console.log('DATA BODY:', req.body);
       req.flash('successMessage', 'SO / DO sudah berhasil terinput');
       res.redirect('/soDo');
@@ -140,7 +160,12 @@ router.post('/create', async (req, res) => {
 // POST: Update Monitoring Data
 router.post('/update/:id_monitoring_data', async (req, res) => {
   const id = req.params.id_monitoring_data;
-  const {
+  const userSession = req.session.user;
+  const user_id = userSession?.user_id;
+  const name = userSession?.name;
+  const role_name = userSession?.role_name;
+
+  let {
     warehouse_location,
     division_team,
     sales_order_number,
@@ -157,6 +182,17 @@ router.post('/update/:id_monitoring_data', async (req, res) => {
     receive_name,
     invoicing_date // Tambahkan invoicing_date jika diperlukan
   } = req.body;
+
+  // Jika kosong, set null
+    if (!eta || eta.trim() === '') {
+      eta = null;
+    }
+    if (!weight || weight.trim() === '') {
+      weight = null;
+    }
+    if (!price || price.trim() === '') {
+      price = null;
+    }
 
   try {
     const updateQuery = `
@@ -200,12 +236,20 @@ router.post('/update/:id_monitoring_data', async (req, res) => {
       id
     ]);
 
+    await pool.query(
+      `INSERT INTO log_monitoring_data
+        (user_id, name, role_name, delivery_order_number_inputed, inputed_at, keterangan)
+        VALUES ($1, $2, $3, $4, NOW(), 'Updated SO/DO')`,
+      [user_id, name, role_name, delivery_order_number]
+    );
+
     req.flash('successMessage', 'SO / DO sudah berhasil diperbarui');
     res.redirect('/soDo');
   } catch (err) {
     console.error('Error updating SO/DO:', err);
     console.error('Gagal memperbarui data:', err);
     req.flash('errorMessage', 'Gagal memperbarui data:', err);
+    res.redirect('/soDo');
     res.status(500).send('Gagal memperbarui data');
   }
 });

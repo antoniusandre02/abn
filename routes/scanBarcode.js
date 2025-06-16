@@ -96,7 +96,7 @@ router.post('/scanBarcode', checkRole([1, 2, 3, 4, 5, 6, 7, 12]), async (req, re
     await pool.query(
       `INSERT INTO log_monitoring_scan 
         (user_id, name, role_name, delivery_order_number_scanned, status_scanned, scanned_at)
-       VALUES ($1, $2, $3, $4, $5, NOW())`,
+        VALUES ($1, $2, $3, $4, $5, NOW())`,
       [user_id, name, role_name, barcode_do, nextStatus]
     );
     res.render('scanBarcode', { message: updateMessage });

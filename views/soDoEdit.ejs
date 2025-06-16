@@ -3,10 +3,10 @@
 
 <div class="content-wrapper p-3">
   <h3>Edit SO / DO</h3>
-  <form action="/soDo/update/<%= item.id_monitoring_data %>" method="POST">
+  <form id="editForm" data-role="<%= user.role %>" action="/soDo/update/<%= item.id_monitoring_data %>" method="POST">
     <div class="form-group">
       <label>Warehouse Location</label>
-      <% if (role == 8) { %>
+      <% if (role == 8 || role == 10 || role == 11) { %>
       <input type="text" class="form-control"
         value="<%= optionWarehouseLocation.find(w => w.id_warehouse === item.warehouse_location)?.location_warehouse %>"
         readonly>
@@ -26,19 +26,19 @@
     <div class="form-group">
       <label>Sales Order Number</label>
       <input type="text" class="form-control" name="sales_order_number" value="<%= item.sales_order_number %>"
-        <% if (user.role === 8) { %> readonly <% } %>>
+        <% if (role == 8 || role == 10 || role == 11) { %> readonly <% } %>>
     </div>
 
     <div class="form-group">
       <label>Sales Order Date</label>
       <input type="date" class="form-control" name="sales_order_date"
-        value="<%= item.sales_order_date.toISOString().split('T')[0] %>" <% if (user.role === 8) { %> readonly <% } %>>
+        value="<%= item.sales_order_date.toISOString().split('T')[0] %>" <% if (role == 8 || role == 10 || role == 11) { %> readonly <% } %>>
     </div>
 
     <div class="form-group">
       <label>Delivery Order Number</label>
       <input type="text" class="form-control" name="delivery_order_number" value="<%= item.delivery_order_number %>"
-        <% if (user.role === 8) { %> readonly <% } %>>
+        <% if (role == 8 || role == 10 || role == 11) { %> readonly <% } %>>
     </div>
 
     <div class="form-group">
@@ -55,19 +55,19 @@
     <div class="form-group">
       <label>Delivery Order Date</label>
       <input type="date" class="form-control" name="delivery_order_date"
-        value="<%= item.delivery_order_date.toISOString().split('T')[0] %>" <% if (user.role === 8) { %> readonly
+        value="<%= item.delivery_order_date.toISOString().split('T')[0] %>" <% if (role == 8 || role == 10 || role == 11) { %> readonly
         <% } %>>
     </div>
 
     <div class="form-group">
       <label>Customer Name</label>
       <input type="text" class="form-control" name="customer_name" value="<%= item.customer_name %>"
-        <% if (user.role === 8) { %> readonly <% } %>>
+        <% if (role == 8 || role == 10 || role == 11) { %> readonly <% } %>>
     </div>
 
     <div class="form-group">
       <label>Division</label>
-      <% if (role == 8) { %>
+      <% if (role == 8 || role == 10 || role == 11) { %>
       <input type="text" class="form-control"
         value="<%= optionDivision.find(w => w.id_division === item.division_team)?.name_division%>" readonly>
       <input type="hidden" name="division_team" value="<%= item.division_team %>">
@@ -84,45 +84,44 @@
 
     <div class="form-group">
       <label>Ship By</label>
-      <input type="text" class="form-control" name="ship_by" value="<%= item.ship_by %>" <% if (user.role === 8) { %>
+      <input type="text" class="form-control" name="ship_by" placeholder="Jika Tidak ada diisi - " value="<%= item.ship_by %>" <% if (role == 8 ) { %>
         readonly <% } %>>
     </div>
 
     <div class="form-group">
-      <label>Ekspedisi Note</label>
-      <input type="text" class="form-control" name="ekspedisi_note" value="<%= item.ekspedisi_note %>"
-        <% if (user.role === 8) { %> readonly <% } %>>
-    </div>
-
-    <div class="form-group">
       <label>Resi Number</label>
-      <input type="text" class="form-control" name="resi_number" value="<%= item.resi_number %>"
-        <% if (user.role === 8) { %> readonly <% } %>>
+      <input type="text" class="form-control" name="resi_number" placeholder="Jika Tidak ada diisi - " value="<%= item.resi_number %>"
+        <% if (role == 8 ) { %> readonly <% } %>>
     </div>
 
     <div class="form-group">
       <label>Weight (Kg)</label>
-      <input type="text" class="form-control" name="weight" value="<%= item.weight %>" <% if (user.role === 8) { %>
+      <input type="text" class="form-control" name="weight" placeholder="Jika Tidak ada diisi 0 " value="<%= item.weight %>" <% if (role == 8 ) { %>
         readonly <% } %>>
     </div>
 
     <div class="form-group">
       <label>Shipping Price (Rp)</label>
-      <input type="text" class="form-control" name="price" value="<%= item.price %>" <% if (user.role === 8) { %>
+      <input type="text" class="form-control" name="price" placeholder="Jika Tidak ada diisi 0 " value="<%= item.price %>" <% if (role == 8 ) { %>
         readonly <% } %>>
     </div>
 
     <div class="form-group">
       <label>Shipped Date</label>
-      <input type="date" class="form-control" name="eta"
-        value="<%= item.eta ? item.eta.toISOString().split('T')[0] : '' %>" <% if (user.role === 8) { %> readonly
+      <input type="date" class="form-control" name="eta" value="<%= item.eta ? item.eta.toISOString().split('T')[0] : '' %>" <% if (role == 8 ) { %> readonly
         <% } %>>
     </div>
 
     <div class="form-group">
       <label>Nama Penerima</label>
-      <input type="text" class="form-control" name="receive_name" value="<%= item.receive_name %>"
-        <% if (user.role === 8) { %> readonly <% } %>>
+      <input type="text" class="form-control" name="receive_name" placeholder="Nama Penerima " value="<%= item.receive_name %>"
+        <% if (role == 8 ) { %> readonly <% } %>>
+    </div>
+
+    <div class="form-group">
+      <label>Notes</label>
+      <input type="text" class="form-control" name="ekspedisi_note" placeholder="Catatan atau Keterangan" value="<%= item.ekspedisi_note %>"
+        <% if (role == 8 ) { %> readonly <% } %>>
     </div>
 
     <% if (user && (user.role === 1 || user.role === 8)) { %>
@@ -136,9 +135,119 @@
 
     <div class="form-group text-right">
       <a href="/soDo" class="btn btn-secondary">Batal</a>
-      <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+      <button type="submit" id="submitBtn" class="btn btn-primary">Simpan Perubahan</button>
     </div>
   </form>
 </div>
 
 <%- include('layout/footer') %>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode"></script>
+  
+<script>
+  document.getElementById('editForm').addEventListener('submit', async function (e) {
+    const role = parseInt(this.dataset.role);
+
+    if (role === 8) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const data = new URLSearchParams();
+      for (const pair of formData) {
+        data.append(pair[0], pair[1]);
+      }
+
+      try {
+        const response = await fetch(this.action, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: data
+        });
+
+        if (response.ok) {
+          await exportRowFinanceToPDF(); // ambil data langsung dari form
+          window.location.href = "/soDo";
+        } else {
+          alert("Gagal menyimpan perubahan.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Terjadi kesalahan.");
+      }
+    }
+  });
+</script>
+
+
+<script>
+  async function exportRowFinanceToPDF() {
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: [70, 35]
+    });
+
+    const formatDate = (str) => {
+      if (!str || str === '-') return "-";
+      const parts = str.split(/[\/\-]/);
+      if (parts.length !== 3) return str;
+      const [year, month, day] = str.split('-'); // input type="date" => yyyy-mm-dd
+      const date = new Date(`${year}-${month}-${day}`);
+      if (isNaN(date)) return str;
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit', month: 'short', year: 'numeric'
+      }).replace(/ /g, '-');
+    };
+
+    // Ambil data dari form input
+    const getValue = (name) => document.querySelector(`[name="${name}"]`)?.value || '-';
+
+    const doNumber = getValue('delivery_order_number');
+    const doDate = getValue('delivery_order_date');
+    const customer = getValue('customer_name');
+    const shipBy = getValue('ship_by');
+    const receiveName = getValue('receive_name');
+    const eta = getValue('eta');
+    const invoicingDate = getValue('invoicing_date');
+    const location = getValue('warehouse_location');
+
+    const todayFormatted = formatDate(new Date().toISOString().split('T')[0]);
+
+    // Outline
+    doc.setLineWidth(0.3);
+    doc.rect(2, 2, 66, 31);
+
+    // Layout
+    let xLeft = 5;
+    let xRight = 65;
+    let y = 8;
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text(doNumber, xLeft, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(formatDate(eta), xRight, y, { align: "right" });
+
+    y += 5;
+    doc.text(customer, xLeft, y);
+
+    y += 5;
+    doc.text(shipBy || "-", xLeft, y);
+
+    y += 5;
+    doc.text(receiveName, xLeft, y);
+
+    y += 7;
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(8);
+    doc.text(`INFO dr GUDANG ${location} Tgl.`, xLeft, y);
+    doc.text(formatDate(invoicingDate), xRight, y, { align: "right" });
+
+    doc.save(`finance-label-${doNumber}.pdf`);
+  }
+</script>

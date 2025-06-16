@@ -93,7 +93,24 @@ router.post('/login', async (req, res) => {
             is_deleted: user.is_deleted
         };
 
+        try {
+        await pool.query(
+            `INSERT INTO log_user_login (name, role_name, login_at, user_id)
+            VALUES ($1, $2, NOW(), $3)`,
+            [user.name, user.role_name, user.user_id]
+        );
+        console.log(`✅ Login log created for ${user.name}`);
+        } catch (logErr) {
+        console.error('❌ Gagal menyimpan log login:', logErr);
+        }
+
+        // Arahkan ke /karyawan jika role-nya adalah 13 (IT)
+        if (req.session.user.role === 13) {
+            return res.redirect('/karyawan');
+        }
+        
         res.redirect('/dashboard');
+        
     } catch (error) {
         console.error(error);
         req.flash('errorMessage', 'Terjadi kesalahan saat login');
