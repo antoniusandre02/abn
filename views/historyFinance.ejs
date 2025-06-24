@@ -1,0 +1,211 @@
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<style>
+    .pagination a {
+        margin: 0 5px;
+        text-decoration: none;
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .pagination a.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    html,
+    body {
+        height: 100%;
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    .content-wrapper {
+        flex: 1;
+        padding: 20px;
+        background-color: #f4f6f9;
+    }
+
+    .main-footer {
+        background: #fff;
+        border-top: 1px solid #dee2e6;
+        color: #6c757d;
+        padding: 10px 20px;
+        margin-left: 250px;
+        /* Sesuaikan dengan lebar sidebar */
+    }
+</style>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <%- include('layout/header') %>
+        <%- include('layout/sidebar') %>
+        <div class="content-wrapper">
+            <% if (successMessage && successMessage.length > 0) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= successMessage %>
+                <button type="button" class="btn btn-sm btn-default ms-2" data-bs-dismiss="alert" aria-label="Close">
+                    &times;
+                </button>
+            </div>
+            <% } %>
+
+            <% if (errorMessage && errorMessage.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= errorMessage %>
+                <button type="button" class="btn btn-sm btn-default ms-2" data-bs-dismiss="alert" aria-label="Close">
+                    &times;
+                </button>
+            </div>
+            <% } %>
+            <section class="content p-3">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <!-- <h3 class="card-title">Monitoring Order</h3> -->
+                        <div class="form-inline row g-2">
+                            <!-- <form> -->
+                            <div class="col-auto">
+                                <input type="text" id="search" name="search" class="form-control form-control-sm"
+                                    placeholder="Cari DO / SO / Customer / Divisi" style="width: 30ch;">
+                            </div>
+                            <div class="col-auto">
+                                <input type="date" id="filterDateStart" name="filterDateStart"
+                                    class="form-control form-control-sm">
+                            </div>
+                            <div class="col-auto">
+                                <input type="date" id="filterDateEnd" name="filterDateEnd"
+                                    class="form-control form-control-sm">
+                            </div>
+                            <div class="col-auto">
+                                <button id="filterButton" class="btn btn-sm btn-primary">Filter</button>
+                                <button id="resetButton" class="btn btn-sm btn-secondary">Reset</button>
+                            </div>
+                            <!-- </form> -->
+                        </div>
+                    </div>
+                    <!---end card-header -->
+                    <!-- Table Content -->
+                    <div class="card-body table-responsive">
+                        <table id="soDoTable"
+                            class="table table-bordered table-striped table-hover table-sm align-middle text-nowrap"
+                            style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Sales Order Number</th>
+                                    <th>Delivery Order Number</th>
+                                    <th>Delivery Order Date</th>
+                                    <th>Location</th>
+                                    <th>Customer</th>
+                                    <th>Divisi</th>
+                                    <th>Info ke Invoicing Diterima</th>
+                                    <th>Ship By</th>
+                                    <th>Resi Number</th>
+                                    <th>ETA</th>
+                                    <th>Nama Penerima</th>
+                                    <th>Harga Ongkir</th>
+                                    <th>Berat</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="searchResults">
+                                <% if (data && data.length > 0) { %>
+                                <% data.forEach((item, index) => { %>
+                                <tr id="row-<%= item.id_monitoring_data %>">
+                                    <td><%= index + 1 %></td>
+                                    <td><%= item.sales_order_number %></td>
+                                    <td><%= item.delivery_order_number %></td>
+                                    <td>
+                                        <%= new Date(item.delivery_order_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
+                                    </td>
+                                    <td><%= item.location_warehouse %></td>
+                                    <td><%= item.customer_name %></td>
+                                    <td><%= item.name_division %></td>
+                                    <td>
+                                        <% if (item.invoicing_date) { %>
+                                        <%= new Date(item.invoicing_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
+                                        <% } else { %>
+                                        <span class="badge badge-danger">Belum diinput oleh Tim Finance</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (item.ship_by) { %>
+                                        <%= item.ship_by %>
+                                        <% } else { %>
+                                        <span class="badge badge-danger">Pengirim atau Ekspedisi belum diinput</span>
+                                        <% } %>
+                                    </td>
+                                    <td><%= item.resi_number%></td>
+                                    <td>
+                                        <% if (item.eta) { %>
+                                        <%= new Date(item.eta).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
+                                        <% } else { %>
+                                        <span class="badge badge-danger">Tanggal ETA belum diinput</span>
+                                        <% } %>
+                                    </td>
+                                    <td><%= item.receive_name %></td>
+                                    <td><%= item.price %></td>
+                                    <td><%= item.weight %></td>
+                                    <td><%= item.status %></td>    
+                                </tr>
+                                <% }) %>
+                                <% } else { %>
+                                <tr>
+                                    <td colspan="15" class="text-center">Tidak ada data</td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!---end Table Content-->
+                    <div class="d-flex justify-content-end mt-3">
+                        <% const pageLimit = 5; 
+                const startPage = Math.max(1, currentPage - Math.floor(pageLimit / 2));
+                const endPage = Math.min(totalPages, startPage + pageLimit - 1);
+                %>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination pagination-sm mb-0">
+                                <% if (currentPage > 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1&search=<%= searchKeyword %>">&laquo; First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link"
+                                        href="?page=<%= currentPage - 1 %>&search=<%= searchKeyword %>">Prev</a>
+                                </li>
+                                <% } %>
+                                <% for (let i = startPage; i <= endPage; i++) { %>
+                                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                    <a class="page-link" href="?page=<%= i %>&search=<%= searchKeyword %>"><%= i %></a>
+                                </li>
+                                <% } %>
+                                <% if (currentPage < totalPages) { %>
+                                <li class="page-item">
+                                    <a class="page-link"
+                                        href="?page=<%= currentPage + 1 %>&search=<%= searchKeyword %>">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<%= totalPages %>&search=<%= searchKeyword %>">Last
+                                        &raquo;</a>
+                                </li>
+                                <% } %>
+                            </ul>
+                        </nav>
+                    </div>
+                    <br>
+                    <!---END pagination-->
+                </div>
+                <!-- end Card Table -->
+            </section>
+        </div>
+    </div>
+    <%- include('layout/footer') %>
+</body>
