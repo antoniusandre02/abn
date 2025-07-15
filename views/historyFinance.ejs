@@ -246,9 +246,7 @@
         const startDate = document.getElementById('filterDateStart');
         const endDate = document.getElementById('filterDateEnd');
 
-        filterButton.addEventListener('click', function (e) {
-            e.preventDefault(); // Hindari submit form default
-
+        function handleFilter() {
             const query = new URLSearchParams();
 
             if (searchInput.value.trim() !== '') {
@@ -262,6 +260,34 @@
             }
 
             window.location.href = `/historyFinance?${query.toString()}`;
+        }
+
+        filterButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            handleFilter();
+        });
+
+        // Enter saat di input search
+        searchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleFilter();
+            }
+        });
+
+        // Optional: Enter juga dari date input
+        startDate.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleFilter();
+            }
+        });
+
+        endDate.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleFilter();
+            }
         });
     });
 </script>
