@@ -108,15 +108,21 @@ exports.getPinjamAssetEdit = async (req, res) => {
     } = req.params;
     try {
         const result = await pool.query(`
-            SELECT pa.*, dpa.*, k.*, d.name_division, dep.department_name, a.*, ja.jenis_asset
-            FROM pinjam_asset pa
-            JOIN detail_pinjam_asset dpa ON pa.id_pinjam_asset = dpa.id_pinjam_asset
-            JOIN asset a ON dpa.id_asset = a.id_asset
-            JOIN jenis_asset ja ON a.jenis_asset = ja.id_jenis_asset
-            JOIN karyawan k ON dpa.id_karyawan = k.id_karyawan
-            JOIN division d ON k.divisi_karyawan = d.id_division
-            JOIN department dep ON k.departemen_karyawan = dep.id_department
-            WHERE pa.id_pinjam_asset = $1`, [id]
+            SELECT *
+            FROM (
+                SELECT pa.id_pinjam_asset, a.id_asset, a.kode_asset, a.nama_asset, a.sn_asset, a.brand_asset, a.tahun_pembelian, ja.jenis_asset, dpa.tanggal_peminjaman, dpa.tanggal_pengembalian, pa.notes,
+                    k.nama_karyawan, k.email_karyawan, d.name_division, dep.department_name,
+                    ROW_NUMBER() OVER (PARTITION BY dpa.id_asset ORDER BY dpa.id_detail_pinjam_asset) AS rn
+                FROM pinjam_asset pa
+                JOIN detail_pinjam_asset dpa ON pa.id_pinjam_asset = dpa.id_pinjam_asset
+                JOIN asset a ON dpa.id_asset = a.id_asset
+                JOIN jenis_asset ja ON a.jenis_asset = ja.id_jenis_asset
+                JOIN karyawan k ON dpa.id_karyawan = k.id_karyawan
+                JOIN division d ON k.divisi_karyawan = d.id_division
+                JOIN department dep ON k.departemen_karyawan = dep.id_department
+                WHERE pa.id_pinjam_asset = $1
+            ) sub
+            WHERE rn = 1`, [id]
         );
 
         if (!result.rows.length) return res.status(404).send('Data tidak ditemukan');

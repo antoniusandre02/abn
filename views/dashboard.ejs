@@ -1,610 +1,636 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: none;
+    background-color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .card-header {
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #222;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .table {
+    font-size: 0.95rem;
+    color: #222;
+  }
+
+  .table th {
+    background-color: #f0f0f0;
+    font-weight: 600;
+    border-bottom: 1px solid #dcdcdc;
+  }
+
+  .table td {
+    vertical-align: middle;
+    padding: 0.5rem;
+  }
+
+  .table thead th {
+  background-color: #ffffff !important; 
+  color: #000 !important;               
+  border-bottom: 1px solid #dee2e6;
+  }
+
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #000;              
+  }
+
+  .table-striped tbody tr:nth-of-type(even) {
+    background-color: #ffffff;       
+  }
+
+  .align-middle {
+    vertical-align: middle !important;
+  }
+
+  .text-neutral {
+    color: #333;
+    font-weight: 600;
+  }
+
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .content-wrapper {
+    flex: 1;
+    padding: 20px;
+    background-color: #f4f6f9;
+  }
+
+  .content-header h3 {
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 0.5rem;
+  }
+
+  #tanggal {
+    font-size: 1rem;
+    color: #555;
+    font-weight: 500;
+  }
+
+  .app-content-footer {
+    font-size: 0.9rem;
+    color: #777;
+  }
+
+  .pagination {
+    text-align: center;
+    margin: 10px;
+    font-size: 20px;
+  }
+
+  .pagination a,
+  .pagination span {
+    display: inline-block;
+    margin: 0 4px;
+    color: #3490dc;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  .pagination .disabled {
+    color: #999;
+    cursor: default;
+  }
+
+  #loading-indicator {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-weight: 600;
+    z-index: 1000;
+  }
+
+  @media (max-width: 768px) {
     .card {
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        border: none;
-        background-color: #fff;
-        margin-bottom: 20px;
+      margin-bottom: 30px;
+      /* Tambahkan jarak lebih pada layar kecil */
     }
+  }
 
-    .card-header {
-        background-color: #f5f5f5;
-        border-bottom: 1px solid #e0e0e0;
-        padding: 1rem;
-        text-align: center;
-        font-weight: 600;
-        font-size: 1.1rem;
-        color: #222;
-        border-radius: 10px 10px 0 0;
-    }
-
-    .card-body {
-        padding: 1rem;
-    }
-
-    .table {
-        font-size: 0.95rem;
-        color: #222;
-    }
-
-    .table th {
-        background-color: #f0f0f0;
-        font-weight: 600;
-        border-bottom: 1px solid #dcdcdc;
-    }
-
-    .table td {
-        vertical-align: middle;
-        padding: 0.5rem;
-    }
-
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: #f9f9f9;
-    }
-
-    .table tbody tr:hover {
-        background-color: #eef6ff;
-        cursor: pointer;
-    }
-
-    .align-middle {
-        vertical-align: middle !important;
-    }
-
-    .text-neutral {
-        color: #333;
-        font-weight: 600;
-    }
-
-    .wrapper {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-
-    .content-wrapper {
-        flex: 1;
-        padding: 20px;
-        background-color: #f4f6f9;
-    }
-
-    .content-header h3 {
-        font-weight: 700;
-        color: #111;
-        margin-bottom: 0.5rem;
-    }
-
-    #tanggal {
-        font-size: 1rem;
-        color: #555;
-        font-weight: 500;
-    }
-
-    .app-content-footer {
-        padding-top: 1rem;
-        font-size: 0.9rem;
-        color: #777;
-    }
-
-    .pagination {
-        text-align: center;
-        margin: 20px 0;
-        font-size: 23px;
-    }
-
-    .pagination a,
-    .pagination span {
-        display: inline-block;
-
-        margin: 0 4px;
-        color: #3490dc;
-        text-decoration: none;
-        font-weight: 600;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-
-    .pagination a:hover {
-        background-color: #e2e8f0;
-    }
-
-    .pagination .disabled {
-        color: #999;
-        cursor: default;
-    }
-
-    #loading-indicator {
-        display: none;
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: #fff;
-        padding: 10px 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        font-weight: 600;
-        z-index: 1000;
-    }
-
-    @media (max-width: 768px) {
-        .card {
-            margin-bottom: 30px;
-            /* Tambahkan jarak lebih pada layar kecil */
-        }
-    }
-
-    .clamp-2-lines {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-height: 2.8em;
-        /* kira-kira 2 baris */
-        line-height: 1.4em;
-    }
+  .clamp-2-lines {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.8em;
+  }
 </style>
 
 <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
-        <%- include('layout/header') %>
-        <%- include('layout/sidebar') %>
-        <div class="content-wrapper">
-            <div class="content-header pt-0">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-sm-12 text-center">
-                            <h3 class="mb-0 text-blue-color">Order Status</h3>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12 text-center">
-                            <div class="text-center text-blue-color">
-                                <div id="tanggal"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <div class="wrapper">
+    <%- include('layout/header') %> <%- include('layout/sidebar') %>
+    <div class="content-wrapper">
+      <div class="content-header pt-0">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-12 text-center">
+              <h3 class="mb-0 text-blue-color">Order Status</h3>
             </div>
-
-            <section class="content p-0">
-                <div class="app-content">
-                    <div class="container-fluid p-0">
-                        <div class="row">
-                            <!-- Picked -->
-                            <div class="col-md-4">
-                                <div class="card mb-4">
-                                    <div class="card-header text-center">
-                                        <div class="fw-bold" style="font-size: 18px">PICKED</div>
-                                    </div>
-                                    <div class="card-body table-responsive p-2">
-                                        <table id="tbl_picked" class="table table-sm table-striped">
-                                            <thead style="font-size: 16px; text-align: center">
-                                                <tr>
-                                                    <th style="width: 115px; vertical-align: middle">
-                                                        SO/DO Number
-                                                    </th>
-                                                    <th style="vertical-align: middle">Customer Name</th>
-                                                    <th style="width: 100px; vertical-align: middle">
-                                                        Location
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <% if (pickedData.length === 0) { %>
-                                                <tr style="height: 55px;">
-                                                    <td colspan="3" class="text-center text-muted"
-                                                        style=" vertical-align: middle;">
-                                                        No data available
-                                                    </td>
-                                                </tr>
-                                                <% for (let i = 1; i < 10; i++) { %>
-                                                <tr style="height: 55px;">
-                                                    <td style="width: 115px; ">&nbsp;</td>
-                                                    <td>&nbsp;</td>
-                                                    <td style="width: 100px; ">&nbsp;</td>
-                                                </tr>
-                                                <% } %>
-                                                <% } else { %> <% pickedData.forEach(item => { %>
-                                                <tr class="align-middle" style="height: 55px">
-                                                    <td style="
-                                    text-align: center;
-                                    width: 115px;
-                                    vertical-align: middle;
-                                    ">
-                                                        <%= item.sales_order_number %> / <%=
-                                    item.delivery_order_number %>
-                                                    </td>
-                                                    <td style="vertical-align: middle; font-size: 17px;">
-                                                        <div class="clamp-2-lines">
-                                                            <%= item.customer_name %>
-                                                        </div>
-                                                    </td>
-                                                    <td style="
-                                    text-align: center;
-                                    width: 100px;
-                                    vertical-align: middle;
-                                    ">
-                                                        <%= item.location_warehouse %>
-                                                    </td>
-                                                </tr>
-                                                <% }) %> <% } %>
-                                            </tbody>
-                                        </table>
-                                        <div class="d-flex justify-content-center mt-2">
-                                            <div class="pagination">
-                                                <span id="currentPagePicked" class="badge bg-info">Page 1</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Packed -->
-                            <div class="col-md-4">
-                                <div class="card mb-4">
-                                    <div class="card-header text-center">
-                                        <div class="fw-bold" style="font-size: 18px">PACKED</div>
-                                    </div>
-                                    <div class="card-body table-responsive p-2">
-                                        <table id="tbl_packed" class="table table-sm table-striped">
-                                            <thead style="font-size: 16px; text-align: center">
-                                                <tr>
-                                                    <th style="width: 115px; vertical-align: middle">
-                                                        SO/DO Number
-                                                    </th>
-                                                    <th style="vertical-align: middle">Customer Name</th>
-                                                    <th style="width: 100px; vertical-align: middle">
-                                                        Location
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <% if (packedData.length === 0) { %>
-                                                <tr style="height: 55px;">
-                                                    <td colspan="3" class="text-center text-muted"
-                                                        style=" vertical-align: middle;">
-                                                        No data available
-                                                    </td>
-                                                </tr>
-                                                <% for (let i = 1; i < 10; i++) { %>
-                                                <tr style="height: 55px;">
-                                                    <td style="width: 115px; ">&nbsp;</td>
-                                                    <td>&nbsp;</td>
-                                                    <td style="width: 100px; ">&nbsp;</td>
-                                                </tr>
-                                                <% } %>
-                                                <% } else { %>
-                                                <% packedData.forEach(item => { %>
-                                                <tr class="align-middle" style="height: 55px;">
-                                                    <td style="text-align: center; width: 115px; ">
-                                                        <%= item.sales_order_number %> /
-                                                        <%= item.delivery_order_number %>
-                                                    </td>
-                                                    <td style="vertical-align: middle; font-size: 17px; ">
-                                                        <div class="clamp-2-lines"><%= item.customer_name %></div>
-                                                    </td>
-                                                    <td
-                                                        style="text-align: center; width: 100px; vertical-align: middle;">
-                                                        <%= item.location_warehouse %>
-                                                    </td>
-                                                </tr>
-                                                <% }); %>
-                                                <% for (let i = packedData.length; i < 10; i++) { %>
-                                                <tr style="height: 55px;">
-                                                    <td style="width: 115px; ">&nbsp;</td>
-                                                    <td>&nbsp;</td>
-                                                    <td style="width: 100px; ">&nbsp;</td>
-                                                </tr>
-                                                <% } %>
-                                                <% } %>
-                                            </tbody>
-                                        </table>
-                                        <div class="d-flex justify-content-center mt-2">
-                                            <div class="pagination">
-                                                <span id="currentPagePacked" class="badge bg-info">Page 1</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Shipped -->
-                            <div class="col-md-4">
-                                <div class="card mb-4">
-                                    <div class="card-header text-center">
-                                        <div class="fw-bold" style="font-size: 18px">SHIPPED</div>
-                                    </div>
-                                    <div class="card-body table-responsive p-2">
-                                        <table id="tbl_shipped" class="table table-sm table-striped">
-                                            <thead style="font-size: 16px; text-align: center">
-                                                <tr>
-                                                    <th style="width: 115px; vertical-align: middle">
-                                                        SO/DO Number
-                                                    </th>
-                                                    <th style="vertical-align: middle">Customer Name</th>
-                                                    <th style="width: 100px; vertical-align: middle">
-                                                        Location
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <% if (shippedData.length === 0) { %>
-                                                <tr style="height: 55px;">
-                                                    <td colspan="3" class="text-center text-muted"
-                                                        style=" vertical-align: middle;">
-                                                        No data available
-                                                    </td>
-                                                </tr>
-                                                <% for (let i = 1; i < 10; i++) { %>
-                                                <tr style="height: 55px;">
-                                                    <td style="width: 115px; ">&nbsp;</td>
-                                                    <td>&nbsp;</td>
-                                                    <td style="width: 100px; ">&nbsp;</td>
-                                                </tr>
-                                                <% } %>
-                                                <% } else { %>
-                                                <% shippedData.forEach(item => { %>
-                                                <tr class="align-middle" style="height: 55px;">
-                                                    <td style="text-align: center; width: 115px; ">
-                                                        <%= item.sales_order_number %> /
-                                                        <%= item.delivery_order_number %>
-                                                    </td>
-                                                    <td style="vertical-align: middle; font-size: 17px; ">
-                                                        <div class="clamp-2-lines"><%= item.customer_name %></div>
-                                                    </td>
-                                                    <td
-                                                        style="text-align: center; width: 100px; vertical-align: middle;">
-                                                        <%= item.location_warehouse %>
-                                                    </td>
-                                                </tr>
-                                                <% }); %>
-                                                <% for (let i = shippedData.length; i < 10; i++) { %>
-                                                <tr style="height: 55px;">
-                                                    <td style="width: 115px; ">&nbsp;</td>
-                                                    <td>&nbsp;</td>
-                                                    <td style="width: 100px; ">&nbsp;</td>
-                                                </tr>
-                                                <% } %>
-                                                <% } %>
-                                            </tbody>
-                                        </table>
-                                        <div class="d-flex justify-content-center mt-2">
-                                            <div class="pagination">
-                                                <span id="currentPageShipped" class="badge bg-info">Page 1</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="app-content-footer">
-                    <div class="container-fluid">
-                        <div class="col-md-12 text-center">
-                            <p class="text-blue-color">#Weworkbettertogether</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 text-center">
+              <div class="text-center text-blue-color">
+                <div id="tanggal"></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <!-- Loading indicator -->
-        <div id="loading-indicator">Loading next page...</div>
+      </div>
+
+      <section class="content p-0">
+        <div class="app-content">
+          <div class="container-fluid p-0">
+            <div class="row">
+              <!-- Picked -->
+              <div class="col-md-4">
+                <div class="card mb-4">
+                  <div class="card-header text-center">
+                    <div class="fw-bold" style="font-size: 18px">PICKED</div>
+                  </div>
+                  <div class="card-body table-responsive p-2">
+                    <table id="tbl_picked" class="table table-sm table-striped">
+                      <thead style="font-size: 16px; text-align: center">
+                        <tr>
+                          <th style="width: 115px; vertical-align: middle">
+                            SO/DO Number
+                          </th>
+                          <th style="vertical-align: middle">Customer Name</th>
+                          <th style="width: 100px; vertical-align: middle">
+                            Location
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% if (pickedData.length === 0) { %>
+                        <tr style="height: 55px">
+                          <td
+                            colspan="3"
+                            class="text-center text-muted"
+                            style="vertical-align: middle"
+                          >
+                            No data available
+                          </td>
+                        </tr>
+                        <% for (let i = 1; i < 10; i++) { %>
+                        <tr style="height: 55px">
+                          <td style="width: 115px">&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td style="width: 100px">&nbsp;</td>
+                        </tr>
+                        <% } %> <% } else { %> <% pickedData.forEach(item => {
+                        %>
+                        <tr class="align-middle" style="height: 55px">
+                          <td style="text-align: center; width: 115px">
+                            <%= item.sales_order_number %> / <%=
+                            item.delivery_order_number %>
+                          </td>
+                          <td style="vertical-align: middle; font-size: 16px">
+                            <div class="clamp-2-lines">
+                              <%= item.customer_name %>
+                            </div>
+                          </td>
+                          <td
+                            style="
+                              text-align: center;
+                              width: 100px;
+                              vertical-align: middle;
+                            "
+                          >
+                            <%= item.location_warehouse %>
+                          </td>
+                        </tr>
+                        <% }); %> <% for (let i = pickedData.length; i < 10;
+                        i++) { %>
+                        <tr style="height: 55px">
+                          <td style="width: 115px">&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td style="width: 100px">&nbsp;</td>
+                        </tr>
+                        <% } %> <% } %>
+                      </tbody>
+                    </table>
+                    <div class="d-flex justify-content-center">
+                      <div class="pagination">
+                        <span id="currentPagePicked" class="badge bg-info" style="padding: 10px;"
+                          >Page 1</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Packed -->
+              <div class="col-md-4">
+                <div class="card mb-4">
+                  <div class="card-header text-center">
+                    <div class="fw-bold" style="font-size: 18px">PACKED</div>
+                  </div>
+                  <div class="card-body table-responsive p-2">
+                    <table id="tbl_packed" class="table table-sm table-striped">
+                      <thead style="font-size: 16px; text-align: center">
+                        <tr>
+                          <th style="width: 115px; vertical-align: middle">
+                            SO/DO Number
+                          </th>
+                          <th style="vertical-align: middle">Customer Name</th>
+                          <th style="width: 100px; vertical-align: middle">
+                            Location
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% if (packedData.length === 0) { %>
+                        <tr style="height: 55px">
+                          <td
+                            colspan="3"
+                            class="text-center text-muted"
+                            style="vertical-align: middle"
+                          >
+                            No data available
+                          </td>
+                        </tr>
+                        <% for (let i = 1; i < 10; i++) { %>
+                        <tr style="height: 55px">
+                          <td style="width: 115px">&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td style="width: 100px">&nbsp;</td>
+                        </tr>
+                        <% } %> <% } else { %> <% packedData.forEach(item => {
+                        %>
+                        <tr class="align-middle" style="height: 55px">
+                          <td style="text-align: center; width: 115px">
+                            <%= item.sales_order_number %> / <%=
+                            item.delivery_order_number %>
+                          </td>
+                          <td style="vertical-align: middle; font-size: 16px">
+                            <div class="clamp-2-lines">
+                              <%= item.customer_name %>
+                            </div>
+                          </td>
+                          <td
+                            style="
+                              text-align: center;
+                              width: 100px;
+                              vertical-align: middle;
+                            "
+                          >
+                            <%= item.location_warehouse %>
+                          </td>
+                        </tr>
+                        <% }); %> <% for (let i = packedData.length; i < 10;
+                        i++) { %>
+                        <tr style="height: 55px">
+                          <td style="width: 115px">&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td style="width: 100px">&nbsp;</td>
+                        </tr>
+                        <% } %> <% } %>
+                      </tbody>
+                    </table>
+                    <div class="d-flex justify-content-center">
+                      <div class="pagination">
+                        <span id="currentPagePacked" class="badge bg-info" style="padding: 10px;"
+                          >Page 1</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Shipped -->
+              <div class="col-md-4">
+                <div class="card mb-4">
+                  <div class="card-header text-center">
+                    <div class="fw-bold" style="font-size: 18px">SHIPPED</div>
+                  </div>
+                  <div class="card-body table-responsive p-2">
+                    <table
+                      id="tbl_shipped"
+                      class="table table-sm table-striped"
+                    >
+                      <thead style="font-size: 16px; text-align: center">
+                        <tr>
+                          <th style="width: 115px; vertical-align: middle">
+                            SO/DO Number
+                          </th>
+                          <th style="vertical-align: middle">Customer Name</th>
+                          <th style="width: 100px; vertical-align: middle">
+                            Location
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% if (shippedData.length === 0) { %>
+                        <tr style="height: 55px">
+                          <td
+                            colspan="3"
+                            class="text-center text-muted"
+                            style="vertical-align: middle"
+                          >
+                            No data available
+                          </td>
+                        </tr>
+                        <% for (let i = 1; i < 10; i++) { %>
+                        <tr style="height: 55px">
+                          <td style="width: 115px">&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td style="width: 100px">&nbsp;</td>
+                        </tr>
+                        <% } %> <% } else { %> <% shippedData.forEach(item => {
+                        %>
+                        <tr class="align-middle" style="height: 55px">
+                          <td style="text-align: center; width: 115px">
+                            <%= item.sales_order_number %> / <%=
+                            item.delivery_order_number %>
+                          </td>
+                          <td style="vertical-align: middle; font-size: 16px">
+                            <div class="clamp-2-lines">
+                              <%= item.customer_name %>
+                            </div>
+                          </td>
+                          <td
+                            style="
+                              text-align: center;
+                              width: 100px;
+                              vertical-align: middle;
+                            "
+                          >
+                            <%= item.location_warehouse %>
+                          </td>
+                        </tr>
+                        <% }); %> <% for (let i = shippedData.length; i < 10;
+                        i++) { %>
+                        <tr style="height: 55px">
+                          <td style="width: 115px">&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td style="width: 100px">&nbsp;</td>
+                        </tr>
+                        <% } %> <% } %>
+                      </tbody>
+                    </table>
+                    <div class="d-flex justify-content-center">
+                      <div class="pagination">
+                        <span id="currentPageShipped" class="badge bg-info" style="padding: 10px;"
+                          >Page 1</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-content-footer">
+          <div class="container-fluid">
+            <div class="col-md-12 text-center">
+              <div class="text-blue-color" style="padding-bottom: 0px;">#Weworkbettertogether</div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
+    <!-- Loading indicator -->
+    <div id="loading-indicator">Loading next page...</div>
+  </div>
 </body>
 <%- include('layout/footer') %>
 <!-- ... HTML dan styles atas tetap sama ... -->
-<% if (successMessageLogin && successMessageLogin.length > 0) { %>
+<% if (successMessage && successMessage.length > 0) { %>
 <script>
-    Swal.fire({
-        icon: 'success',
-        title: 'Login Berhasil',
-        text: '<%= successMessageLogin %>',
-        timer: 2500,
-        showConfirmButton: false
-    });
+  Swal.fire({
+    icon: "success",
+    title: "Login Berhasil",
+    text: "<%= successMessage %>",
+    timer: 2500,
+    showConfirmButton: false,
+  });
 </script>
 <% } %>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    let currentPagePicked = 1;
-    let currentPagePacked = 1;
-    let currentPageShipped = 1;
+  let currentPagePicked = 1;
+  let currentPagePacked = 1;
+  let currentPageShipped = 1;
 
-    let totalPagesPicked = 1;
-    let totalPagesPacked = 1;
-    let totalPagesShipped = 1;
+  let totalPagesPicked = 1;
+  let totalPagesPacked = 1;
+  let totalPagesShipped = 1;
 
-    let isSocketUpdateInProgress = false;
-    let initialDataLoaded = false;
+  let isSocketUpdateInProgress = false;
+  let initialDataLoaded = false;
 
-    function updateTable(tableId, data) {
-        const tbody = document.querySelector(`#${tableId} tbody`);
-        tbody.innerHTML = "";
+  function updateTable(tableId, data) {
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    tbody.innerHTML = "";
 
-        const totalRows = 10; // Tetapkan jumlah baris tetap 10
+    const totalRows = 10; // Tetapkan jumlah baris tetap 10
 
-        if (data.length === 0) {
-            const tr = document.createElement("tr");
-            tr.innerHTML =
-                `<td colspan="3" class="text-center text-muted" style="height: 55px; vertical-align: middle;">No data available</td>`;
-            tbody.appendChild(tr);
+    if (data.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="3" class="text-center text-muted" style="height: 55px; vertical-align: middle;">No data available</td>`;
+      tbody.appendChild(tr);
 
-            for (let i = 1; i < totalRows; i++) {
-                const emptyTr = document.createElement("tr");
-                emptyTr.innerHTML = `
+      for (let i = 1; i < totalRows; i++) {
+        const emptyTr = document.createElement("tr");
+        emptyTr.innerHTML = `
                 <td style="height: 55px;">&nbsp;</td>
                 <td style="height: 55px;">&nbsp;</td>
                 <td style="height: 55px;">&nbsp;</td>
             `;
-                tbody.appendChild(emptyTr);
-            }
-        } else {
-            data.forEach((item) => {
-                const tr = document.createElement("tr");
-                tr.classList.add("align-middle");
-                tr.innerHTML = `
+        tbody.appendChild(emptyTr);
+      }
+    } else {
+      data.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.classList.add("align-middle");
+        tr.innerHTML = `
             <td style="text-align: center; width: 115px; vertical-align: middle; height: 55px;">
             ${item.sales_order_number} / ${item.delivery_order_number}
             </td>
-            <td style="vertical-align: middle; height: 55px; font-size: 17px;">
+            <td style="vertical-align: middle; height: 55px; font-size: 16px;">
                 <div class="clamp-2-lines">${item.customer_name}</div>
             </td>
             <td style="text-align: center; width: 115px; vertical-align: middle; height: 55px;">
             ${item.location_warehouse}
             </td>
             `;
-                tbody.appendChild(tr);
-            });
+        tbody.appendChild(tr);
+      });
 
-            // Tambahkan baris kosong jika data kurang dari 10
-            for (let i = data.length; i < totalRows; i++) {
-                const emptyTr = document.createElement("tr");
-                emptyTr.innerHTML = `<td style="height: 55px;" colspan="3">&nbsp;</td>`;
-                tbody.appendChild(emptyTr);
-            }
-        }
+      // Tambahkan baris kosong jika data kurang dari 10
+      for (let i = data.length; i < totalRows; i++) {
+        const emptyTr = document.createElement("tr");
+        emptyTr.innerHTML = `<td style="height: 55px;" colspan="3">&nbsp;</td>`;
+        tbody.appendChild(emptyTr);
+      }
+    }
+  }
+
+  function updatePaginationUI() {
+    document.getElementById(
+      "currentPagePicked"
+    ).textContent = `Page ${currentPagePicked}`;
+    document.getElementById(
+      "currentPagePacked"
+    ).textContent = `Page ${currentPagePacked}`;
+    document.getElementById(
+      "currentPageShipped"
+    ).textContent = `Page ${currentPageShipped}`;
+  }
+
+  function paginateStatus() {
+    if (!initialDataLoaded || isSocketUpdateInProgress) {
+      isSocketUpdateInProgress = false;
+      return;
     }
 
-    function updatePaginationUI() {
-        document.getElementById(
-            "currentPagePicked"
-        ).textContent = `Page ${currentPagePicked}`;
-        document.getElementById(
-            "currentPagePacked"
-        ).textContent = `Page ${currentPagePacked}`;
-        document.getElementById(
-            "currentPageShipped"
-        ).textContent = `Page ${currentPageShipped}`;
-    }
+    const url = `/dashboardData?pagePicked=${currentPagePicked}&pagePacked=${currentPagePacked}&pageShipped=${currentPageShipped}`;
+    console.log("Fetching:", url);
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        totalPagesPicked = Math.ceil(data.pickedTotal / 10);
+        totalPagesPacked = Math.ceil(data.packedTotal / 10);
+        totalPagesShipped = Math.ceil(data.shippedTotal / 10);
 
-    function paginateStatus() {
-        if (!initialDataLoaded || isSocketUpdateInProgress) {
-            isSocketUpdateInProgress = false;
-            return;
-        }
+        console.log(
+          "Auto-paginate total pages =>",
+          totalPagesPicked,
+          totalPagesPacked,
+          totalPagesShipped
+        );
+        console.log(
+          `📦 Fetching Picked ${currentPagePicked}, Packed ${currentPagePacked}, Shipped ${currentPageShipped}`
+        );
 
-        const url =
-            `/dashboardData?pagePicked=${currentPagePicked}&pagePacked=${currentPagePacked}&pageShipped=${currentPageShipped}`;
-        console.log("Fetching:", url);
-        fetch(url)
-            .then((res) => res.json())
-            .then((data) => {
-                totalPagesPicked = Math.ceil(data.pickedTotal / 10);
-                totalPagesPacked = Math.ceil(data.packedTotal / 10);
-                totalPagesShipped = Math.ceil(data.shippedTotal / 10);
-
-                console.log(
-                    "Auto-paginate total pages =>",
-                    totalPagesPicked,
-                    totalPagesPacked,
-                    totalPagesShipped
-                );
-                console.log(
-                    `📦 Fetching Picked ${currentPagePicked}, Packed ${currentPagePacked}, Shipped ${currentPageShipped}`
-                );
-
-                // Update Table
-                updateTable("tbl_picked", data.pickedData);
-                updateTable("tbl_packed", data.packedData);
-                updateTable("tbl_shipped", data.shippedData);
-
-                // Update UI before incrementing
-                updatePaginationUI();
-
-                // Increment pages after displaying
-                currentPagePicked =
-                    totalPagesPicked > 1 && currentPagePicked < totalPagesPicked ?
-                    currentPagePicked + 1 :
-                    1;
-                currentPagePacked =
-                    totalPagesPacked > 1 && currentPagePacked < totalPagesPacked ?
-                    currentPagePacked + 1 :
-                    1;
-                currentPageShipped =
-                    totalPagesShipped > 1 && currentPageShipped < totalPagesShipped ?
-                    currentPageShipped + 1 :
-                    1;
-
-                document.getElementById("loading-indicator").style.display = "block";
-                setTimeout(() => {
-                    document.getElementById("loading-indicator").style.display = "none";
-                }, 1000);
-            })
-            .catch((err) => {
-                console.error("Pagination fetch error:", err);
-            });
-    }
-
-    const socket = io();
-    socket.on("dataUpdate", (data) => {
-        isSocketUpdateInProgress = true;
-        initialDataLoaded = true;
-
+        // Update Table
         updateTable("tbl_picked", data.pickedData);
         updateTable("tbl_packed", data.packedData);
         updateTable("tbl_shipped", data.shippedData);
 
-        currentPagePicked = 1;
-        currentPagePacked = 1;
-        currentPageShipped = 1;
-
+        // Update UI before incrementing
         updatePaginationUI();
-    });
 
-    document.addEventListener("DOMContentLoaded", () => {
+        // Increment pages after displaying
+        currentPagePicked =
+          totalPagesPicked > 1 && currentPagePicked < totalPagesPicked
+            ? currentPagePicked + 1
+            : 1;
+        currentPagePacked =
+          totalPagesPacked > 1 && currentPagePacked < totalPagesPacked
+            ? currentPagePacked + 1
+            : 1;
+        currentPageShipped =
+          totalPagesShipped > 1 && currentPageShipped < totalPagesShipped
+            ? currentPageShipped + 1
+            : 1;
+
+        document.getElementById("loading-indicator").style.display = "block";
         setTimeout(() => {
-            initialDataLoaded = true;
+          document.getElementById("loading-indicator").style.display = "none";
         }, 1000);
+      })
+      .catch((err) => {
+        console.error("Pagination fetch error:", err);
+      });
+  }
 
-        setInterval(paginateStatus, 20000);
+  const socket = io();
+  socket.on("dataUpdate", (data) => {
+    isSocketUpdateInProgress = true;
+    initialDataLoaded = true;
 
-        const hariNames = [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-        ];
-        const bulanNames = [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December",
-        ];
-        const today = new Date();
-        const hari = hariNames[today.getDay()];
-        const tanggal = today.getDate();
-        const bulan = bulanNames[today.getMonth()];
-        const tahun = today.getFullYear();
+    updateTable("tbl_picked", data.pickedData);
+    updateTable("tbl_packed", data.packedData);
+    updateTable("tbl_shipped", data.shippedData);
 
-        const suffix = (tanggal) => {
-            if (tanggal % 10 === 1 && tanggal % 100 !== 11) return "st";
-            if (tanggal % 10 === 2 && tanggal % 100 !== 12) return "nd";
-            if (tanggal % 10 === 3 && tanggal % 100 !== 13) return "rd";
-            return "th";
-        };
+    currentPagePicked = 1;
+    currentPagePacked = 1;
+    currentPageShipped = 1;
 
-        const formattedDate = `${hari}, ${bulan} ${tanggal}${suffix(
-        tanggal
-        )} ${tahun}`;
-        document.getElementById("tanggal").textContent = formattedDate;
-    });
+    updatePaginationUI();
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+      initialDataLoaded = true;
+    }, 1000);
+
+    setInterval(paginateStatus, 20000);
+
+    const hariNames = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const bulanNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    const today = new Date();
+    const hari = hariNames[today.getDay()];
+    const tanggal = today.getDate();
+    const bulan = bulanNames[today.getMonth()];
+    const tahun = today.getFullYear();
+
+    const suffix = (tanggal) => {
+      if (tanggal % 10 === 1 && tanggal % 100 !== 11) return "st";
+      if (tanggal % 10 === 2 && tanggal % 100 !== 12) return "nd";
+      if (tanggal % 10 === 3 && tanggal % 100 !== 13) return "rd";
+      return "th";
+    };
+
+    const formattedDate = `${hari}, ${bulan} ${tanggal}${suffix(
+      tanggal
+    )} ${tahun}`;
+    document.getElementById("tanggal").textContent = formattedDate;
+  });
 </script>
