@@ -1,4 +1,6 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <style>
     .pagination a {
@@ -38,417 +40,583 @@
       margin-left: 250px; /* Sesuaikan dengan lebar sidebar */
     }
 
-
-
+    .table .th {
+      word-wrap:break-word
+    }
   </style>
-<body class="hold-transition sidebar-mini layout-fixed">
-  <div class="wrapper">
-  <%- include('layout/header') %>
-  <%- include('layout/sidebar') %>
-
-  <div class="content-wrapper">
-    <% if (successMessage && successMessage.length > 0) { %>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-      <%= successMessage %>
-      <button type="button" class="btn btn-sm btn-default ms-2" data-bs-dismiss="alert" aria-label="Close">
-        &times;
-      </button>
-    </div>
-    <% } %>
-
-    <% if (errorMessage && errorMessage.length > 0) { %>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      <%= errorMessage %>
-      <button type="button" class="btn btn-sm btn-default ms-2" data-bs-dismiss="alert" aria-label="Close">
-        &times;
-      </button>
-    </div>
-    <% } %>
-
-    <div class="row p-3">
-      <div class="col-12">
-        <!-- Tombol Add di atas card -->
-        <% if (role === 1 || role === 10 || role === 11 || role === 12) { %>
-        <div class="mb-2 text-right">
-          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-lg">Add SO / DO</button>
+  <body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+    <%- include('layout/header') %>
+    <%- include('layout/sidebar') %>
+      <div class="content-wrapper" style="padding-top: 10px; padding-left: 15px; padding-right: 15px; min-height: 0px !important; ">
+        <div class="content-header">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6">
+                <h3>Monitoring Order</h3>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <% if (role === 1 || role === 10 || role === 11 || role === 12) { %>
+                  <div class="mb-2 text-right">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-lg">Add SO / DO</button>
+                  </div>
+                  <% } %>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% if (successMessage && successMessage.length > 0) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <%= successMessage %>
+          <button type="button" class="btn btn-sm btn-default ms-2" data-bs-dismiss="alert" aria-label="Close">
+            &times;
+          </button>
         </div>
         <% } %>
 
-        <div class="modal fade" id="modal-lg">
-          <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-              <% if (user && (user.role === 1 || user.role === 12 || user.role === 10 || user.role === 11)) { %>
-              <div class="modal-header">
-                <h4 class="modal-title">Tambah SO / DO</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <% } %>
-              <form action="/soDo/create" method="POST">
-                <div class="modal-body">
-                  <h5 class="mb-2">Lokasi Warehouse</h5>
-                  <div class="input-group mb-3 ">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-map-marker"></i></span>
-                    </div>
-                    <select class="custom-select rounded-0" id="warehouse_location" name="warehouse_location" required>
-                      <option value="" disabled selected>-- Pilih Lokasi Warehouse --</option>
-                      <% if (optionWarehouseLocation && optionWarehouseLocation.length > 0) { %>
-                      <% optionWarehouseLocation.forEach(optionWarehouseLocation => { %>
-                      <option value="<%= optionWarehouseLocation.id_warehouse %>">
-                        <%= optionWarehouseLocation.location_warehouse %></option>
-                      <% }) %>
-                      <% } else { %>
-                      <option value="" disabled>Pilihan Warehouse Tidak Tersedia</option>
-                      <% } %>
-                    </select>
-                  </div>
-                  
-                  
-                  <h5 class="mb-2">Sales Order Number</h5>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-hashtag"></i></span>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Input Angka SO Saja" id="sales_order_number" name="sales_order_number" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
-                  </div>
-                
-                  <h5 class="mb-2">Sales Order Date</h5>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                    </div>
-                    <input type="date" class="form-control" id="sales_order_date" name="sales_order_date" required>
-                  </div>
-
-                  <h5 class="mb-2">Delivery Order Number</h5>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-hashtag"></i></span>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Input Angka DO Saja" id="delivery_order_number" name="delivery_order_number" name="sales_order_number" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
-                  </div>
-
-                  <h5 class="mb-2">Delivery Order Date</h5>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                    </div>
-                    <input type="date" class="form-control" id="delivery_order_date" name="delivery_order_date"
-                      required>
-                  </div>
-
-                  <h5 class="mb-2">Customer Name</h5>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-user"></i></span>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Customer Name" id="customer_name"
-                      name="customer_name" required>
-                  </div>
-
-                  <h5 class="mb-2">Divisi</h5>
-                  <div class="input-group mb-3 ">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-users"></i></span>
-                    </div>
-                    <select class="custom-select rounded-0" id="division_team" name="division_team" required>
-                      <option value="" disabled selected>-- Pilih Divisi --</option>
-                      <% if (optionDivision && optionDivision.length > 0) { %>
-                      <% optionDivision.forEach(optionDivision => { %>
-                      <option value="<%= optionDivision.id_division %>"><%= optionDivision.name_division %></option>
-                      <% }) %>
-                      <% } else { %>
-                      <option value="" disabled>Tidak ada divisi tersedia</option>
-                      <% } %>
-                    </select>
-                  </div>
-
-                  <% if (user && (user.role === 1 || user.role === 12)) { %>
-                  <h5 class="mb-2">Shipped By</h5>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-file"></i></span>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Nama Ekspedisi" id="ship_by" name="ship_by">
-                  </div>
-
-                  <h5 class="mb-2">Resi Number</h5>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-hashtag"></i></span>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Nomor Resi" id="resi_number"
-                      name="resi_number">
-                  </div>
-
-                  <h5 class="mb-2">Weight</h5>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-boxes"></i></span>
-                    </div>
-                    <input type="text" class="form-control" id="weight" name="weight" placeholder="Berat dalam Kg">
-                    <div class="input-group-append">
-                      <div class="input-group-text">Kg</div>
-                    </div>
-                  </div>
-
-                  <h5 class="mb-2">Harga Ongkir</h5>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">Rp</span>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Harga Ongkir" id="price" name="price">
-                  </div>
-
-                  <h5 class="mb-2">Pickup Date</h5>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                    </div>
-                    <input type="date" class="form-control" id="eta" name="eta">
-                  </div>
-
-                  <h5 class="mb-2">Nama Penerima</h5>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-user"></i></span>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Nama Penerima" id="receive_name"
-                      name="receive_name">
-                  </div>
-
-                  <h5 class="mb-2">Notes</h5>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fa fa-file"></i></span>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Catatan" id="ekspedisi_note"
-                      name="ekspedisi_note">
-                  </div>
-                  <% } %>
-
-                </div>
-                <div class="modal-footer justify-content-between">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary">Save changes</button>
-                </div>
-              </form>
-            </div>
-            <!-- /.modal-content -->
-          </div>
-          <!-- /.modal-dialog -->
+        <% if (errorMessage && errorMessage.length > 0) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= errorMessage %>
+          <button type="button" class="btn btn-sm btn-default ms-2" data-bs-dismiss="alert" aria-label="Close">
+            &times;
+          </button>
         </div>
-        <!-- end modal fade -->
+        <% } %>
 
-        <!-- Card Table -->
-        <section class="content p-3">
-          <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h3 class="card-title">Monitoring Order</h3>
-                <div class="form-inline row g-2">
-                  <!-- <form> -->
-                    <div class="col-auto">
-                      <input type="text" id="search" name="search" class="form-control form-control-sm" placeholder="Cari DO / SO / Customer">
+        <div class="row">
+          <div class="col-12">
+
+            <div class="modal fade" id="modal-lg">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <% if (user && (user.role === 1 || user.role === 12 || user.role === 10 || user.role === 11)) { %>
+                  <div class="modal-header">
+                    <h4 class="modal-title">Tambah SO / DO</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <% } %>
+                  <form action="/create" method="POST">
+                    <div class="modal-body">
+                      <h5 class="mb-2">Lokasi Warehouse</h5>
+                      <div class="input-group mb-3 ">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-map-marker"></i></span>
+                        </div>
+                        <select class="custom-select rounded-0" id="warehouse_location" name="warehouse_location" required>
+                          <option value="" disabled selected>-- Pilih Lokasi Warehouse --</option>
+                          <% if (optionWarehouseLocation && optionWarehouseLocation.length > 0) { %>
+                          <% optionWarehouseLocation.forEach(optionWarehouseLocation => { %>
+                          <option value="<%= optionWarehouseLocation.id_warehouse %>">
+                            <%= optionWarehouseLocation.location_warehouse %></option>
+                          <% }) %>
+                          <% } else { %>
+                          <option value="" disabled>Pilihan Warehouse Tidak Tersedia</option>
+                          <% } %>
+                        </select>
+                      </div>
+                      
+                      
+                      <h5 class="mb-2">Sales Order Number</h5>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-hashtag"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Input Angka SO Saja" id="sales_order_number" name="sales_order_number" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                      </div>
+                    
+                      <h5 class="mb-2">Sales Order Date</h5>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                        </div>
+                        <input type="date" class="form-control" id="sales_order_date" name="sales_order_date" required>
+                      </div>
+
+                      <h5 class="mb-2">Delivery Order Number</h5>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-hashtag"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Input Angka DO Saja" id="delivery_order_number" name="delivery_order_number" name="sales_order_number" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                      </div>
+
+                      <h5 class="mb-2">Delivery Order Date</h5>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                        </div>
+                        <input type="date" class="form-control" id="delivery_order_date" name="delivery_order_date"
+                          required>
+                      </div>
+
+                      <h5 class="mb-2">Customer Name</h5>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-user"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Customer Name" id="customer_name"
+                          name="customer_name" required>
+                      </div>
+
+                      <h5 class="mb-2">Divisi</h5>
+                      <div class="input-group mb-3 ">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-users"></i></span>
+                        </div>
+                        <select class="custom-select rounded-0" id="division_team" name="division_team" required>
+                          <option value="" disabled selected>-- Pilih Divisi --</option>
+                          <% if (optionDivision && optionDivision.length > 0) { %>
+                          <% optionDivision.forEach(optionDivision => { %>
+                          <option value="<%= optionDivision.id_division %>"><%= optionDivision.name_division %></option>
+                          <% }) %>
+                          <% } else { %>
+                          <option value="" disabled>Tidak ada divisi tersedia</option>
+                          <% } %>
+                        </select>
+                      </div>
+
+                      <% if (user && (user.role === 1 || user.role === 12)) { %>
+                      <h5 class="mb-2">Shipped By</h5>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-file"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Nama Ekspedisi" id="ship_by" name="ship_by">
+                      </div>
+
+                      <h5 class="mb-2">Resi Number</h5>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-hashtag"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Nomor Resi" id="resi_number"
+                          name="resi_number">
+                      </div>
+
+                      <h5 class="mb-2">Weight</h5>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-boxes"></i></span>
+                        </div>
+                        <input type="text" class="form-control" id="weight" name="weight" placeholder="Berat dalam Kg">
+                        <div class="input-group-append">
+                          <div class="input-group-text">Kg</div>
+                        </div>
+                      </div>
+
+                      <h5 class="mb-2">Harga Ongkir</h5>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Rp</span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Harga Ongkir" id="price" name="price">
+                      </div>
+
+                      <h5 class="mb-2">Pickup Date</h5>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                        </div>
+                        <input type="date" class="form-control" id="eta" name="eta">
+                      </div>
+
+                      <h5 class="mb-2">Nama Penerima</h5>
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-user"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Wajib diisi ketika sudah diterima" id="receive_name" name="receive_name">                        
+                      </div>
+                      <p class="text-danger">*Wajib diisi ketika sudah diterima</p>
+
+                      <h5 class="mb-2">Notes</h5>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-file"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Catatan" id="ekspedisi_note"
+                          name="ekspedisi_note">
+                      </div>
+                      <% } %>
+
                     </div>
-                    <div class="col-auto">
-                      <input type="date" id="filterDateStart" name="filterDateStart" class="form-control form-control-sm">
+                    <div class="modal-footer justify-content-between">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary" id="confirmSubmit">Save changes</button>
                     </div>
-                    <div class="col-auto">
-                      <input type="date" id="filterDateEnd" name="filterDateEnd" class="form-control form-control-sm">
-                    </div>
-                    <div class="col-auto">
-                      <button id="filterButton" class="btn btn-sm btn-primary">Filter</button>
-                      <button id="resetButton" class="btn btn-sm btn-secondary">Reset</button>
-                    </div>
-                  <!-- </form> -->
+                  </form>
                 </div>
+                <!-- /.modal-content -->
+              </div>
+              <!-- /.modal-dialog -->
             </div>
-            <!---end card-header -->
-            <!-- Table Content -->
-            <div class="card-body table-responsive">
-              <table id="soDoTable" class="table table-bordered table-striped table-hover table-sm align-middle text-nowrap" style="width:100%">
-                <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Sales Order Number</th>
-                    <th>Sales Order Date</th>
-                    <th>Delivery Order Number</th>
-                    <th>Delivery Order Date</th>
-                    <th>Invoicing Date</th>
-                    <th>Customer</th>
-                    <th>Location</th>
-                    <th>Status</th>
-                    <th>Ship By</th>
-                    <th>ETA</th>
-                    <th>Nama Penerima</th>
-                    <th>Barcode</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="searchResults">
-                  <% if (data && data.length > 0) { %>
-                  <% data.forEach((item, index) => { %>
-                  <tr id="row-<%= item.id_monitoring_data %>">
-                    <td><%= index + 1 %></td>
-                    <td><%= item.sales_order_number %></td>
-                    <td>
-                      <%= new Date(item.sales_order_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
-                    <td><%= item.delivery_order_number %></td>
-                    <td>
-                      <%= new Date(item.delivery_order_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
-                    <td>
-                      <% if (item.invoicing_date) { %>
-                        <%= new Date(item.invoicing_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
-                      <% } else { %>
-                        <span class="badge badge-danger">Belum diinput oleh Tim Finance</span>
-                      <% } %>
-                    </td>
-                    <td><%= item.customer_name %></td>
-                    <td><%= item.location_warehouse %></td>
-                    <td><%= item.status %></td>
-                    <td>
-                      <% if (item.ship_by) { %>
-                        <%= item.ship_by %>
-                      <% } else { %>
-                        <span class="badge badge-danger">Pengirim atau Ekspedisi belum diinput</span>
-                      <% } %>
-                    </td>
-                    <td>
-                      <% if (item.eta) { %>
-                        <%= new Date(item.eta).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
-                      <% } else { %>
-                        <span class="badge badge-danger">Tanggal ETA belum diinput</span>
-                      <% } %>
-                    </td>
-                    <td><%= item.receive_name %></td>
-                    <td><img src="data:image/png;base64,<%= item.barcode_do %>" alt="Barcode DO"
-                        style="width: 180px; height: 60px; object-fit: contain; display: block;"> </td>
-                    <td>
-                      <% if (user) { %>
-                        <% if (user.role === 1) { %>
-                          <!-- Admin -->
-                          <button onclick="exportRowFinanceToPDF(<%= item.id_monitoring_data %>)" class="btn btn-sm btn-info">
-                            <i class="fas fa-print"></i> Finance
-                          </button>
-                          <button onclick="exportRowToPDF(<%= item.id_monitoring_data %>)" class="btn btn-sm btn-info">
-                            <i class="fas fa-print"></i> Barcode
-                          </button>
-                          <a href="/soDoEdit/<%= item.id_monitoring_data %>" class="btn btn-sm btn-warning" title="Edit">
-                            <i class="fas fa-edit"></i>
-                          </a>
-                          <a href="/soDoView/<%= item.id_monitoring_data %>" class="btn btn-sm btn-secondary" title="view">
-                            <i class="fas fa-eye"></i>
-                          </a>
+            <!-- end modal fade -->
 
-                        <% } else if (user.role === 8) { %>
-                        <!-- Finance -->
-                        <% if (item.eta && item.ship_by && item.ship_by.trim() !== '') { %>
-                          <a href="/soDoEdit/<%= item.id_monitoring_data %>" class="btn btn-sm btn-warning" title="Edit">
-                            <i class="fas fa-edit"></i>
-                          </a>
-                        <% } else { %>
-                          <button class="btn btn-sm btn-secondary" title="Lengkapi ETA & Pengirim" disabled>
-                            <i class="fas fa-edit"></i>
-                          </button>
+            <!-- Card Table -->
+            <section class="content">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <div class="form-inline row g-2">
+                      <!-- <form> -->
+                        <div class="col-auto">
+                          <input type="text" id="search" name="search" class="form-control form-control-sm" placeholder="Cari di Monitoring Order" style="width: 30ch;">
+                        </div>
+                        <div class="col-auto">
+                          <input type="date" id="filterDateStart" name="filterDateStart" class="form-control form-control-sm">
+                        </div>
+                        /
+                        <div class="col-auto">
+                          <input type="date" id="filterDateEnd" name="filterDateEnd" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-auto">
+                          <button id="filterButton" class="btn btn-sm btn-primary" style="width: 80px;">Cari</button>
+                          <button id="resetButton" class="btn btn-sm btn-danger">Reset</button>
+                          <% if (user) { %>
+                            <% if (user.role === 1) { %>
+                              <!-- Admin -->
+                              <a href="/historyFinance" class="btn btn-sm btn-success">History</a>
+                              <button id="exportRowToCsv" class="btn btn-sm btn-warning">Export Data</button>
+                            <% } else if ([10, 11, 12].includes(user.role)) { %>
+                              <!-- export buat scm -->
+                              <button id="exportRowToCsv" class="btn btn-sm btn-warning">Export Data</button>
+                            <% } else if (user.role === 8) { %>
+                              <!-- export buat finance -->
+                              <a href="/historyFinance" class="btn btn-sm btn-success">History</a>
+                            <% } %>
+                          <% } %>
+                        </div>
+                      <!-- </form> -->
+                    </div>
+                </div>
+                <!---end card-header -->
+                <!-- Table Content -->
+                <div class="card-body table-responsive p-2">
+                  <table id="soDoTable" class="table table-bordered table-striped table-hover table-sm align-middle" style="width:100%; font-size: 15px; table-layout: fixed;">
+                    <thead>
+                      <tr>
+                        <th style="width: 43px; text-align: center; vertical-align: middle;">No</th>
+                        <th style="width: 130px; text-align: center; vertical-align: middle;">Sales Order Number</th>
+                        <th style="width: 130px; text-align: center; vertical-align: middle;">Delivery Order Number</th>
+                        <th style="width: 120px; text-align: center; vertical-align: middle;">Delivery Order Date</th>
+                        <th style="width: 170px; text-align: center; vertical-align: middle;">Barcode</th>
+                        <th style="width: 200px; text-align: center; vertical-align: middle;">Customer</th>
+                        <th style="width: 150px; text-align: center; vertical-align: middle;">Division</th>
+                        <th style="width: 120px; text-align: center; vertical-align: middle;">Info ke Invoicing Diterima</th>
+                        <th style="width: 150px; text-align: center; vertical-align: middle;">Ship By</th>
+                        <th style="width: 120px; text-align: center; vertical-align: middle;">Pickup Date</th>
+                        <th style="width: 150px; text-align: center; vertical-align: middle;">Nama Penerima</th>
+                        <th style="width: 90px; text-align: center; vertical-align: middle;">Location</th>
+                        <th style="width: 150px; text-align: center; vertical-align: middle;">Status</th>
+                        <th style="width: 150px; word-wrap:normal; text-align: center; vertical-align: middle;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="searchResults">
+                      <% if (data && data.length > 0) { %>
+                      <% data.forEach((item, index) => { %>
+                      <tr id="row-<%= item.id_monitoring_data %>" style="<%= item.status === 'Cancel / Deleted' ? 'background-color: #F7CACA; color: black;' : '' %>">
+                        <!-- No -->
+                        <td style="text-align: center; vertical-align: middle;"><%= (currentPage - 1) * itemsPerPage + index + 1 %></td>
+                        <!-- SO Number -->
+                        <td style="text-align: center; vertical-align: middle;"><%= item.sales_order_number %></td>
+                        <!-- DO Number -->
+                        <td style="text-align: center; vertical-align: middle;"><%= item.delivery_order_number %></td>
+                        <!-- DO Date -->
+                        <td style="text-align: center; vertical-align: middle;"><%= new Date(item.delivery_order_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %></td>
+                        <!-- Barcode -->
+                        <td style="text-align: center; vertical-align: middle;">
+                          <img src="data:image/png;base64,<%= item.barcode_do %>" alt="Barcode DO" style="margin: 0 auto; width: 150px; height: 60px; object-fit: contain; display: block;">
+                        </td>
+                        <!-- Customer -->
+                        <td style="vertical-align: middle;"><%= item.customer_name %></td>
+                        <!-- Division Name -->
+                        <td style="text-align: center; vertical-align: middle;"><%= item.name_division %></td>
+                        <!-- Invoicing -->
+                        <td style="text-align: center; vertical-align: middle;">
+                          <% if (item.invoicing_date) { %>
+                            <%= new Date(item.invoicing_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
+                          <% } else { %>
+                            <span class="badge badge-danger text-wrap p-1">Menunggu Tim Finance</span>
+                          <% } %>
+                        </td>
+                        <!-- Ship By -->
+                        <td style="vertical-align: middle; width: 150px;">
+                          <% if (item.ship_by && item.ship_by.trim() !== '') { %>
+                            <%= item.ship_by %>
+                          <% } else { %>
+                            <span class="badge bg-danger text-light px-2 py-1 d-inline-block" 
+                                  style="width: 140px; height: 30px; line-height: 18px; display: inline-flex; align-items: center; justify-content: center;">
+                              Menunggu Pengirim
+                            </span>
+                          <% } %>
+                        </td>
+                        <!-- ETA -->
+                        <td style="text-align: center; vertical-align: middle;">
+                          <% if (item.eta) { %>
+                            <%= new Date(item.eta).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %>
+                          <% } else { %>
+                            <span class="badge badge-danger text-wrap">Tanggal Pickup belum diinput</span>
+                          <% } %>
+                        </td>
+                        <!-- Nama Penerima -->
+                        <td style="vertical-align: middle;"><%= item.receive_name %>
+                          <% if (item.receive_name) { %>
+                            <%= item.receive_name %>
+                          <% } else { %>
+                            <span class="badge badge-danger text-wrap">Nama Penerima belum diinput</span>
+                          <% } %>
+                        </td>
+                        <!-- Location -->
+                        <td style="text-align: center; vertical-align: middle;"><%= item.location_warehouse %></td>
+                        <!-- Status -->
+                        <td style="text-align: center; vertical-align: middle;">
+                          <% let badgeClass = ''; %>
+                          <% if (item.status === 'Draft') { %>
+                            <% badgeClass = 'badge bg-secondary'; %>
+                          <% } else if (item.status === 'Picked') { %>
+                            <% badgeClass = 'badge bg-warning text-light'; %>
+                          <% } else if (item.status === 'Packed') { %>
+                            <% badgeClass = 'badge bg-info'; %>
+                          <% } else if (item.status === 'Shipped') { %>
+                            <% badgeClass = 'badge bg-success'; %>
+                          <% } else if (item.status === 'Cancel / Deleted') { %>
+                            <% badgeClass = 'badge bg-danger'; %>
+                          <% } else { %>
+                            <% badgeClass = 'badge bg-light text-dark'; %>
+                          <% } %>
+
+                          <span class="<%= badgeClass %>" 
+                                style="display: inline-block; width: 120px; height: 30px; line-height: 20px; font-size: 12px;">
+                            <%= item.status %>
+                          </span>
+                        </td>
+                        <!-- Button Action -->
+                      <td style="text-align: center; vertical-align: middle;">
+                        <% if (user) { %>
+                          <div class="d-flex flex-wrap justify-content-center" style="gap: 6px;">
+                            <% if (user.role === 1) { %>
+                              <!-- Button Print Finance (Invoicing) -->
+                              <button 
+                                onclick="exportRowFinanceToPDF(<%= item.id_monitoring_data %>)" 
+                                class="btn btn-sm btn-primary d-flex align-items-center justify-content-center"
+                                style="width: 35px; height: 35px;"
+                                title="Cetak Invoice">
+                                <i class="fas fa-print fa-lg"></i>
+                              </button>
+
+                              <!-- Button Print Barcode -->
+                              <button 
+                                onclick="exportRowToPDF(<%= item.id_monitoring_data %>)" 
+                                class="btn btn-sm btn-info d-flex align-items-center justify-content-center"
+                                style="width: 35px; height: 35px;"
+                                title="Cetak Barcode">
+                                <i class="fas fa-barcode fa-lg"></i>
+                              </button>
+
+                              <!-- Button Edit -->
+                              <a 
+                                href="/Edit/<%= item.id_monitoring_data %>" 
+                                class="btn btn-sm btn-warning d-flex align-items-center justify-content-center"
+                                style="width: 35px; height: 35px;"
+                                title="Edit Data">
+                                <i class="fas fa-edit fa-lg"></i>
+                              </a>
+
+                              <!-- Button View -->
+                              <a 
+                                href="/View/<%= item.id_monitoring_data %>" 
+                                class="btn btn-sm btn-secondary d-flex align-items-center justify-content-center"
+                                style="width: 35px; height: 35px;"
+                                title="Lihat Detail">
+                                <i class="fas fa-eye fa-lg"></i>
+                              </a>
+
+                              <!-- Button Terima Invoicing -->
+                              <% if (item.eta && item.ship_by && item.ship_by.trim() !== '' && item.receive_name && item.receive_name.trim() !== '') { %>
+                                <button 
+                                  onclick="exportRowFinanceToPDF(<%= item.id_monitoring_data %>)" 
+                                  class="btn btn-sm btn-success d-flex align-items-center justify-content-center"
+                                  style="width: 35px; height: 35px;"
+                                  title="Info ke Invoicing Diterima">
+                                  <i class="fas fa-check-square fa-lg"></i>
+                                </button>
+                              <% } else { %>
+                                <button 
+                                  class="btn btn-sm btn-secondary d-flex align-items-center justify-content-center" 
+                                  style="width: 35px; height: 35px;"
+                                  title="Lengkapi ETA & Pengirim" 
+                                  disabled>
+                                  <i class="fas fa-check-square fa-lg"></i>
+                                </button>
+                              <% } %>
+                              
+                              <!-- Button Delete / Cancel DO -->
+                              <button 
+                                type="button"
+                                class="btn btn-sm btn-danger d-flex align-items-center justify-content-center"
+                                style="width: 35px; height: 35px;"
+                                title="Cancel / Delete"
+                                onclick="handleCancelDelete(<%= item.id_monitoring_data %>, '<%= item.delivery_order_number %>')"
+                              >
+                                <i class="fas fa-trash fa-lg"></i>
+                              </button>
+                            <!-- FINANCE ROLE -->
+                            <% } else if (user.role === 8) { %>
+                              <% if (item.eta && item.ship_by && item.ship_by.trim() !== '') { %>
+                                <button 
+                                  onclick="exportRowFinanceToPDF(<%= item.id_monitoring_data %>)" 
+                                  class="btn btn-sm btn-success d-flex align-items-center justify-content-center"
+                                  style="width: 35px; height: 35px;"
+                                  title="Info ke Invoicing Diterima">
+                                  <i class="fas fa-check-square fa-lg"></i>
+                                </button>
+                              <% } else { %>
+                                <button 
+                                  class="btn btn-sm btn-secondary d-flex align-items-center justify-content-center" 
+                                  style="width: 35px; height: 35px;"
+                                  title="Lengkapi ETA & Pengirim" 
+                                  disabled>
+                                  <i class="fas fa-check-square fa-lg"></i>
+                                </button>
+                              <% } %>
+
+                            <!-- Admin Gudang Kopo dan Saleh Dan Supervisor -->
+                            <% } else if ([10, 11, 12].includes(user.role)) { %>
+                              <button 
+                                onclick="exportRowToPDF(<%= item.id_monitoring_data %>)" 
+                                class="btn btn-sm btn-info d-flex align-items-center justify-content-center"
+                                style="width: 35px; height: 35px;"
+                                title="Cetak Barcode">
+                                <i class="fas fa-print fa-lg"></i>
+                              </button>
+
+                              <a 
+                                href="/Edit/<%= item.id_monitoring_data %>" 
+                                class="btn btn-sm btn-warning d-flex align-items-center justify-content-center"
+                                style="width: 35px; height: 35px;"
+                                title="Edit Data">
+                                <i class="fas fa-edit fa-lg"></i>
+                              </a>
+
+                            <!-- Sales Admin -->
+                            <% } else if (user.role === 14) { %>
+                              <a 
+                                href="/View/<%= item.id_monitoring_data %>" 
+                                class="btn btn-sm btn-secondary d-flex align-items-center justify-content-center"
+                                style="width: 35px; height: 35px;"
+                                title="Lihat Detail">
+                                <i class="fas fa-eye fa-lg"></i>
+                              </a>
+                            <% } %>
+                          </div>
                         <% } %>
+                      </td>
 
-
-                        <% } else if ([10, 11, 12].includes(user.role)) { %>
-                          <!-- Admin Gudang & Supervisor-->
-                          <button onclick="exportRowToPDF(<%= item.id_monitoring_data %>)" class="btn btn-sm btn-info">
-                            <i class="fas fa-print"></i>
-                          </button>
-                          <a href="/soDoEdit/<%= item.id_monitoring_data %>" class="btn btn-sm btn-warning" title="Edit">
-                            <i class="fas fa-edit"></i>
-                          </a>
-
-                        <% } else if (user.role === 14) { %>
-                          <!-- Viewer -->
-                          <a href="/soDoView/<%= item.id_monitoring_data %>" class="btn btn-sm btn-secondary" title="View">
-                            <i class="fas fa-eye"></i>
-                          </a>
-                        <% } %>
+                      </tr>
+                      <% }) %>
+                      <% } else { %>
+                      <tr>
+                        <td colspan="15" class="text-center">Tidak ada data</td>
+                      </tr>
                       <% } %>
-                  </td>
+                    </tbody>
+                  </table>
+                </div>
+                <!---end Table Content-->
+                <div class="d-flex justify-content-center mt-3">
+                  <% const pageLimit = 5; 
+                    const startPage = Math.max(1, currentPage - Math.floor(pageLimit / 2));
+                    const endPage = Math.min(totalPages, startPage + pageLimit - 1);
+                    const queryString = `search=${encodeURIComponent(searchKeyword || '')}&filterDateStart=${filterDateStart || ''}&filterDateEnd=${filterDateEnd || ''}`;
+                  %>
+                  <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                      <% if (currentPage > 1) { %>
+                        <li class="page-item">
+                          <a class="page-link" href="?page=1&<%= queryString %>">&laquo; First</a>
+                        </li>
+                        <li class="page-item">
+                          <a class="page-link" href="?page=<%= currentPage - 1 %>&<%= queryString %>">Prev</a>
+                        </li>
+                      <% } %>
 
-                  </tr>
-                  <% }) %>
-                  <% } else { %>
-                  <tr>
-                    <td colspan="14" class="text-center">Tidak ada data</td>
-                  </tr>
-                  <% } %>
-                </tbody>
-              </table>
-            </div>
-            <!---end Table Content-->
-            <div class="d-flex justify-content-end mt-3">
-              <% const pageLimit = 5; 
-              const startPage = Math.max(1, currentPage - Math.floor(pageLimit / 2));
-              const endPage = Math.min(totalPages, startPage + pageLimit - 1);
-              %>
-              <nav aria-label="Page navigation">
-                <ul class="pagination pagination-sm mb-0">
-                  <% if (currentPage > 1) { %>
-                    <li class="page-item">
-                      <a class="page-link" href="?page=1&search=<%= searchKeyword %>">&laquo; First</a>
-                    </li>
-                    <li class="page-item">
-                      <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= searchKeyword %>">Prev</a>
-                    </li>
-                  <% } %>
-                  <% for (let i = startPage; i <= endPage; i++) { %>
-                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                      <a class="page-link" href="?page=<%= i %>&search=<%= searchKeyword %>"><%= i %></a>
-                    </li>
-                  <% } %>
-                  <% if (currentPage < totalPages) { %>
-                    <li class="page-item">
-                      <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= searchKeyword %>">Next</a>
-                    </li>
-                    <li class="page-item">
-                      <a class="page-link" href="?page=<%= totalPages %>&search=<%= searchKeyword %>">Last &raquo;</a>
-                    </li>
-                  <% } %>
-                </ul>
-              </nav>
-            </div>
-          <br>
-          <!---END pagination-->
+                      <% for (let i = startPage; i <= endPage; i++) { %>
+                        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                          <a class="page-link" href="?page=<%= i %>&<%= queryString %>"><%= i %></a>
+                        </li>
+                      <% } %>
+
+                      <% if (currentPage < totalPages) { %>
+                        <li class="page-item">
+                          <a class="page-link" href="?page=<%= currentPage + 1 %>&<%= queryString %>">Next</a>
+                        </li>
+                        <li class="page-item">
+                          <a class="page-link" href="?page=<%= totalPages %>&<%= queryString %>">Last &raquo;</a>
+                        </li>
+                      <% } %>
+                    </ul>
+                  </nav>
+                </div>
+              <br>
+              <!---END pagination-->
+              </div>
+            <!-- end Card Table -->
+            </section>
           </div>
-        <!-- end Card Table -->
-        </section>
+          <!---END COL-12 -->
+        </div>
+        <!---END row p-3 -->
       </div>
-      <!---END COL-12 -->
+    <!--end content wrapper-->
     </div>
-    <!---END row p-3 -->
-  </div>
-  <!--end content wrapper-->
-</div>
-  <%- include('layout/footer') %>
-  </div>
-</body>
+    <%- include('layout/footer') %>
+  </body>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode"></script>
-  <script>
-    document.getElementById('resetButton').addEventListener('click', function (e) {
-      e.preventDefault();
-      window.location.href = `/soDo`;
-    });
-  </script>
-  <script>
+<script>
   document.addEventListener('DOMContentLoaded', function () {
+    // Reset Button
+    const resetButton = document.getElementById('resetButton');
+    if (resetButton) {
+      resetButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.location.href = `/soDo`;
+      });
+    }
+
+    // Confirm Submit
+    const confirmBtn = document.getElementById('confirmSubmit');
+    const formCreate = document.querySelector('form[action="/create"]');
+    if (confirmBtn && formCreate) {
+      confirmBtn.addEventListener('click', function () {
+        Swal.fire({
+          title: 'Apakah Anda yakin?',
+          text: "Data SO/DO akan disimpan.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Ya, simpan!',
+          cancelButtonText: 'Batal'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            formCreate.submit();
+          }
+        });
+      });
+    }
+
+    // Filter Button
     const filterButton = document.getElementById('filterButton');
     const searchInput = document.getElementById('search');
     const startDate = document.getElementById('filterDateStart');
     const endDate = document.getElementById('filterDateEnd');
 
-    filterButton.addEventListener('click', function (e) {
-      e.preventDefault(); // Hindari submit form default
-
+    function handleFilter() {
       const query = new URLSearchParams();
 
       if (searchInput.value.trim() !== '') {
@@ -462,123 +630,130 @@
       }
 
       window.location.href = `/soDo?${query.toString()}`;
+    }
+
+    // Klik tombol filter
+    filterButton.addEventListener('click', function (e) {
+      e.preventDefault();
+      handleFilter();
+    });
+
+    // Enter di input pencarian atau tanggal
+    [searchInput, startDate, endDate].forEach((input) => {
+      input.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleFilter();
+        }
       });
     });
-  </script>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      <% if (data && data.length > 0) { %>
-        <% data.forEach(item => { %>
-          JsBarcode("#barcode-<%item.id_monitoring_data%>", "<%= item.delivery_order_number %>", {
-            format: "CODE128",
-            displayValue: true,
-            width: 2,
-            height: 40,
-          })
-        <% });%>
-      <% } %>
-    });
-  </script>
-  <script>
+    // Barcode Rendering
+    <% if (data && data.length > 0) { %>
+      <% data.forEach(item => { %>
+        JsBarcode("#barcode-<%= item.id_monitoring_data %>", "<%= item.delivery_order_number %>", {
+          format: "CODE128",
+          displayValue: true,
+          width: 2,
+          height: 40
+        });
+      <% }); %>
+    <% } %>
+  });
+
   async function exportRowToPDF(id) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [45, 15] });
-
     const row = document.querySelector(`#row-${id}`);
     if (!row) {
-      alert("Data tidak ditemukan!");
-      return;
+      return Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Data tidak ditemukan!', showConfirmButton: false, timer: 2500 });
     }
     const cells = Array.from(row.querySelectorAll('td'));
-    const [
-      no, soNumber, soDate, doNumber, doDate,
-      invoicingDate, customer, location, status, shipBy, eta
-    ] = cells.map(cell => cell.innerText.trim());
-
+    const doNumber = cells[2]?.innerText.trim();
     const barcodeImg = row.querySelector("img");
     if (!barcodeImg || !barcodeImg.src.startsWith("data:image")) {
-      alert("Barcode tidak ditemukan!");
-      return;
+      return Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Barcode tidak ditemukan!', showConfirmButton: false, timer: 2500 });
     }
-
     const imgProps = doc.getImageProperties(barcodeImg.src);
-    const imgWidth = 38; // 35mm lebar barcode
+    const imgWidth = 38;
     const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
     const xCenter = (45 - imgWidth) / 2;
-    const yCenter = (18 - imgHeight) / 2;
-
+    const yCenter = (15 - imgHeight) / 2;
     doc.addImage(barcodeImg.src, 'PNG', xCenter, yCenter, imgWidth, imgHeight);
-
-    doc.save(`barcode-monitoring-detail-${doNumber}.pdf`);
+    doc.save(`barcode-${doNumber}.pdf`);
   }
-</script>
-<script>
+
   async function exportRowFinanceToPDF(id) {
     const { jsPDF } = window.jspdf;
-
-    // Kertas ukuran 70mm x 35mm (label kecil)
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'mm',
-      format: [70, 35]
-    });
-
     const row = document.querySelector(`#row-${id}`);
     if (!row) {
-      alert("Data tidak ditemukan!");
-      return;
+      return Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Data tidak ditemukan!', showConfirmButton: false, timer: 2500 });
     }
+    try {
+      const response = await fetch(`/invoice-export/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error || 'Gagal update invoicing_date');
 
-    const cells = Array.from(row.querySelectorAll('td'));
-    const [
-      no, soNumber, soDate, doNumber, doDate,
-      invoicingDate, customer, location, status, shipBy, eta, receive_name
-    ] = cells.map(cell => cell.innerText.trim());
+      const detail = await (await fetch(`/detail/${id}`)).json();
+      const formatDate = (str) => str ? new Date(str).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : "-";
+      const formatRupiah = (n) => (n && !isNaN(n)) ? 'Rp. ' + Number(n).toLocaleString('id-ID') + ',00' : '-';
 
-    // ✅ Format tanggal dari dd/mm/yyyy → 13-Jun-2025
-    const formatDate = (str) => {
-      if (!str || str === '-') return "-";
-      const parts = str.split(/[\/\-]/); // support 11/6/2025 atau 11-6-2025
-      if (parts.length !== 3) return str;
-      const [day, month, year] = parts.map(p => parseInt(p));
-      const date = new Date(year, month - 1, day);
-      if (isNaN(date)) return str;
-      return date.toLocaleDateString('en-GB', {
-        day: '2-digit', month: 'short', year: 'numeric'
-      }).replace(/ /g, '-');
-    };
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [70, 43] });
+      doc.setLineWidth(0.3);
+      doc.rect(2, 2, 66, 39);
 
-    // ❑ Outline box
-    doc.setLineWidth(0.3);
-    doc.rect(2, 2, 66, 31); // (x, y, width, height)
-    
-    // Layout
-    let xLeft = 5;
-    let xRight = 65;
-    let y = 8;
+      let xLeft = 5, xRight = 65, y = 8;
+      doc.setFontSize(9).setFont("helvetica", "bold").text(detail.delivery_order_number, xLeft, y);
+      doc.setFont("helvetica", "normal").text(formatDate(detail.eta), xRight, y, { align: "right" });
 
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.text(doNumber, xLeft, y);
-    doc.setFont("helvetica", "normal");
-    doc.text(formatDate(eta), xRight, y, { align: "right" });
+      y += 5;
+      doc.text(detail.customer_name, xLeft, y); y += 5;
+      doc.text(detail.ship_by || "-", xLeft, y); y += 5;
+      doc.text(detail.receive_name || "-", xLeft, y); y += 5;
+      doc.text(detail.resi_number || '-', xLeft, y); y += 5;
+      doc.text(formatRupiah(detail.price), xLeft, y); y += 5;
 
-    y += 5;
-    doc.text(customer, xLeft, y);
+      doc.setFont("helvetica", "italic").setFontSize(8);
+      doc.text(`INFO dr GUDANG ${detail.location_warehouse} Tgl.`, xLeft, y);
+      doc.text(formatDate(detail.invoicing_date), xRight, y, { align: "right" });
 
-    y += 5;
-    doc.text(shipBy || "-", xLeft, y);
+      doc.save(`finance-label-${detail.delivery_order_number}.pdf`);
 
-    y += 5;
-    doc.text(receive_name, xLeft, y);
+      Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Update & export berhasil!', showConfirmButton: false, timer: 3000 });
+      location.reload();
+    } catch (err) {
+      console.error('Gagal export:', err);
+      Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: err.message || 'Gagal export', showConfirmButton: false, timer: 3000 });
+    }
+  }
 
-    y += 7;
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(8);
-    doc.text(`INFO dr GUDANG ${location} Tgl.`, xLeft, y);
-    doc.text(formatDate(invoicingDate), xRight, y, { align: "right" });
+  document.getElementById("exportRowToCsv")?.addEventListener("click", function (e) {
+    e.preventDefault();
+    const urlParams = new URLSearchParams(window.location.search);
+    window.location.href = `/soDo/export-csv${urlParams.toString() ? '?' + urlParams.toString() : ''}`;
+  });
 
-    doc.save(`finance-label-${doNumber}.pdf`);
+  function handleCancelDelete(id, doNumber) {
+    Swal.fire({
+      title: 'Yakin ingin Cancel / Delete?',
+      text: `Data DO ${doNumber} akan dicancel atau didelete.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#aaa',
+      confirmButtonText: 'Ya, hapus!',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/cancelDelete/${id}`;
+        document.body.appendChild(form);
+        form.submit();
+      }
+    });
   }
 </script>

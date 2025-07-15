@@ -23,7 +23,7 @@
 
         <% if ([1].includes(user.role)) { %>
         <li class="nav-item">
-          <a href="/uploadSODO" class="nav-link">
+          <a href="/upload" class="nav-link">
             <i class="nav-icon fas fa-file"></i>
             <p>Upload SO / DO</p>
           </a>
@@ -88,11 +88,26 @@
                 <p>Peminjaman Asset</p>
               </a>
             </li>
+            <li class="nav-item">
+              <a href="/pengajuanMemo" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Memo</p>
+              </a>
+            </li>
           </ul>
         </li>
 
         <% } %>
 
+        <% if ([1, 15].includes(user.role)) { %>
+        <!-- E-Warranty: Admin dan Customer Service -->
+        <li class="nav-item">
+          <a href="/eWarranty" class="nav-link">
+            <i class="nav-icon fas fa-file"></i>
+            <p>E-Warranty</p>
+          </a>
+        </li>
+        <% } %>
       </ul>
     </nav>
     <!-- /.sidebar-menu -->

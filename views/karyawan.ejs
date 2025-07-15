@@ -1,0 +1,291 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+<div class="content-wrapper">
+    <% if (successMessage && successMessage.length > 0) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= successMessage %>
+        <button type="button" class="btn btn-sm btn-default ms-2" data-bs-dismiss="alert" aria-label="Close">
+            &times;
+        </button>
+    </div>
+    <% } %>
+
+    <% if (errorMessage && errorMessage.length > 0) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= errorMessage %>
+        <button type="button" class="btn btn-sm btn-default ms-2" data-bs-dismiss="alert" aria-label="Close">
+            &times;
+        </button>
+    </div>
+    <% } %>
+    <div class="modal fade" id="modal-lg">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Tambah Karyawan</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="/createKaryawan" method="POST">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="xxx">ID Karyawan</label>
+                            <input type="number" class="form-control" required id="employee_id" name="employee_id"
+                                placeholder="ID Karyawan (10X untuk Department dan 20X untuk Intern)" />
+                        </div>
+                        <div class="form-group">
+                            <label for="xxx">Nama Karyawan</label>
+                            <input type="text" class="form-control" required id="nama_karyawan" name="nama_karyawan"
+                                placeholder="Nama Karyawan" />
+                        </div>
+                        <div class="form-group">
+                            <label for="xxx">Nomor HP</label>
+                            <input type="text" class="form-control" required id="nomor_hp" name="nomor_hp"
+                                placeholder="Masukkan nomor HP Karyawan" />
+                        </div>
+                        <div class="form-group">
+                            <label for="xxx">Email</label>
+                            <input type="text" class="form-control" required id="email_karyawan" name="email_karyawan"
+                                placeholder="namakaryawan@abadinusa.co.id" />
+                        </div>
+                        <div class="form-group">
+                            <label>Divisi Karyawan</label>
+                            <select class="form-control" name="divisi_karyawan" required>
+                                <option value="">-- Pilih Divisi --</option>
+                                <% optionDivision.forEach(division => { %>
+                                <option value="<%= division.id_division %>"><%= division.name_division %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Departemen Karyawan</label>
+                            <select class="form-control" name="departemen_karyawan" required>
+                                <option value="">-- Pilih Departemen --</option>
+                                <% optionDepartment.forEach(dept => { %>
+                                <option value="<%= dept.id_department %>"><%= dept.department_name %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+    <section class="content p-3">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3>Daftar Karyawan</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-2 text-right">
+                            <button type="button" class="btn btn-primary" style="width: 200px;" data-toggle="modal"
+                                data-target="#modal-lg">
+                                Tambah Karyawan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="form-inline row g-2 ms">
+                    <!-- <form> -->
+                    <div class="col-auto">
+                        <input type="text" id="search" name="search" class="form-control form-control-sm"
+                            placeholder="Cari Karyawan">
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" id="filterDateStart" name="filterDateStart"
+                            class="form-control form-control-sm">
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" id="filterDateEnd" name="filterDateEnd" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-auto">
+                        <button id="filterButton" name="filterButton" class="btn btn-sm btn-primary">Filter</button>
+                        <button id="resetButton" name="resetButton" class="btn btn-sm btn-secondary">Reset</button>
+                    </div>
+                    <!-- </form> -->
+                </div>
+            </div>
+            <!---end card-header -->
+            <!-- Table Content -->
+            <div class="card-body table-responsive">
+                <table id="assetTable" class="table table-striped table-bordered" style="width:100%">
+                    <thead>
+                        <tr style="text-align: center;">
+                            <th style="font-size: 14px; vertical-align: middle;" class="text-center pl-2">No</th>
+                            <th style="font-size: 14px; vertical-align: middle;">ID Karyawan</th>
+                            <th style="font-size: 14px; vertical-align: middle;">Nama Karyawan</th>
+                            <th style="font-size: 14px; vertical-align: middle;">Divisi</th>
+                            <th style="font-size: 14px; vertical-align: middle;">Departemen</th>
+                            <th style="font-size: 14px; vertical-align: middle;" class="text-center pl-2 pr-2"
+                                colspan="2">Status </th>
+                        </tr>
+                    </thead>
+                    <% if (data && data.length > 0) { %>
+                    <% data.forEach((item, index) => { %>
+                    <tbody id="searchResults">
+                        <tr>
+                            <td style="font-size: 15px; justify-content: center;" class="text-center pl-2">
+                                <%= index + 1 %>
+                            </td>
+                            <td style="font-size: 15px;"><%= item.employee_id %></td>
+                            <td style="font-size: 15px;"><%= item.nama_karyawan %></td>
+                            <td style="font-size: 15px"><%= item.name_division %></td>
+                            <td style="font-size: 15px"><%= item.department_name %></td>
+                            <td class="text-center">
+                                <% if (item.is_resign) { %>
+                                <span class="badge badge-danger p-2" style="width: 130px; height: 30px;">Karyawan
+                                    Resign</span>
+                                <% } else { %>
+                                <span class="badge badge-success p-2" style="width: 130px; height: 30px;">Karyawan
+                                    Aktif</span>
+                                <% } %>
+                            </td>
+                            <td class="text-center pr-2">
+                                <a href="/karyawanEdit/<%= item.id_karyawan %>" class="btn btn-sm btn-warning"
+                                    title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                        <% } else { %>
+                        <tr>
+                            <td colspan="11" class="text-center">Tidak ada data</td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <!---end Table Content-->
+            <div class="d-flex justify-content-center mt-3">
+                <% const pageLimit = 5; 
+                    const startPage = Math.max(1, currentPage - Math.floor(pageLimit / 2));
+                    const endPage = Math.min(totalPages, startPage + pageLimit - 1);
+                    const queryString = `search=${encodeURIComponent(searchKeyword || '')}&filterDateStart=${filterDateStart || ''}&filterDateEnd=${filterDateEnd || ''}`;
+                %>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                    <% if (currentPage > 1) { %>
+                        <li class="page-item">
+                        <a class="page-link" href="?page=1&<%= queryString %>">&laquo; First</a>
+                        </li>
+                        <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>&<%= queryString %>">Prev</a>
+                        </li>
+                    <% } %>
+
+                    <% for (let i = startPage; i <= endPage; i++) { %>
+                        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>&<%= queryString %>"><%= i %></a>
+                        </li>
+                    <% } %>
+
+                    <% if (currentPage < totalPages) { %>
+                        <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>&<%= queryString %>">Next</a>
+                        </li>
+                        <li class="page-item">
+                        <a class="page-link" href="?page=<%= totalPages %>&<%= queryString %>">Last &raquo;</a>
+                        </li>
+                    <% } %>
+                    </ul>
+                </nav>
+            </div>
+            <br>
+            <!---END pagination-->
+        </div>
+        <!-- end Card Table -->
+    </section>
+</div>
+</div>
+</div>
+<%- include('layout/footer') %>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode"></script>
+<% if (successMessageLogin && successMessageLogin.length > 0) { %>
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Login Berhasil',
+        text: '<%= successMessageLogin %>',
+        timer: 2500,
+        showConfirmButton: false
+    });
+</script>
+<% } %>
+
+<script>
+    document.getElementById('resetButton').addEventListener('click', function (e) {
+        e.preventDefault();
+        window.location.href = `/karyawan`;
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const filterButton = document.getElementById('filterButton');
+        const searchInput = document.getElementById('search');
+        const startDate = document.getElementById('filterDateStart');
+        const endDate = document.getElementById('filterDateEnd');
+
+        function handleFilter() {
+            const query = new URLSearchParams();
+
+            if (searchInput.value.trim() !== '') {
+                query.append('search', searchInput.value.trim());
+            }
+            if (startDate.value) {
+                query.append('filterDateStart', startDate.value);
+            }
+            if (endDate.value) {
+                query.append('filterDateEnd', endDate.value);
+            }
+
+            window.location.href = `/karyawan?${query.toString()}`;
+        }
+
+        filterButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            handleFilter();
+        });
+
+        // Enter saat di input search
+        searchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleFilter();
+            }
+        });
+
+        // Optional: Enter juga dari date input
+        startDate.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleFilter();
+            }
+        });
+
+        endDate.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleFilter();
+            }
+        });
+    });
+</script>

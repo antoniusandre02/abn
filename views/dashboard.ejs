@@ -1,3 +1,5 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <style>
     .card {
         border-radius: 10px;
@@ -89,12 +91,13 @@
     .pagination {
         text-align: center;
         margin: 20px 0;
+        font-size: 23px;
     }
 
     .pagination a,
     .pagination span {
         display: inline-block;
-        padding: 8px 16px;
+
         margin: 0 4px;
         color: #3490dc;
         text-decoration: none;
@@ -131,15 +134,26 @@
             /* Tambahkan jarak lebih pada layar kecil */
         }
     }
+
+    .clamp-2-lines {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 2.8em;
+        /* kira-kira 2 baris */
+        line-height: 1.4em;
+    }
 </style>
 
 <body class="hold-transition sidebar-mini layout-fixed">
-
     <div class="wrapper">
         <%- include('layout/header') %>
         <%- include('layout/sidebar') %>
         <div class="content-wrapper">
-            <div class="content-header">
+            <div class="content-header pt-0">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-sm-12 text-center">
@@ -156,46 +170,74 @@
                 </div>
             </div>
 
-            <section class="content">
+            <section class="content p-0">
                 <div class="app-content">
-                    <div class="container-fluid">
+                    <div class="container-fluid p-0">
                         <div class="row">
-
                             <!-- Picked -->
                             <div class="col-md-4">
                                 <div class="card mb-4">
-                                    <div class="card-header">
-                                        <h3 class="card-title align-center"><b>Picked</b></h3>
+                                    <div class="card-header text-center">
+                                        <div class="fw-bold" style="font-size: 18px">PICKED</div>
                                     </div>
-                                    <div class="card-body table-responsive">
+                                    <div class="card-body table-responsive p-2">
                                         <table id="tbl_picked" class="table table-sm table-striped">
-                                            <thead>
+                                            <thead style="font-size: 16px; text-align: center">
                                                 <tr>
-                                                    <th>NO SO / NO DO</th>
-                                                    <th>Location</th>
-                                                    <th>Customer Name</th>
+                                                    <th style="width: 115px; vertical-align: middle">
+                                                        SO/DO Number
+                                                    </th>
+                                                    <th style="vertical-align: middle">Customer Name</th>
+                                                    <th style="width: 100px; vertical-align: middle">
+                                                        Location
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <% if (pickedData.length === 0) { %>
-                                                <tr>
-                                                    <td colspan="3" class="text-center text-muted">No data available
+                                                <tr style="height: 55px;">
+                                                    <td colspan="3" class="text-center text-muted"
+                                                        style=" vertical-align: middle;">
+                                                        No data available
                                                     </td>
                                                 </tr>
-                                                <% } else { %>
-                                                <% pickedData.forEach(item => { %>
-                                                <tr class="align-middle">
-                                                    <td><%= item.sales_order_number %> /
-                                                        <%= item.delivery_order_number %></td>
-                                                    <td><%= item.location_warehouse %></td>
-                                                    <td><%= item.customer_name %></td>
+                                                <% for (let i = 1; i < 10; i++) { %>
+                                                <tr style="height: 55px;">
+                                                    <td style="width: 115px; ">&nbsp;</td>
+                                                    <td>&nbsp;</td>
+                                                    <td style="width: 100px; ">&nbsp;</td>
                                                 </tr>
-                                                <% }) %>
                                                 <% } %>
+                                                <% } else { %> <% pickedData.forEach(item => { %>
+                                                <tr class="align-middle" style="height: 55px">
+                                                    <td style="
+                                    text-align: center;
+                                    width: 115px;
+                                    vertical-align: middle;
+                                    ">
+                                                        <%= item.sales_order_number %> / <%=
+                                    item.delivery_order_number %>
+                                                    </td>
+                                                    <td style="vertical-align: middle; font-size: 17px;">
+                                                        <div class="clamp-2-lines">
+                                                            <%= item.customer_name %>
+                                                        </div>
+                                                    </td>
+                                                    <td style="
+                                    text-align: center;
+                                    width: 100px;
+                                    vertical-align: middle;
+                                    ">
+                                                        <%= item.location_warehouse %>
+                                                    </td>
+                                                </tr>
+                                                <% }) %> <% } %>
                                             </tbody>
                                         </table>
-                                        <div class="pagination">
-                                            <span id="currentPagePicked" class="badge bg-info">Picked Page 1</span>
+                                        <div class="d-flex justify-content-center mt-2">
+                                            <div class="pagination">
+                                                <span id="currentPagePicked" class="badge bg-info">Page 1</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -204,38 +246,67 @@
                             <!-- Packed -->
                             <div class="col-md-4">
                                 <div class="card mb-4">
-                                    <div class="card-header">
-                                        <h3 class="card-title align-center"><b>Packed</b></h3>
+                                    <div class="card-header text-center">
+                                        <div class="fw-bold" style="font-size: 18px">PACKED</div>
                                     </div>
-                                    <div class="card-body table-responsive">
+                                    <div class="card-body table-responsive p-2">
                                         <table id="tbl_packed" class="table table-sm table-striped">
-                                            <thead>
+                                            <thead style="font-size: 16px; text-align: center">
                                                 <tr>
-                                                    <th>NO SO / NO DO</th>
-                                                    <th>Location</th>
-                                                    <th>Customer Name</th>
+                                                    <th style="width: 115px; vertical-align: middle">
+                                                        SO/DO Number
+                                                    </th>
+                                                    <th style="vertical-align: middle">Customer Name</th>
+                                                    <th style="width: 100px; vertical-align: middle">
+                                                        Location
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <% if (packedData.length === 0) { %>
-                                                <tr>
-                                                    <td colspan="3" class="text-center text-muted">No data available
+                                                <tr style="height: 55px;">
+                                                    <td colspan="3" class="text-center text-muted"
+                                                        style=" vertical-align: middle;">
+                                                        No data available
                                                     </td>
                                                 </tr>
+                                                <% for (let i = 1; i < 10; i++) { %>
+                                                <tr style="height: 55px;">
+                                                    <td style="width: 115px; ">&nbsp;</td>
+                                                    <td>&nbsp;</td>
+                                                    <td style="width: 100px; ">&nbsp;</td>
+                                                </tr>
+                                                <% } %>
                                                 <% } else { %>
                                                 <% packedData.forEach(item => { %>
-                                                <tr class="align-middle">
-                                                    <td><%= item.sales_order_number %> /
-                                                        <%= item.delivery_order_number %></td>
-                                                    <td><%= item.location_warehouse %></td>
-                                                    <td><%= item.customer_name %></td>
+                                                <tr class="align-middle" style="height: 55px;">
+                                                    <td style="text-align: center; width: 115px; ">
+                                                        <%= item.sales_order_number %> /
+                                                        <%= item.delivery_order_number %>
+                                                    </td>
+                                                    <td style="vertical-align: middle; font-size: 17px; ">
+                                                        <div class="clamp-2-lines"><%= item.customer_name %></div>
+                                                    </td>
+                                                    <td
+                                                        style="text-align: center; width: 100px; vertical-align: middle;">
+                                                        <%= item.location_warehouse %>
+                                                    </td>
                                                 </tr>
-                                                <% }) %>
+                                                <% }); %>
+                                                <% for (let i = packedData.length; i < 10; i++) { %>
+                                                <tr style="height: 55px;">
+                                                    <td style="width: 115px; ">&nbsp;</td>
+                                                    <td>&nbsp;</td>
+                                                    <td style="width: 100px; ">&nbsp;</td>
+                                                </tr>
+                                                <% } %>
                                                 <% } %>
                                             </tbody>
                                         </table>
-                                        <div class="pagination">
-                                            <span id="currentPagePacked" class="badge bg-info">Packed Page 1</span>
+                                        <div class="d-flex justify-content-center mt-2">
+                                            <div class="pagination">
+                                                <span id="currentPagePacked" class="badge bg-info">Page 1</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -244,44 +315,73 @@
                             <!-- Shipped -->
                             <div class="col-md-4">
                                 <div class="card mb-4">
-                                    <div class="card-header">
-                                        <h3 class="card-title align-center"><b>Shipped</b></h3>
+                                    <div class="card-header text-center">
+                                        <div class="fw-bold" style="font-size: 18px">SHIPPED</div>
                                     </div>
-                                    <div class="card-body table-responsive">
+                                    <div class="card-body table-responsive p-2">
                                         <table id="tbl_shipped" class="table table-sm table-striped">
-                                            <thead>
+                                            <thead style="font-size: 16px; text-align: center">
                                                 <tr>
-                                                    <th>NO SO / NO DO</th>
-                                                    <th>Location</th>
-                                                    <th>Customer Name</th>
+                                                    <th style="width: 115px; vertical-align: middle">
+                                                        SO/DO Number
+                                                    </th>
+                                                    <th style="vertical-align: middle">Customer Name</th>
+                                                    <th style="width: 100px; vertical-align: middle">
+                                                        Location
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <% if (shippedData.length === 0) { %>
-                                                <tr>
-                                                    <td colspan="3" class="text-center text-muted">No data available
+                                                <tr style="height: 55px;">
+                                                    <td colspan="3" class="text-center text-muted"
+                                                        style=" vertical-align: middle;">
+                                                        No data available
                                                     </td>
                                                 </tr>
+                                                <% for (let i = 1; i < 10; i++) { %>
+                                                <tr style="height: 55px;">
+                                                    <td style="width: 115px; ">&nbsp;</td>
+                                                    <td>&nbsp;</td>
+                                                    <td style="width: 100px; ">&nbsp;</td>
+                                                </tr>
+                                                <% } %>
                                                 <% } else { %>
                                                 <% shippedData.forEach(item => { %>
-                                                <tr class="align-middle">
-                                                    <td><%= item.sales_order_number %> /
-                                                        <%= item.delivery_order_number %></td>
-                                                    <td><%= item.location_warehouse %></td>
-                                                    <td><%= item.customer_name %></td>
+                                                <tr class="align-middle" style="height: 55px;">
+                                                    <td style="text-align: center; width: 115px; ">
+                                                        <%= item.sales_order_number %> /
+                                                        <%= item.delivery_order_number %>
+                                                    </td>
+                                                    <td style="vertical-align: middle; font-size: 17px; ">
+                                                        <div class="clamp-2-lines"><%= item.customer_name %></div>
+                                                    </td>
+                                                    <td
+                                                        style="text-align: center; width: 100px; vertical-align: middle;">
+                                                        <%= item.location_warehouse %>
+                                                    </td>
                                                 </tr>
-                                                <% }) %>
+                                                <% }); %>
+                                                <% for (let i = shippedData.length; i < 10; i++) { %>
+                                                <tr style="height: 55px;">
+                                                    <td style="width: 115px; ">&nbsp;</td>
+                                                    <td>&nbsp;</td>
+                                                    <td style="width: 100px; ">&nbsp;</td>
+                                                </tr>
+                                                <% } %>
                                                 <% } %>
                                             </tbody>
                                         </table>
-                                        <div class="pagination">
-                                            <span id="currentPageShipped" class="badge bg-info">Shipped Page 1</span>
+                                        <div class="d-flex justify-content-center mt-2">
+                                            <div class="pagination">
+                                                <span id="currentPageShipped" class="badge bg-info">Page 1</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
+                        </div>
                     </div>
                 </div>
 
@@ -300,6 +400,17 @@
 </body>
 <%- include('layout/footer') %>
 <!-- ... HTML dan styles atas tetap sama ... -->
+<% if (successMessageLogin && successMessageLogin.length > 0) { %>
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Login Berhasil',
+        text: '<%= successMessageLogin %>',
+        timer: 2500,
+        showConfirmButton: false
+    });
+</script>
+<% } %>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -316,30 +427,62 @@
 
     function updateTable(tableId, data) {
         const tbody = document.querySelector(`#${tableId} tbody`);
-        tbody.innerHTML = '';
+        tbody.innerHTML = "";
+
+        const totalRows = 10; // Tetapkan jumlah baris tetap 10
 
         if (data.length === 0) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td colspan="3" class="text-center text-muted">No data available</td>`;
+            const tr = document.createElement("tr");
+            tr.innerHTML =
+                `<td colspan="3" class="text-center text-muted" style="height: 55px; vertical-align: middle;">No data available</td>`;
             tbody.appendChild(tr);
+
+            for (let i = 1; i < totalRows; i++) {
+                const emptyTr = document.createElement("tr");
+                emptyTr.innerHTML = `
+                <td style="height: 55px;">&nbsp;</td>
+                <td style="height: 55px;">&nbsp;</td>
+                <td style="height: 55px;">&nbsp;</td>
+            `;
+                tbody.appendChild(emptyTr);
+            }
         } else {
-            data.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.classList.add('align-middle');
+            data.forEach((item) => {
+                const tr = document.createElement("tr");
+                tr.classList.add("align-middle");
                 tr.innerHTML = `
-                    <td>${item.sales_order_number} / ${item.delivery_order_number}</td>
-                    <td>${item.location_warehouse}</td>
-                    <td>${item.customer_name}</td>
-                `;
+            <td style="text-align: center; width: 115px; vertical-align: middle; height: 55px;">
+            ${item.sales_order_number} / ${item.delivery_order_number}
+            </td>
+            <td style="vertical-align: middle; height: 55px; font-size: 17px;">
+                <div class="clamp-2-lines">${item.customer_name}</div>
+            </td>
+            <td style="text-align: center; width: 115px; vertical-align: middle; height: 55px;">
+            ${item.location_warehouse}
+            </td>
+            `;
                 tbody.appendChild(tr);
             });
+
+            // Tambahkan baris kosong jika data kurang dari 10
+            for (let i = data.length; i < totalRows; i++) {
+                const emptyTr = document.createElement("tr");
+                emptyTr.innerHTML = `<td style="height: 55px;" colspan="3">&nbsp;</td>`;
+                tbody.appendChild(emptyTr);
+            }
         }
     }
 
     function updatePaginationUI() {
-        document.getElementById('currentPagePicked').textContent = `Picked Page ${currentPagePicked}`;
-        document.getElementById('currentPagePacked').textContent = `Packed Page ${currentPagePacked}`;
-        document.getElementById('currentPageShipped').textContent = `Shipped Page ${currentPageShipped}`;
+        document.getElementById(
+            "currentPagePicked"
+        ).textContent = `Page ${currentPagePicked}`;
+        document.getElementById(
+            "currentPagePacked"
+        ).textContent = `Page ${currentPagePacked}`;
+        document.getElementById(
+            "currentPageShipped"
+        ).textContent = `Page ${currentPageShipped}`;
     }
 
     function paginateStatus() {
@@ -348,49 +491,66 @@
             return;
         }
 
-        const url = `/dashboardData?pagePicked=${currentPagePicked}&pagePacked=${currentPagePacked}&pageShipped=${currentPageShipped}`;
+        const url =
+            `/dashboardData?pagePicked=${currentPagePicked}&pagePacked=${currentPagePacked}&pageShipped=${currentPageShipped}`;
         console.log("Fetching:", url);
         fetch(url)
-        .then(res => res.json())
-            .then(data => {
+            .then((res) => res.json())
+            .then((data) => {
                 totalPagesPicked = Math.ceil(data.pickedTotal / 10);
                 totalPagesPacked = Math.ceil(data.packedTotal / 10);
                 totalPagesShipped = Math.ceil(data.shippedTotal / 10);
 
-                console.log('Auto-paginate total pages =>', totalPagesPicked, totalPagesPacked, totalPagesShipped);
-                console.log(`📦 Fetching Picked ${currentPagePicked}, Packed ${currentPagePacked}, Shipped ${currentPageShipped}`);
+                console.log(
+                    "Auto-paginate total pages =>",
+                    totalPagesPicked,
+                    totalPagesPacked,
+                    totalPagesShipped
+                );
+                console.log(
+                    `📦 Fetching Picked ${currentPagePicked}, Packed ${currentPagePacked}, Shipped ${currentPageShipped}`
+                );
 
                 // Update Table
-                updateTable('tbl_picked', data.pickedData);
-                updateTable('tbl_packed', data.packedData);
-                updateTable('tbl_shipped', data.shippedData);
+                updateTable("tbl_picked", data.pickedData);
+                updateTable("tbl_packed", data.packedData);
+                updateTable("tbl_shipped", data.shippedData);
 
                 // Update UI before incrementing
                 updatePaginationUI();
 
                 // Increment pages after displaying
-                currentPagePicked = totalPagesPicked > 1 && currentPagePicked < totalPagesPicked ? currentPagePicked + 1 : 1;
-                currentPagePacked = totalPagesPacked > 1 && currentPagePacked < totalPagesPacked ? currentPagePacked + 1 : 1;
-                currentPageShipped = totalPagesShipped > 1 && currentPageShipped < totalPagesShipped ? currentPageShipped + 1 : 1;
+                currentPagePicked =
+                    totalPagesPicked > 1 && currentPagePicked < totalPagesPicked ?
+                    currentPagePicked + 1 :
+                    1;
+                currentPagePacked =
+                    totalPagesPacked > 1 && currentPagePacked < totalPagesPacked ?
+                    currentPagePacked + 1 :
+                    1;
+                currentPageShipped =
+                    totalPagesShipped > 1 && currentPageShipped < totalPagesShipped ?
+                    currentPageShipped + 1 :
+                    1;
 
-                document.getElementById('loading-indicator').style.display = 'block';
+                document.getElementById("loading-indicator").style.display = "block";
                 setTimeout(() => {
-                    document.getElementById('loading-indicator').style.display = 'none';
+                    document.getElementById("loading-indicator").style.display = "none";
                 }, 1000);
             })
-            .catch(err => {
-                console.error('Pagination fetch error:', err);
+            .catch((err) => {
+                console.error("Pagination fetch error:", err);
             });
     }
 
     const socket = io();
-    socket.on('dataUpdate', (data) => {
+    socket.on("dataUpdate", (data) => {
         isSocketUpdateInProgress = true;
         initialDataLoaded = true;
 
-        updateTable('tbl_picked', data.pickedData);
-        updateTable('tbl_packed', data.packedData);
-        updateTable('tbl_shipped', data.shippedData);
+        updateTable("tbl_picked", data.pickedData);
+        updateTable("tbl_packed", data.packedData);
+        updateTable("tbl_shipped", data.shippedData);
 
         currentPagePicked = 1;
         currentPagePacked = 1;
@@ -399,16 +559,36 @@
         updatePaginationUI();
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
             initialDataLoaded = true;
         }, 1000);
 
         setInterval(paginateStatus, 20000);
 
-        const hariNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        const bulanNames = ["January", "February", "March", "April", "May", "June", "July", "August",
-            "September", "October", "November", "December"];
+        const hariNames = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+        ];
+        const bulanNames = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ];
         const today = new Date();
         const hari = hariNames[today.getDay()];
         const tanggal = today.getDate();
@@ -416,13 +596,15 @@
         const tahun = today.getFullYear();
 
         const suffix = (tanggal) => {
-            if (tanggal % 10 === 1 && tanggal % 100 !== 11) return 'st';
-            if (tanggal % 10 === 2 && tanggal % 100 !== 12) return 'nd';
-            if (tanggal % 10 === 3 && tanggal % 100 !== 13) return 'rd';
-            return 'th';
+            if (tanggal % 10 === 1 && tanggal % 100 !== 11) return "st";
+            if (tanggal % 10 === 2 && tanggal % 100 !== 12) return "nd";
+            if (tanggal % 10 === 3 && tanggal % 100 !== 13) return "rd";
+            return "th";
         };
 
-        const formattedDate = `${hari}, ${bulan} ${tanggal}${suffix(tanggal)} ${tahun}`;
-        document.getElementById('tanggal').textContent = formattedDate;
+        const formattedDate = `${hari}, ${bulan} ${tanggal}${suffix(
+        tanggal
+        )} ${tahun}`;
+        document.getElementById("tanggal").textContent = formattedDate;
     });
 </script>

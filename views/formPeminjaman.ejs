@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            color: #000;
+        }
+
+        .judul {
+            text-align: center;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .judul span {
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .judul h3 {
+            margin: 0;
+            text-decoration: underline;
+        }
+
+        .info {
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .info p {
+            margin: 4px 0;
+            font-size: 14px;
+        }
+
+        table {
+            width: auto;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            width: auto;
+            border: 1px solid #000;
+            padding: 8px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+
+        .signature {
+            margin-top: 100px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .signature div {
+            text-align: center;
+            width: 30%;
+        }
+
+        .signature p {
+            margin-bottom: 100px;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 70px;
+            }
+
+            body {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="judul">
+        <h3>SURAT PERNYATAAN TANGGUNG JAWAB <br />ASET ATAS PERANGKAT KERJA</h3>
+        <% 
+            const date = new Date(item.tanggal_peminjaman);
+
+            const hari = String(date.getDate()).padStart(2, '0');
+            const bulan = String(date.getMonth() + 1).padStart(2, '0');            // Bulan (1-12)
+            const bulanNama = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const namaBulan = bulanNama[date.getMonth()];
+            const tahun = date.getFullYear();   
+            const urutan = String(item.id_pinjam_asset).padStart(3, '0');
+        %>
+        <span>Nomor: IT/<%= bulan %>-<%= tahun %>/FR-SPTJ-<%= urutan %><br /></span>
+    </div>
+
+    <div class="info">
+        <p>Saya yang bertanda tangan di bawah ini:</p>
+        <table style="border-collapse: collapse; border: none; width: 100%">
+            <colgroup>
+                <col style="width: 30%" />
+                <col style="width: 70%" />
+            </colgroup>
+            <tr>
+                <td style="border: none; padding: 0">
+                    <strong>Nama Peminjam</strong>
+                </td>
+                <td style="border: none; padding: 0">: <%= item.nama_karyawan %></td>
+            </tr>
+            <tr>
+                <td style="border: none; padding: 0">
+                    <strong>Nomor Induk</strong>
+                </td>
+                <td style="border: none; padding: 0">: <%= item.employee_id %></td>
+            </tr>
+            <tr>
+                <td style="border: none; padding: 0"><strong>Jabatan</strong></td>
+                <td style="border: none; padding: 0">: <%= item.department_name %></td>
+            </tr>
+            <tr>
+                <td style="border: none; padding: 0"><strong>Divisi</strong></td>
+                <td style="border: none; padding: 0">: <%= item.name_division %></td>
+            </tr>
+            <tr>
+                <td style="border: none; padding: 0"><strong>No HP</strong></td>
+                <td style="border: none; padding: 0">: <%= item.nomor_hp %></td>
+            </tr>
+            <tr>
+                <td style="border: none; padding: 0">
+                    <strong>Tanggal Pinjam</strong>
+                </td>
+                <td style="border: none; padding: 0">: <%= hari %>&nbsp;<%= namaBulan %>&nbsp;<%= tahun %></td>
+            </tr>
+        </table>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Kode Barang</th>
+                <th>Nama Barang</th>
+                <th>Brand</th>
+                <th>Serial Number</th>
+                <th>Tahun</th>
+                <th>Jenis Asset</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% itemAssets.forEach(asset => { %>
+                <tr>
+                    <td><%= asset.kode_asset %></td>
+                    <td><%= asset.nama_asset %></td>
+                    <td><%= asset.brand_asset %></td>
+                    <td><%= asset.sn_asset %></td>
+                    <td><%= asset.tahun_pembelian %></td>
+                    <td><%= asset.jenis_asset %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+    <p style="font-size: 14px">
+        Saya menyatakan bertanggung jawab dalam menggunakan serta menjaga
+        fasilitas tersebut di atas sesuai dengan ketentuan yang berlaku.
+        <br /><br />
+        Apabila dalam penggunaan fasilitas dimaksud terjadi hal-hal sebagai
+        berikut:
+        <br />
+        1. <b>Rusak</b>, dibuktikan dengan Berita Acara Pemeriksaan oleh Tim IT
+        karena kelalaian pengguna;<br />
+        2. <b>Hilang</b>, dibuktikan dengan Berita Acara Kejadian oleh Divisi
+        terkait selaku pemilik dan pengelola aset;<br />
+        3. Catatan tambahan: <%= item.notes %>
+        <br /><br />
+        Maka saya selaku pengguna fasilitas tersebut bertanggung jawab penuh dan
+        bersedia mengganti dengan fasilitas yang setara sesuai ketentuan
+        perusahaan, serta tidak dapat mengajukan permintaan fasilitas pengganti.
+        <br /><br />
+        Demikian surat pernyataan ini dibuat untuk dipergunakan sebagaimana
+        mestinya.
+        <br />
+        <br />
+        <br />
+    </p>
+
+    <table style="width: 100%; border-collapse: collapse; border: none">
+        <tr style="height: 180px">
+            <td style="text-align: left; vertical-align: top; border: none">
+                <p>Jakarta, <%= hari %>&nbsp;<%= namaBulan %>&nbsp;<%= tahun %><br />Pengguna Aset</p>
+                <div style="height: 80px"></div>
+                <p><%= item.nama_karyawan %></p>
+            </td>
+            <td style="text-align: center; vertical-align: top; border: none">
+                <p style="margin-bottom: 10px">Pemilik dan Pengelola Aset</p>
+                <img src="/adminlte/dist/img/paksondra.png" alt="Tanda Tangan IT"
+                    style="width: 120px; height: auto; margin-bottom: 10px" />
+                <p>IT</p>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+        window.onload = function () {
+            window.print();
+        };
+
+        window.onafterprint = function () {
+            window.location.href = "/pinjamAsset";
+        };
+    </script>
+</body>
+
+</html>

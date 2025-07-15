@@ -1,0 +1,405 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+<div class="content-wrapper">
+    <% if (successMessage && successMessage.length > 0) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= successMessage %>
+        <button type="button" class="btn btn-sm btn-default ms-2" data-bs-dismiss="alert" aria-label="Close">
+            &times;
+        </button>
+    </div>
+    <% } %>
+
+    <% if (errorMessage && errorMessage.length > 0) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= errorMessage %>
+        <button type="button" class="btn btn-sm btn-default ms-2" data-bs-dismiss="alert" aria-label="Close">
+            &times;
+        </button>
+    </div>
+    <% } %>
+    <div class="modal fade" id="modal-lg" tabindex="-1" , aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content position-relative">
+                <div class="modal-header">
+                    <h4 class="modal-title">Form Pinjam Asset</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="/pinjamAssetCreate" method="POST" id="pinjamForm">
+                    <input type="hidden" name="tempAssets" id="tempAssets" />
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- KIRI: Data Peminjam -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Nama Peminjam</label>
+                                    <select id="nama_karyawan" name="id_karyawan" class="form-control select2">
+                                        <option value="">-- Pilih Peminjam --</option>
+                                        <% optionKaryawan.forEach(k => { %>
+                                        <option value="<%= k.id_karyawan %>">
+                                            <%= k.nama_karyawan %>
+                                        </option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nomor Handphone</label>
+                                    <input type="text" class="form-control" id="nomor_karyawan" readonly />
+                                </div>
+                                <div class="form-group">
+                                    <label>Divisi</label>
+                                    <input type="text" class="form-control" id="division" readonly />
+                                </div>
+                                <div class="form-group">
+                                    <label>Jabatan</label>
+                                    <input type="text" class="form-control" id="jabatan_karyawan" readonly />
+                                </div>
+                            </div>
+
+                            <!-- KANAN: Data Barang -->
+                            <!-- KANAN: Data Barang -->
+                            <div class="col-9">
+                                <div class="form-group row align-items-end">
+                                    <div class="col-9 pl-0">
+                                        <label>Kode Barang</label>
+                                        <select id="nomor_asset" class="form-control select2">
+                                            <option value="">-- Pilih Asset --</option>
+                                            <% optionAsset.forEach(a => { %>
+                                            <option value="<%= a.id_asset %>" data-kode="<%= a.kode_asset %>"
+                                                data-nama="<%= a.nama_asset %>" data-sn="<%= a.sn_asset %>">
+                                                <%= a.kode_asset %> – <%= a.nama_asset %>
+                                            </option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="col-3">
+                                        <label class="invisible">Tambah</label>
+                                        <button type="button" class="btn btn-success" id="btnAddAsset">
+                                            Tambah
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Table Modal yang diletakkan di bawah Kode Barang & Upload -->
+                                <div class="card p-2">
+                                    <div class="card-body p-0" style="overflow-y: auto; max-height: 225px">
+                                        <table class="table table-bordered" id="addedAssetsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Kode Asset</th>
+                                                    <th>Nama</th>
+                                                    <th>Serial</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-12 mt-2">
+                                <label>Tanggal Peminjaman</label>
+                                <input type="date" class="form-control" id="tanggal_pinjam" name="tanggal_pinjam">
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label>Catatan Peminjam</label>
+                                    <textarea class="form-control" name="notes" id="notes" rows="2"
+                                        placeholder="Masukkan catatan jika ada..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <section class="content p-3">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3>Daftar Pengajuan Asset</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-2 text-right">
+                            <button type="button" class="btn btn-primary" style="width: 200px;" data-toggle="modal"
+                                data-target="#modal-lg">
+                                Form Peminjaman
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="form-inline row g-2 ms">
+                    <!-- <form> -->
+                    <div class="col-auto">
+                        <input type="text" id="search" name="search" class="form-control form-control-sm"
+                            placeholder="Cari Kode Asset atau Nama Karyawan">
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" id="filterDateStart" name="filterDateStart"
+                            class="form-control form-control-sm">
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" id="filterDateEnd" name="filterDateEnd" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-auto">
+                        <button id="filterButton" name="filterButton" class="btn btn-sm btn-primary">Filter</button>
+                        <button id="resetButton" name="resetButton" class="btn btn-sm btn-secondary">Reset</button>
+                    </div>
+                    <!-- </form> -->
+                </div>
+            </div>
+            <!---end card-header -->
+            <!-- Table Content -->
+            <div class="card-body table-responsive">
+                <table id="assetTable" class="table table-striped table-bordered" style="width:100%">
+                    <thead>
+                        <tr style="text-align: center;">
+                            <th style="font-size: 14px; vertical-align: middle;" class="text-center pl-2">No</th>
+                            <th style="font-size: 14px; vertical-align: middle;">Nama Karyawan</th>
+                            <th style="font-size: 14px; vertical-align: middle;">Employee ID</th>
+                            <th style="font-size: 14px; vertical-align: middle;">Jumlah Asset</th>
+                            <th style="font-size: 14px; vertical-align: middle;">Kode Asset</th>
+                            <th style="font-size: 14px; vertical-align: middle;" class="text-center pl-3 pr-3" colspan="3">Status </th>
+                        </tr>
+                    </thead>
+                    <% if (data && data.length > 0) { %>
+                    <% data.forEach((item, index) => { %>
+                    <tbody id="searchResults">
+                        <tr>
+                            <td style="font-size: 15px; justify-content: center;" class="text-center pl-2">
+                                <%= index + 1 %>
+                            </td>
+                            <td><%= item.nama_karyawan %></td>
+                            <td><%= item.employee_id %></td>
+                            <td><%= item.jumlah_asset %> aset</td>
+                            <td><%= item.daftar_kode_asset %></td>
+                            <td>
+                                <% if (!item.tanggal_pengembalian) { %>
+                                <span class="p-2 badge bg-info text-light" style="width: 100px; height: 30px;">Dipinjam</span>
+                                <% } else { %>
+                                <span class="p-2 badge bg-success text-light" style="width: 100px; height: 30px;">Dikembalikan</span>
+                                <% } %>
+                            </td>
+
+                            <% if (item.id_pinjam_asset) { %>
+                            <td>
+                                <a href="/pinjamAssetEdit/<%= item.id_pinjam_asset %>" class="btn btn-sm btn-warning"
+                                    title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                            <% } else { %>
+                            <td class="text-muted">-</td>
+                            <% } %>
+                            <td>
+                                <a href="/printFormPeminjaman/<%= item.id_pinjam_asset %>" class="btn btn-sm btn-info"
+                                    title="Print">
+                                    <i class="fas fa-print"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                        <% } else { %>
+                        <tr>
+                            <td colspan="11" class="text-center">Tidak ada data</td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <!---end Table Content-->
+            <div class="d-flex justify-content-center mt-3">
+                <% const pageLimit = 5; 
+                    const startPage = Math.max(1, currentPage - Math.floor(pageLimit / 2));
+                    const endPage = Math.min(totalPages, startPage + pageLimit - 1);
+                    const queryString = `search=${encodeURIComponent(searchKeyword || '')}&filterDateStart=${filterDateStart || ''}&filterDateEnd=${filterDateEnd || ''}`;
+                %>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                    <% if (currentPage > 1) { %>
+                        <li class="page-item">
+                        <a class="page-link" href="?page=1&<%= queryString %>">&laquo; First</a>
+                        </li>
+                        <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>&<%= queryString %>">Prev</a>
+                        </li>
+                    <% } %>
+
+                    <% for (let i = startPage; i <= endPage; i++) { %>
+                        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>&<%= queryString %>"><%= i %></a>
+                        </li>
+                    <% } %>
+
+                    <% if (currentPage < totalPages) { %>
+                        <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>&<%= queryString %>">Next</a>
+                        </li>
+                        <li class="page-item">
+                        <a class="page-link" href="?page=<%= totalPages %>&<%= queryString %>">Last &raquo;</a>
+                        </li>
+                    <% } %>
+                    </ul>
+                </nav>
+            </div>
+            <br>
+            <!---END pagination-->
+        </div>
+        <!-- end Card Table -->
+    </section>
+</div>
+</div>
+</div>
+<%- include('layout/footer') %>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // ===================== Handle Nama Karyawan =====================
+        $('#nama_karyawan').on('change', function () {
+            const id = $(this).val();
+            if (!id) {
+                $('#nomor_karyawan').val('');
+                $('#division').val('');
+                $('#jabatan_karyawan').val('');
+                return;
+            }
+
+            $.ajax({
+                url: `/karyawan-info/${id}`,
+                method: 'GET',
+                success: function (res) {
+                    $('#nomor_karyawan').val(res.nomor_hp || '');
+                    $('#division').val(res.name_division || '');
+                    $('#jabatan_karyawan').val(res.department_name || '');
+                },
+                error: function (err) {
+                    console.error(err);
+                    alert('Gagal mengambil data karyawan');
+                }
+            });
+        });
+
+        // ===================== Init Select2 =====================
+        $('#nama_karyawan,#nomor_asset').select2({
+            dropdownParent: $('#modal-lg'),
+            minimumInputLength: 1
+        });
+
+        // ===================== Modal Shown =====================
+        $('#modal-lg').on('shown.bs.modal', function () {
+            $('.select2').select2({
+                dropdownParent: $('#modal-lg')
+            });
+
+            $('.select2-selection').attr(
+                'style',
+                'height: 38px; display: flex; padding-left: 8px;'
+            );
+            $('.select2-selection__arrow').css({
+                height: '38px',
+                top: '0',
+                display: 'flex',
+                'align-items': 'center'
+            });
+        });
+
+        // ===================== Handle Tambah & Hapus Asset =====================
+        const tempAssets = [];
+
+        $('#btnAddAsset').on('click', () => {
+            const sel = $('#nomor_asset option:selected');
+            const id = sel.val();
+            if (!id) return alert('Pilih asset dulu!');
+            if (tempAssets.find(a => a.id_asset == id)) return alert('Asset sudah ditambahkan');
+
+            const row = {
+                id_asset: id,
+                kode: sel.data('kode'),
+                nama: sel.data('nama'),
+                sn: sel.data('sn')
+            };
+
+            tempAssets.push(row);
+            $('#addedAssetsTable tbody').append(`
+        <tr data-id="${id}">
+          <td>${row.kode}</td><td>${row.nama}</td><td>${row.sn}</td>
+          <td><button type="button" class="btn btn-danger btn-sm btn-remove">X</button></td>
+        </tr>
+      `);
+        });
+
+        $('#addedAssetsTable').on('click', '.btn-remove', function () {
+            const id = $(this).closest('tr').data('id');
+            const idx = tempAssets.findIndex(a => a.id_asset == id);
+            if (idx >= 0) {
+                tempAssets.splice(idx, 1);
+                $(this).closest('tr').remove();
+            }
+        });
+
+        $('#pinjamForm').on('submit', e => {
+            if (tempAssets.length === 0) {
+                e.preventDefault();
+                return alert('Minimal pilih 1 asset!');
+            }
+            $('#tempAssets').val(JSON.stringify(tempAssets));
+        });
+
+        // ===================== Reset & Filter =====================
+        document.getElementById('resetButton').addEventListener('click', function (e) {
+            e.preventDefault();
+            window.location.href = `/pinjamAsset`;
+        });
+
+        const filterButton = document.getElementById('filterButton');
+        const searchInput = document.getElementById('search');
+        const startDate = document.getElementById('filterDateStart');
+        const endDate = document.getElementById('filterDateEnd');
+
+        filterButton.addEventListener('click', function (e) {
+            e.preventDefault(); // Hindari submit form default
+
+            const query = new URLSearchParams();
+            if (searchInput.value.trim() !== '') {
+                query.append('search', searchInput.value.trim());
+            }
+            if (startDate.value) {
+                query.append('filterDateStart', startDate.value);
+            }
+            if (endDate.value) {
+                query.append('filterDateEnd', endDate.value);
+            }
+
+            window.location.href = `/pinjamAsset?${query.toString()}`;
+        });
+
+        // Trigger tombol Filter saat tekan Enter di input
+        [searchInput, startDate, endDate].forEach(input => {
+            input.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    filterButton.click();
+                }
+            });
+        });
+    });
+</script>

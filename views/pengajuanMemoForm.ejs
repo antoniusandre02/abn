@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title><%= memo.perihal %></title>
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 17px;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+
+    .header {
+      text-align: center;
+    }
+
+    .header img {
+      width: 300px;
+    }
+
+    .memo-number {
+      font-size: 18px;
+      margin-top: 4px;
+    }
+
+    .info-table {
+      width: 100%;
+      margin-top: 20px;
+      font-size: 16px;
+    }
+
+    .info-table td {
+      vertical-align: top;
+      padding: 2px 5px;
+    }
+
+    .double-line {
+      border-top: 1px solid black;
+      margin-top: 10px;
+      margin-bottom: 1px;
+    }
+
+    .double-line-bold {
+      border-top: 4px solid black;
+      margin-bottom: 20px;
+    }
+
+    .content p {
+      margin: 10px 0;
+    }
+
+    table.purchase {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 15px;
+    }
+
+    table.purchase th,
+    table.purchase td {
+      border: 1px solid #000;
+      padding: 6px 10px;
+      text-align: left;
+    }
+
+    table.signature {
+      width: 100%;
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    table.signature img {
+      width: 100px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 15px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: black;
+      margin-top: 60px;
+    }
+
+    .content {
+      flex: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="content">
+    <!-- Header -->
+    <div class="header">
+      <img src="<%= logoPath %>" alt="logo" />
+      <div class="memo-number"><%= memo.nomor_memo %></div>
+    </div>
+
+    <!-- Info Table -->
+    <table class="info-table">
+      <tr>
+        <td style="width: 10%"><b>DARI</b></td>
+        <td style="width: 45%">: <%= memo.dari_nama %></td>
+        <td style="width: 5%; text-align: center"><b>( &nbsp; )</b></td>
+        <td style="width: 30%; text-align: right;">UNTUK DIKETAHUI</td>
+      </tr>
+      <tr>
+        <td><b>KEPADA</b></td>
+        <td>: Ibu Kharisma Hidayat</td>
+        <td style="text-align: center"><b>( &nbsp; )</b></td>
+        <td style="text-align: right;">UNTUK DILAKSANAKAN</td>
+      </tr>
+      <tr>
+        <td><b>TANGGAL</b></td>
+        <td>:
+          <%= new Date(memo.tanggal_pengajuan).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>
+        </td>
+        <td style="text-align: center"><b>( &nbsp; )</b></td>
+        <td style="text-align: right;">UNTUK ARSIP</td>
+      </tr>
+      <tr>
+        <td><b>PERIHAL</b></td>
+        <td>: <%= memo.perihal %></td>
+        <td style="text-align: center"><b>( &nbsp; )</b></td>
+        <td style="text-align: right;">UNTUK TANGGAPAN</td>
+      </tr>
+      <tr>
+        <td><b>CC</b></td>
+        <td>: <%= memo.cc_nama %></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+
+    <div class="double-line"></div>
+    <div class="double-line-bold"></div>
+
+    <!-- Content -->
+    <p>Dengan Hormat,</p>
+
+    <p>
+      Melalui memo ini, saya ingin mengajukan approval kepada Ibu Kharisma
+      Hidayat mengenai pengajuan pembelian:
+    </p>
+
+    <!-- Purchase Table -->
+    <table class="purchase">
+      <thead>
+        <tr>
+          <th style="width: 40%; text-align: center;">Nama Barang</th>
+          <th style="width: 5%; text-align: center;">Qty</th>
+          <th style="width: 10%; text-align: center;">User</th>
+          <th style="width: 20%; text-align: center;">Remark</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% details.forEach(d => { %>
+        <tr>
+          <td>
+            <div><strong><%= d.item %></strong></div>
+            <div style="font-size: 0.8em; word-break: break-all;"><a href="<%= d.link %>" target="_blank"><%= d.link %></a></div>
+          </td>
+          <td><%= d.jumlah %></td>
+          <td><%= d.user_memo %></td>
+          <td><%= d.keterangan %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <p>
+      Demikian permohonan ini saya sampaikan. Mohon kesediaan Ibu Kharisma
+      untuk dapat melakukan review dan memberikan persetujuan.
+    </p>
+    <p>Terima kasih.</p>
+
+    <!-- Signature -->
+    <table class="signature">
+      <thead>
+        <tr>
+          <th style="width: 50%;">Hormat Saya</th>
+          <th></th>
+          <th style="width: 50%;">Approval</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <img src="<%= ttdPath %>" alt="Tanda Tangan IT" />
+          </td>
+          <td></td>
+          <td>
+            <% if (typeof ttdApprove !== 'undefined') { %>
+              <img src="<%= ttdApprove %>" alt="TTD Approver" />
+            <% } %>
+          </td>
+        </tr>
+        <tr>
+          <td><%= memo.dari_nama %></td>
+          <td></td>
+          <td>
+            Ibu Kharisma Hidayat<br />
+            <% if (memo.tanggal_approve) { %>
+              <div style="font-size: 12px; margin-top: 5px; color: #555;">
+                Ditandatangani pada:
+                <%= new Date(memo.tanggal_approve).toLocaleString('id-ID', {
+                  day: '2-digit',
+                  month: 'long',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  timeZone: 'Asia/Jakarta' // Pastikan zona waktu
+                }) %>
+              </div>
+            <% } %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <% if (memo.tanggal_reject) { %>
+      <div style="text-align: center; font-size: 20px; padding-top: 15px;">
+        Memo ini Reject dengan Alasan : <br /> <b><%= memo.keterangan_memo %></b>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <b>
+      PT. ABADINUSA USAHASEMESTA, Jl. Surabaya No. 54, Jakarta 10310<br />
+      Telp. (021) 310 1825 (Hunting), Fax. (021) 310 1926, Email:
+      abntoday@abadinusa.co.id
+    </b>
+  </footer>
+</body>
+
+</html>

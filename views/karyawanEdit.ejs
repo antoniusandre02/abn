@@ -1,0 +1,63 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+
+<div class="content-wrapper p-3">
+    <h3>Edit Karyawan</h3>
+    <form action="/updateKaryawan/<%= item.id_karyawan %>" method="POST">
+        <div class="form-group">
+            <label for="xxx">ID Karyawan</label>
+            <input type="number" class="form-control" required id="employee_id" name="employee_id" value="<%= item.employee_id %>"/>
+        </div>
+
+        <div class="form-group">
+            <label for="xxx">Nama Karyawan</label>
+            <input type="text" class="form-control" required id="nama_karyawan" name="nama_karyawan" value="<%= item.nama_karyawan %>" />
+        </div>
+
+        <div class="form-group">
+            <label for="xxx">Nomor HP</label>
+            <input type="text" class="form-control" required id="nomor_hp" name="nomor_hp" value="<%= item.nomor_hp %>"/>
+        </div>
+
+        <div class="form-group">
+            <label for="xxx">Email</label>
+            <input type="text" class="form-control" required id="email_karyawan" name="email_karyawan" value="<%= item.email_karyawan %>"/>
+        </div>
+
+        <div class="form-group">
+            <label>Divisi Karyawan</label>
+            <select class="form-control" name="divisi_karyawan" required>
+                <option value="">-- Pilih Divisi --</option>
+                <% divisi.forEach(d => { %>
+                <option value="<%= d.id_division %>" <%= item.divisi_karyawan === d.id_division ? 'selected' : '' %>><%= d.name_division %></option>
+                <% }) %>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Departemen Karyawan</label>
+            <select class="form-control" name="departemen_karyawan" required>
+                <option value="">-- Pilih Departemen --</option>
+                <% departemen.forEach(dep => { %>
+                <option value="<%= dep.id_department %>" <%= item.departemen_karyawan === dep.id_department ? 'selected' : '' %>><%= dep.department_name %></option>
+                <% }) %>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Status Karyawan</label>
+            <select class="form-control" id="is_resign" name="is_resign" required>
+                <option value="">-- Pilih Status --</option>
+                <option value="true" <%= item.is_resign === true ? 'selected' : '' %>>Karyawan Sudah Mengundurkan Diri</option>
+                <option value="false" <%= item.is_resign === false ? 'selected' : '' %>>Karyawan Aktif</option>
+            </select>
+        </div>
+
+        <div class="form-group text-right">
+            <a href="/karyawan" class="btn btn-secondary">Batal</a>
+            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+        </div>
+    </form>
+</div>
+
+<%- include('layout/footer') %>

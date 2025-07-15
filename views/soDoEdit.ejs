@@ -2,137 +2,180 @@
 <%- include('layout/sidebar') %>
 
 <div class="content-wrapper p-3">
-  <h3>Edit SO / DO</h3>
-  <form id="editForm" data-role="<%= user.role %>" action="/soDo/update/<%= item.id_monitoring_data %>" method="POST">
-    <div class="form-group">
-      <label>Warehouse Location</label>
-      <% if (role == 8 || role == 10 || role == 11) { %>
-      <input type="text" class="form-control"
-        value="<%= optionWarehouseLocation.find(w => w.id_warehouse === item.warehouse_location)?.location_warehouse %>"
-        readonly>
-      <input type="hidden" name="warehouse_location" value="<%= item.warehouse_location %>">
-      <input type="hidden" name="location_warehouse_name" value="<%= optionWarehouseLocation.find(w => w.id_warehouse === item.warehouse_location)?.location_warehouse %>">
-      <% } else { %>
-      <select name="warehouse_location" class="form-control">
-        <% optionWarehouseLocation.forEach(warehouse => { %>
-        <option value="<%= warehouse.id_warehouse %>"
-          <%= warehouse.id_warehouse === item.warehouse_location ? 'selected' : '' %>>
-          <%= warehouse.location_warehouse %>
-        </option>
-        <% }) %>
-      </select>
-      <% } %>
+  <h3 style="text-align: center; margin-bottom: 30px">Edit SO / DO</h3>
+  <%
+    function formatDateInput(date) {
+      if (!date) return '';
+      const d = new Date(date);
+      const y = d.getFullYear();
+      const m = ('0' + (d.getMonth() + 1)).slice(-2);
+      const da = ('0' + d.getDate()).slice(-2);
+      return `${y}-${m}-${da}`;
+    }
+  %>
+  <form id="editForm" data-role="<%= user.role %>" action="/update/<%= item.id_monitoring_data %>" method="POST">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Warehouse Location</label>
+          <% if (role == 8 || role == 10 || role == 11) { %>
+          <input type="text" class="form-control"
+            value="<%= optionWarehouseLocation.find(w => w.id_warehouse === item.warehouse_location)?.location_warehouse %>" readonly>
+          <input type="hidden" name="warehouse_location" value="<%= item.warehouse_location %>">
+          <input type="hidden" name="location_warehouse_name" value="<%= optionWarehouseLocation.find(w => w.id_warehouse === item.warehouse_location)?.location_warehouse %>">
+          <% } else { %>
+          <select name="warehouse_location" class="form-control">
+            <% optionWarehouseLocation.forEach(warehouse => { %>
+            <option value="<%= warehouse.id_warehouse %>" <%= warehouse.id_warehouse === item.warehouse_location ? 'selected' : '' %>>
+              <%= warehouse.location_warehouse %>
+            </option>
+            <% }) %>
+          </select>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Sales Order Number</label>
+          <input type="text" class="form-control" name="sales_order_number" value="<%= item.sales_order_number %>" <% if (role == 8 || role == 10 || role == 11 || role == 12) { %> readonly <% } %>>
+        </div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Sales Order Number</label>
-      <input type="text" class="form-control" name="sales_order_number" value="<%= item.sales_order_number %>"
-        <% if (role == 8 || role == 10 || role == 11) { %> readonly <% } %>>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Sales Order Date</label>
+          <input type="date" class="form-control" name="sales_order_date"
+            value="<%= formatDateInput(item.sales_order_date) %>" <% if (role == 8 || role == 10 || role == 11 || role == 12) { %> readonly <% } %>>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Delivery Order Number</label>
+          <input type="text" class="form-control" name="delivery_order_number" value="<%= item.delivery_order_number %>" <% if (role == 8 || role == 10 || role == 11 || role == 12) { %> readonly <% } %>>
+        </div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Sales Order Date</label>
-      <input type="date" class="form-control" name="sales_order_date"
-        value="<%= item.sales_order_date.toISOString().split('T')[0] %>" <% if (role == 8 || role == 10 || role == 11) { %> readonly <% } %>>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="d-block mb-2">Delivery Order Barcode</label>
+          <% if (item.barcode_do) { %>
+          <div>
+            <img
+              src="data:image/png;base64,<%= item.barcode_do %>"
+              alt="Barcode DO"
+              style="width: 180px; height: 60px"
+            />
+          </div>
+          <% } else { %>
+          <p class="text-muted">Barcode belum tersedia</p>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Delivery Order Date</label>
+          <input type="date" class="form-control" name="delivery_order_date"
+            value="<%= formatDateInput(item.delivery_order_date) %>" <% if (role == 8 || role == 10 || role == 11 || role == 12) { %> readonly <% } %>>
+        </div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Delivery Order Number</label>
-      <input type="text" class="form-control" name="delivery_order_number" value="<%= item.delivery_order_number %>"
-        <% if (role == 8 || role == 10 || role == 11) { %> readonly <% } %>>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Customer Name</label>
+          <input type="text" class="form-control" name="customer_name" value="<%= item.customer_name %>" <% if (role == 8 || role == 10 || role == 11) { %> readonly <% } %>>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Division</label>
+          <% if (role == 8 || role == 10 || role == 11) { %>
+          <input type="text" class="form-control"
+            value="<%= optionDivision.find(w => w.id_division === item.division_team)?.name_division%>" readonly>
+          <input type="hidden" name="division_team" value="<%= item.division_team %>">
+          <% } else { %>
+          <select name="division_team" class="form-control">
+            <% optionDivision.forEach(division => { %>
+            <option value="<%= division.id_division%>" <%= division.id_division === item.division_team ? 'selected' : '' %>>
+              <%= division.name_division%>
+            </option>
+            <% }) %>
+          </select>
+          <% } %>
+        </div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Delivery Order Barcode</label>
-      <div>
-        <% if (item.barcode_do) { %>
-        <img src="data:image/png;base64,<%= item.barcode_do %>" alt="Barcode DO" style="width: 180px; height: 60px;">
-        <% } else { %>
-        <p class="text-muted">Barcode belum tersedia</p>
-        <% } %>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Ship By</label>
+          <input type="text" class="form-control" name="ship_by" placeholder="Jika Tidak ada diisi - " value="<%= item.ship_by %>" <% if (role == 8) { %> readonly <% } %>>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Resi Number</label>
+          <input type="text" class="form-control" name="resi_number" placeholder="Jika Tidak ada diisi - " value="<%= item.resi_number %>" <% if (role == 8) { %> readonly <% } %>>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Weight (Kg)</label>
+          <input type="text" class="form-control" name="weight" placeholder="Jika Tidak ada diisi 0 " value="<%= item.weight %>" <% if (role == 8) { %> readonly <% } %>>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Shipping Price (Rp)</label>
+          <input type="text" class="form-control" name="price" placeholder="Jika Tidak ada diisi 0 " value="<%= item.price %>" <% if (role == 8) { %> readonly <% } %>>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Pickup Date</label>
+          <input type="date" class="form-control" name="eta" value="<%= item.eta ? formatDateInput(item.eta) : '' %>" <% if (role == 8) { %> readonly <% } %>>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Nama Penerima</label>
+          <input type="text" class="form-control" name="receive_name" placeholder="Nama Penerima " value="<%= item.receive_name %>" <% if (role == 8) { %> readonly <% } %>>
+          <p class="text-danger">*Wajib diisi ketika sudah diterima</p>
+        </div>
       </div>
     </div>
 
     <div class="form-group">
-      <label>Delivery Order Date</label>
-      <input type="date" class="form-control" name="delivery_order_date"
-        value="<%= item.delivery_order_date.toISOString().split('T')[0] %>" <% if (role == 8 || role == 10 || role == 11) { %> readonly
-        <% } %>>
-    </div>
-
-    <div class="form-group">
-      <label>Customer Name</label>
-      <input type="text" class="form-control" name="customer_name" value="<%= item.customer_name %>"
-        <% if (role == 8 || role == 10 || role == 11) { %> readonly <% } %>>
-    </div>
-
-    <div class="form-group">
-      <label>Division</label>
-      <% if (role == 8 || role == 10 || role == 11) { %>
-      <input type="text" class="form-control"
-        value="<%= optionDivision.find(w => w.id_division === item.division_team)?.name_division%>" readonly>
-      <input type="hidden" name="division_team" value="<%= item.division_team %>">
-      <% } else { %>
-      <select name="division_team" class="form-control">
-        <% optionDivision.forEach(division => { %>
-        <option value="<%= division.id_division%>" <%= division.id_division === item.division_team ? 'selected' : '' %>>
-          <%= division.name_division%>
-        </option>
-        <% }) %>
-      </select>
-      <% } %>
-    </div>
-
-    <div class="form-group">
-      <label>Ship By</label>
-      <input type="text" class="form-control" name="ship_by" placeholder="Jika Tidak ada diisi - " value="<%= item.ship_by %>" <% if (role == 8 ) { %>
-        readonly <% } %>>
-    </div>
-
-    <div class="form-group">
-      <label>Resi Number</label>
-      <input type="text" class="form-control" name="resi_number" placeholder="Jika Tidak ada diisi - " value="<%= item.resi_number %>"
-        <% if (role == 8 ) { %> readonly <% } %>>
-    </div>
-
-    <div class="form-group">
-      <label>Weight (Kg)</label>
-      <input type="text" class="form-control" name="weight" placeholder="Jika Tidak ada diisi 0 " value="<%= item.weight %>" <% if (role == 8 ) { %>
-        readonly <% } %>>
-    </div>
-
-    <div class="form-group">
-      <label>Shipping Price (Rp)</label>
-      <input type="text" class="form-control" name="price" placeholder="Jika Tidak ada diisi 0 " value="<%= item.price %>" <% if (role == 8 ) { %>
-        readonly <% } %>>
-    </div>
-
-    <div class="form-group">
-      <label>Shipped Date</label>
-      <input type="date" class="form-control" name="eta" value="<%= item.eta ? item.eta.toISOString().split('T')[0] : '' %>" <% if (role == 8 ) { %> readonly
-        <% } %>>
-    </div>
-
-    <div class="form-group">
-      <label>Nama Penerima</label>
-      <input type="text" class="form-control" name="receive_name" placeholder="Nama Penerima " value="<%= item.receive_name %>"
-        <% if (role == 8 ) { %> readonly <% } %>>
-    </div>
-
-    <div class="form-group">
       <label>Notes</label>
-      <input type="text" class="form-control" name="ekspedisi_note" placeholder="Catatan atau Keterangan" value="<%= item.ekspedisi_note %>"
-        <% if (role == 8 ) { %> readonly <% } %>>
+      <input type="text" class="form-control" name="ekspedisi_note" placeholder="Catatan atau Keterangan" value="<%= item.ekspedisi_note %>" <% if (role == 8) { %> readonly <% } %>>
     </div>
 
-    <% if (user && (user.role === 1 || user.role === 8)) { %>
+    <% if (user && [1, 8, 10, 11, 12].includes(user.role)) { %>
     <div class="form-group">
-      <label>Invoicing Date</label>
+      <label>Info ke Invoicing Diterima</label>
       <input type="date" class="form-control" id="invoicingDate" name="invoicing_date"
-        value="<%= item.invoicing_date ? item.invoicing_date.toISOString().split('T')[0] : '' %>" required>
+        value="<%= formatDateInput(item.invoicing_date) ? formatDateInput(item.invoicing_date) : '' %>" <% if ([10, 11, 12, 14].includes(user.role)) { %> readonly <% } %>>
     </div>
     <% } %>
-
 
     <div class="form-group text-right">
       <a href="/soDo" class="btn btn-secondary">Batal</a>
@@ -181,8 +224,6 @@
     }
   });
 </script>
-
-
 <script>
   async function exportRowFinanceToPDF() {
     const { jsPDF } = window.jspdf;
@@ -190,7 +231,7 @@
     const doc = new jsPDF({
       orientation: 'landscape',
       unit: 'mm',
-      format: [70, 35]
+      format: [58, 29]
     });
 
     const formatDate = (str) => {
@@ -221,14 +262,14 @@
 
     // Outline
     doc.setLineWidth(0.3);
-    doc.rect(2, 2, 66, 31);
+    doc.rect(2, 2, 54, 25);
 
     // Layout
     let xLeft = 5;
-    let xRight = 65;
-    let y = 8;
+    let xRight = 53;
+    let y = 5;
 
-    doc.setFontSize(9);
+    doc.setFontSize(7);
     doc.setFont("helvetica", "bold");
     doc.text(doNumber, xLeft, y);
     doc.setFont("helvetica", "normal");
@@ -243,9 +284,9 @@
     y += 5;
     doc.text(receiveName, xLeft, y);
 
-    y += 7;
+    y += 6;
     doc.setFont("helvetica", "italic");
-    doc.setFontSize(8);
+    doc.setFontSize(7);
     doc.text(`INFO dr GUDANG ${location} Tgl.`, xLeft, y);
     doc.text(formatDate(invoicingDate), xRight, y, { align: "right" });
 

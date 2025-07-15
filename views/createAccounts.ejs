@@ -1,168 +1,289 @@
-<%- include('layout/header') %>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<%- include('layout/header') %> 
 <%- include('layout/sidebar') %>
 <div class="content-wrapper">
-  <div class="row p-3">
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-6">
+          <h3>User Account List</h3>
+        </div>
+        <div class="col-sm-6">
+          <div class="text-right">
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-toggle="modal"
+              data-target="#modal-lg"
+            >
+              Add User
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="p-2">
     <div class="col-12">
-      <% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+      <% if (typeof successMessage !== 'undefined' && successMessage.length > 0)
+      { %>
       <div class="alert alert-success alert-dismissible fade show" role="alert">
         <%= successMessage[0] %>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <% } %>
-
-      <% if (typeof errorMessage !== 'undefined' && errorMessage.length > 0) { %>
+      <% } %> <% if (typeof errorMessage !== 'undefined' && errorMessage.length
+      > 0) { %>
       <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <%= errorMessage[0] %>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <% } %>
 
-      <div class="mb-2 text-right">
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-lg">Add User</button>
-      </div>
       <!-- modals -->
       <div class="modal fade" id="modal-lg">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
               <h4 class="modal-title">Add User</h4>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <form id="registerForm" action="/api/register" method="POST">
               <div class="modal-body">
-
                 <h5 class="mb-2">Nama</h5>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-user"></i></span>
+                    <span class="input-group-text"
+                      ><i class="fa fa-user"></i
+                    ></span>
                   </div>
-                  <input type="text" class="form-control" placeholder="Masukkan Nama" id="name" name="name" required>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Masukkan Nama"
+                    id="name"
+                    name="name"
+                    required
+                  />
                 </div>
 
                 <h5 class="mb-2">Username</h5>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                    <span class="input-group-text"
+                      ><i class="fa fa-envelope"></i
+                    ></span>
                   </div>
-                  <input type="text" class="form-control" placeholder="...@gmail.com" id="email" name="email" required>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Masukkan Username disini"
+                    id="email"
+                    name="email"
+                    required
+                  />
                 </div>
 
                 <h5 class="mb-2">Password</h5>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-key"></i></span>
+                    <span class="input-group-text"
+                      ><i class="fa fa-key"></i
+                    ></span>
                   </div>
-                  <input type="password" class="form-control" placeholder="Masukkan Password Anda" id="password"
-                    name="password" required>
+                  <input
+                    type="password"
+                    class="form-control"
+                    placeholder="Masukkan Password Anda"
+                    id="password"
+                    name="password"
+                    required
+                  />
                   <div class="input-group-append">
-                    <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
+                    <span
+                      class="input-group-text"
+                      id="togglePassword"
+                      style="cursor: pointer"
+                    >
                       <i class="fa fa-eye-slash"></i>
                     </span>
                   </div>
                 </div>
 
-
                 <h5 class="mb-2">Role</h5>
-                <div class="input-group mb-3 ">
+                <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-tasks"></i></span>
+                    <span class="input-group-text"
+                      ><i class="fa fa-tasks"></i
+                    ></span>
                   </div>
-                  <select class="custom-select rounded-0" id="id_role" name="id_role" required>
-                    <option value="" disabled selected>-- Pilih Role Accounts User --</option>
-                    <% if (optionRoleAccounts && optionRoleAccounts.length > 0) { %>
-                    <% optionRoleAccounts.forEach(optionRoleAccounts => { %>
-                    <option value="<%= optionRoleAccounts.id_role %>"><%= optionRoleAccounts.role_name %></option>
-                    <% }) %>
-                    <% } else { %>
-                    <option value="" disabled>Pilihan Role Accounts User Tidak Tersedia</option>
+                  <select
+                    class="custom-select rounded-0"
+                    id="id_role"
+                    name="id_role"
+                    required
+                  >
+                    <option value="" disabled selected>
+                      -- Pilih Role Accounts User --
+                    </option>
+                    <% if (optionRoleAccounts && optionRoleAccounts.length > 0)
+                    { %> <% optionRoleAccounts.forEach(optionRoleAccounts => {
+                    %>
+                    <option value="<%= optionRoleAccounts.id_role %>">
+                      <%= optionRoleAccounts.role_name %>
+                    </option>
+                    <% }) %> <% } else { %>
+                    <option value="" disabled>
+                      Pilihan Role Accounts User Tidak Tersedia
+                    </option>
                     <% } %>
                   </select>
                 </div>
 
                 <div class="modal-footer justify-content-between">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary">Save changes</button>
+                  <button
+                    type="button"
+                    class="btn btn-default"
+                    data-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    Save changes
+                  </button>
                 </div>
+              </div>
             </form>
           </div>
           <!-- /.modal-content -->
         </div>
         <!-- /.modal-dialog -->
       </div>
-
     </div>
 
     <!-- Card Table -->
     <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">User Accounts List</h3>
-      </div>
-
       <!-- Table Content -->
-      <div class="card-body table-responsive p-0" style="height: 300px;">
-        <table class="table table-head-fixed text-nowrap">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Name</th>
-              <th>Username</th>
-              <th>Role</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (listUserAccounts && listUserAccounts.length > 0) { %>
-            <% listUserAccounts.forEach((user, index) => { %>
-            <tr>
-              <td><%= index + 1 %></td>
-              <td><%= user.name %></td>
-              <td><%= user.email %></td>
-              <td><%= user.role_name %></td>
-              <td>
-                <form action="/editAccounts/<%= user.id %>" method="GET" style="display:inline;">
-                  <button class="btn btn-sm btn-warning" type="submit">Edit</button>
-                </form>
-                <form action="/auth/delete/<%= user.id %>" method="POST" style="display:inline;">
-                  <button class="btn btn-sm btn-danger" type="submit"
-                    onclick="return confirm('Yakin ingin menghapus user ini?');">Delete</button>
-                </form>
-              </td>
-            </tr>
-            <% }) %>
-            <% } else { %>
-            <tr>
-              <td colspan="5" class="text-center">Tidak ada user terdaftar.</td>
-            </tr>
-            <% } %>
-          </tbody>
-        </table>
+      <div class="p-1">
+        <div class="card-body table-responsive p-0" style="max-height: calc(100vh - 230px); overflow-y: auto;">
+          <table class="table table-head-fixed text-nowrap">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (listUserAccounts && listUserAccounts.length > 0) { %> <%
+              listUserAccounts.forEach((user, index) => { %>
+              <tr>
+                <td><%= index + 1 %></td>
+                <td><%= user.name %></td>
+                <td><%= user.email %></td>
+                <td><%= user.role_name %></td>
+                <td>
+                  <form
+                    action="/editAccounts/<%= user.id %>"
+                    method="GET"
+                    style="display: inline"
+                  >
+                    <button class="btn btn-sm btn-warning" type="submit">
+                      Edit
+                    </button>
+                  </form>
+                  <form
+                    action="/auth/delete/<%= user.id %>"
+                    method="POST"
+                    style="display: inline"
+                    class="delete-user-form"
+                  >
+                    <button
+                      class="btn btn-sm btn-danger"
+                      type="button"
+                      onclick="confirmDelete(this)"
+                    >
+                      Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <% }) %> <% } else { %>
+              <tr>
+                <td colspan="5" class="text-center">
+                  Tidak ada user terdaftar.
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 </div>
 
 <%- include('layout/footer') %>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+/>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const passwordInput = document.getElementById('password');
-    const toggleIcon = document.getElementById('togglePassword');
+  function confirmDelete(button) {
+    Swal.fire({
+      title: 'Yakin ingin menghapus user ini?',
+      text: "Tindakan ini tidak bisa dibatalkan.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Ya, hapus',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Submit form terdekat dari tombol
+        const form = button.closest('form');
+        if (form) form.submit();
+      }
+    });
+  }
+</script>
 
-    toggleIcon.addEventListener('click', function () {
-      const isPassword = passwordInput.type === 'password';
-      passwordInput.type = isPassword ? 'text' : 'password';
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const passwordInput = document.getElementById("password");
+    const toggleIcon = document.getElementById("togglePassword");
+
+    toggleIcon.addEventListener("click", function () {
+      const isPassword = passwordInput.type === "password";
+      passwordInput.type = isPassword ? "text" : "password";
 
       // Ubah icon mata
-      toggleIcon.innerHTML = isPassword ?
-        '<i class="fa fa-eye"></i>' :
-        '<i class="fa fa-eye-slash"></i>';
+      toggleIcon.innerHTML = isPassword
+        ? '<i class="fa fa-eye"></i>'
+        : '<i class="fa fa-eye-slash"></i>';
     });
   });
 </script>

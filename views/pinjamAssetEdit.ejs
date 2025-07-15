@@ -1,0 +1,106 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+
+<div class="content-wrapper">
+    <div class="container">
+        <div style="padding: 10px; text-align: center;">
+            <h4>Edit Peminjaman Asset</h4>
+        </div>
+        <%
+            function formatDateInput(date) {
+                if (!date) return '';
+                const d = new Date(date);
+                const y = d.getFullYear();
+                const m = ('0' + (d.getMonth() + 1)).slice(-2);
+                const da = ('0' + d.getDate()).slice(-2);
+                return `${y}-${m}-${da}`;
+            }
+        %>
+        <form action="/updatePinjamAsset/<%= item.id_pinjam_asset %>" method="POST">
+            <input type="hidden" name="id_pinjam_asset" value="<%= item.id_pinjam_asset %>" />
+            <input type="hidden" name="tempAssets" id="tempAssets" />
+
+            <!-- Data Peminjam -->
+            <div class="form-group">
+                <label>Nama Peminjam</label>
+                <input type="text" class="form-control" value="<%= item.nama_karyawan %>" readonly />
+            </div>
+
+            <div class="form-group">
+                <label>Nomor HP</label>
+                <input type="text" class="form-control" value="<%= item.nomor_hp %>" readonly />
+            </div>
+
+            <div class="form-group">
+                <label>Divisi</label>
+                <input type="text" class="form-control" value="<%= item.name_division %>" readonly />
+            </div>
+
+            <div class="form-group">
+                <label>Jabatan</label>
+                <input type="text" class="form-control" value="<%= item.department_name %>" readonly />
+            </div>
+            <label>List Asset</label>
+            <!-- Tabel asset yang sudah ditambahkan -->
+            <div class="card">
+                <table class="table table-bordered" id="addedAssetsTable">
+                    <thead>
+                        <tr>
+                            <th>Kode Asset</th>
+                            <th>Nama</th>
+                            <th>Brand</th>
+                            <th>Tahun</th>
+                            <th>Serial</th>
+                            <th>Jenis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% itemAssets.forEach(asset => { %>
+                        <tr>
+                            <td><%= asset.kode_asset %></td>
+                            <td><%= asset.nama_asset %></td>
+                            <td><%= asset.brand_asset %></td>
+                            <td><%= asset.tahun_pembelian %></td>
+                            <td><%= asset.sn_asset %></td>
+                            <td><%= asset.jenis_asset %></td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tanggal -->
+            <div class="form-group">
+                <label>Tanggal Pinjam</label>
+                <input type="date" class="form-control" name="tanggal_pinjam"
+                    value="<%= formatDateInput(item.tanggal_peminjaman)  %>" readonly />
+            </div>
+
+            <div class="form-group">
+                <label>Tanggal Kembali</label>
+                <% if (item.tanggal_pengembalian) { %>
+                <input type="date" class="form-control" name="tanggal_kembali"
+                    value="<%= formatDateInput(item.tanggal_pengembalian) %>" readonly />
+                <% } else { %>
+                <input type="date" class="form-control" name="tanggal_kembali" value="" />
+                <small class="text-danger">Asset belum dikembalikan</small>
+                <% } %>
+            </div>
+
+            <!-- Catatan -->
+            <div class="form-group">
+                <label>Catatan</label>
+                <textarea class="form-control" name="notes" readonly><%= item.notes %></textarea>
+            </div>
+
+            <div class="form-group mb-0">
+                <a href="/pinjamAsset" class="btn btn-secondary mb-3">Batal</a>
+                <% if (item.tanggal_pengembalian == null) { %>
+                <button type="submit" class="btn btn-primary mb-3">Update</button>
+                <% }  %>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include('layout/footer') %>

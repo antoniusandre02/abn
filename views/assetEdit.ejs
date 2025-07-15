@@ -1,0 +1,66 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+
+<div class="content-wrapper p-3">
+    <h3>Edit Asset</h3>
+    <form action="/updateAsset/<%= item.id_asset%>" method="POST">
+        <div class="form-group">
+            <label for="xxx">Nama Barang</label>
+            <input type="text" class="form-control" required id="nama_asset" name="nama_asset"
+                value="<%= item.nama_asset %>" />
+        </div>
+
+        <div class="form-group">
+            <label for="xxx">Serial Number Barang</label>
+            <input type="text" class="form-control" required id="sn_asset" name="sn_asset"
+                value="<%= item.sn_asset %>" />
+        </div>
+
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status_asset" required>
+                <option value="">-- Pilih Status --</option>
+                <option value="TERSEDIA" <%= item.status_asset === 'TERSEDIA' ? 'selected' : '' %>>TERSEDIA</option>
+                <option value="DIPINJAM" <%= item.status_asset === 'DIPINJAM' ? 'selected' : '' %>>DIPINJAM</option>
+                <option value="RUSAK" <%= item.status_asset === 'RUSAK' ? 'selected' : '' %>>RUSAK</option>
+                <option value="HILANG" <%= item.status_asset === 'HILANG' ? 'selected' : '' %>>HILANG</option>
+                <option value="DIJUAL" <%= item.status_asset === 'DIJUAL' ? 'selected' : '' %>>DIJUAL</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="xxx">Tahun Pembelian</label>
+            <input type="number" class="form-control" required id="tahun_pembelian" name="tahun_pembelian"
+                value="<%= item.tahun_pembelian %>" />
+        </div>
+
+        <div class="form-group">
+            <label for="xxx">Brand Barang</label>
+            <input type="text" class="form-control" required id="brand_asset" name="brand_asset"
+                value="<%= item.brand_asset %>" />
+        </div>
+
+        <div class="form-group">
+            <label for="status">Jenis Asset</label>
+            <select class="form-control" id="jenis_asset" name="jenis_asset" required>
+                <option value="">-- Pilih Status --</option>
+                <% optionJenisAsset.forEach(j => { %>
+                <option value="<%= j.id_jenis_asset %>" <%= item.jenis_asset === j.id_jenis_asset ? 'selected' : '' %>><%= j.jenis_asset %></option>
+                <% }) %>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="xxx">Notes Barang</label>
+            <input type="text" class="form-control" required id="notes_asset" name="notes_asset"
+                value="<%= item.notes_asset %>" />
+        </div>
+
+        <div class="form-group text-right">
+            <a href="/asset" class="btn btn-secondary">Batal</a>
+            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+        </div>
+    </form>
+</div>
+
+<%- include('layout/footer') %>

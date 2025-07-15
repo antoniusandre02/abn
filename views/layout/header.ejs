@@ -59,11 +59,11 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
             aria-expanded="false">
-            <i class="fas fa-user"></i> <%= user.name %>
+            <i class="fas fa-user"></i> <%= user?.name || 'Guest' %>
           </a>
           <div class="dropdown-menu dropdown-menu-right">
             <span class="dropdown-item disabled">
-              <i class="fas fa-user-tag"></i> <%= user.role_name %>
+              <i class="fas fa-user-tag"></i> <%= user?.role_name || 'Guest' %>
             </span>
             <div class="dropdown-divider"></div>
             <a href="/logout" class="dropdown-item text-danger">

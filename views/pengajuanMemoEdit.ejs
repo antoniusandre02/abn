@@ -1,0 +1,225 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+
+<div class="content-wrapper p-3">
+    <div class="container">
+        <h4 class="text-center">Edit Pengajuan Memo</h4>
+        <%
+            function formatDateInput(date) {
+                if (!date) return '';
+                const d = new Date(date);
+                const y = d.getFullYear();
+                const m = ('0' + (d.getMonth() + 1)).slice(-2);
+                const da = ('0' + d.getDate()).slice(-2);
+                return `${y}-${m}-${da}`;
+            }
+        %>
+        <form action="/pengajuanMemo/update/<%= memo.id_memo %>" method="POST" id="memoForm">
+            <input type="hidden" name="tempItems" id="tempItems" />
+
+            <div class="form-group">
+                <label>Nomor Memo</label>
+                <input type="text" class="form-control" value="<%= memo.nomor_memo || '-' %>" readonly />
+            </div>
+
+            <div class="form-group">
+                <label>Dari</label>
+                <select id="dariMemo" name="dariMemo" class="form-control select2">
+                    <option value="">-- Pilih Nama Karyawan --</option>
+                    <% optionKaryawan.forEach(k => { %>
+                    <option value="<%= k.id_karyawan %>" <%= k.id_karyawan === memo.dari_memo ? 'selected' : '' %>>
+                        <%= k.nama_karyawan %>
+                    </option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>CC</label>
+                <select id="ccMemo" name="ccMemo" class="form-control select2">
+                    <option value="">-- Pilih Nama Karyawan --</option>
+                    <% optionKaryawan.forEach(k => { %>
+                    <option value="<%= k.id_karyawan %>" <%= k.id_karyawan === memo.cc_memo ? 'selected' : '' %>>
+                        <%= k.nama_karyawan %>
+                    </option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Perihal</label>
+                <input type="text" class="form-control" name="perihal" value="<%= memo.perihal %>" required />
+            </div>
+
+            <div class="form-group">
+                <label>Tanggal Pengajuan Memo</label>
+                <input type="date" class="form-control" name="tanggal_memo"
+                    value="<%= formatDateInput(memo.tanggal_pengajuan) %>" required />
+            </div>
+
+            <!-- Form tambah item -->
+            <div class="row align-items-end">
+                <div class="col-md-3">
+                    <label>Item</label>
+                    <input type="text" class="form-control" id="item" name="item" />
+                </div>
+                <div class="col-md-3">
+                    <label>Link Pembelian</label>
+                    <input type="text" class="form-control" id="link" name="link" />
+                </div>
+                <div class="col-md-2">
+                    <label>Qty</label>
+                    <input type="number" class="form-control" id="qty" name="qty" />
+                </div>
+                <div class="col-md-2">
+                    <label>User</label>
+                    <input type="text" class="form-control" id="user_memo" name="user_memo" />
+                </div>
+                <div class="col-md-2">
+                    <label>Remark</label>
+                    <input type="text" class="form-control" id="remark" name="remark" />
+                </div>
+                <div class="col-md-12 mt-2" style="margin-top: 20px; text-align: center; vertical-align: middle;">
+                    <button type="button" class="col-md-12 btn btn-success btn-sm" id="btnAddItem"
+                        style="font-size: 15px;"><i class="fa fa-plus"
+                            aria-hidden="true"></i>&nbsp;&nbsp;<strong>Tambah</strong></button>
+                </div>
+            </div>
+
+            <!-- Tabel detail -->
+            <div class="mt-3 card">
+                <div class="card-body p-2">
+                    <table class="table table-bordered" id="addedItemsTable">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Link</th>
+                                <th>Qty</th>
+                                <th>User</th>
+                                <th>Remark</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% details.forEach((d, i) => { %>
+                            <tr data-index="<%= i %>">
+                                <td style="width: 30%;"><input type="text" class="form-control" value="<%= d.item %>" />
+                                </td>
+                                <td style="width: 20%;"><input type="text" class="form-control" value="<%= d.link %>" />
+                                </td>
+                                <td style="width: 8%;"><input type="number" class="form-control"
+                                        value="<%= d.jumlah %>" /></td>
+                                <td style="width: 20%;"><input type="text" class="form-control"
+                                        value="<%= d.user_memo %>" /></td>
+                                <td style="width: 30%;"><input type="text" class="form-control"
+                                        value="<%= d.keterangan %>" /></td>
+                                <td style="width: 10%; text-align: center; vertical-align: middle;"><button
+                                        type="button" class="btn btn-danger btn-sm btn-remove"
+                                        style="text-align: center;"><i class="fa fa-times"
+                                            aria-hidden="true"></i></button></td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <a href="/pengajuanMemo" class="btn btn-secondary">Batal</a>
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include('layout/footer') %>
+
+<script>
+    let tempItems = <%-JSON.stringify(details.map(d => ({
+        item: d.item,
+        link: d.link,
+        qty: d.jumlah,
+        user_memo: d.user_memo,
+        remark: d.keterangan
+    })))%>;
+
+    function renderTable() {
+        const tbody = $('#addedItemsTable tbody');
+        tbody.empty();
+        tempItems.forEach((item, index) => {
+            tbody.append(`
+                <tr data-index="${index}">
+                    <td><input type="text" class="form-control" value="${item.item}" /></td>
+                    <td><input type="text" class="form-control" value="${item.link}" /></td>
+                    <td><input type="number" class="form-control" value="${item.qty}" /></td>
+                    <td><input type="text" class="form-control" value="${item.user_memo}" /></td>
+                    <td><input type="text" class="form-control" value="${item.remark}" /></td>
+                    <td><button type="button" class="btn btn-danger btn-sm btn-remove">X</button></td>
+                </tr>
+            `);
+        });
+    }
+
+    $('#btnAddItem').on('click', () => {
+        const item = $('#item').val().trim();
+        const link = $('#link').val().trim();
+        const qty = $('#qty').val().trim();
+        const user_memo = $('#user_memo').val().trim();
+        const remark = $('#remark').val().trim();
+
+        if (!item || !qty || !user_memo) {
+            return alert('Item, Qty, dan User harus diisi!');
+        }
+
+        tempItems.push({
+            item,
+            link,
+            qty,
+            user_memo,
+            remark
+        });
+        renderTable();
+        $('#item, #link, #qty, #user_memo, #remark').val('');
+    });
+
+    $('#addedItemsTable').on('click', '.btn-remove', function () {
+        const index = $(this).closest('tr').data('index');
+        tempItems.splice(index, 1);
+        renderTable();
+    });
+
+    $('#memoForm').on('submit', function (e) {
+        const rows = $('#addedItemsTable tbody tr');
+        tempItems = [];
+
+        rows.each(function () {
+            const item = $(this).find('td:eq(0) input').val().trim();
+            const link = $(this).find('td:eq(1) input').val().trim();
+            const qty = $(this).find('td:eq(2) input').val().trim();
+            const user_memo = $(this).find('td:eq(3) input').val().trim();
+            const remark = $(this).find('td:eq(4) input').val().trim();
+
+            if (item && qty && user_memo) {
+                tempItems.push({
+                    item,
+                    link,
+                    qty,
+                    user_memo,
+                    remark
+                });
+            }
+        });
+
+        if (tempItems.length === 0) {
+            e.preventDefault();
+            return alert('Minimal tambahkan 1 item!');
+        }
+
+        $('#tempItems').val(JSON.stringify(tempItems));
+    });
+
+    // Render awal saat halaman diload
+    $(document).ready(() => {
+        renderTable();
+    });
+</script>
