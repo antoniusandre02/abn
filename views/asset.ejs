@@ -150,37 +150,45 @@
                             <% data.forEach((item, index) => { %>
                             <tbody id="searchResults">
                                 <tr>
-                                    <td style="font-size: 15px; justify-content: center;" class="text-center pl-2">
+                                    <td style="font-size: 15px; justify-content: center;" class="text-center align-middle pl-2">
                                         <%= index + 1 %>
                                     </td>
-                                    <td style="font-size: 15px;"><%= item.kode_asset %></td>
-                                    <td style="font-size: 15px"><%= item.nama_asset %></td>
-                                    <td style="font-size: 15px"><%= item.sn_asset %></td>
-                                    <td style="font-size: 15px">
+                                    <td style="font-size: 15px;" class="text-center align-middle"><%= item.kode_asset %></td>
+                                    <td style="font-size: 15px" class="text-center align-middle"><%= item.nama_asset %></td>
+                                    <td style="font-size: 15px" class="text-center align-middle"><%= item.sn_asset %></td>
+                                    <td style="font-size: 15px" class="text-center align-middle">
                                         <a href="/barcodeAsset/<%= item.kode_asset %>" target="_blank"
                                             class="btn btn-block btn-info btn-sm">
                                             Cetak Barcode
                                         </a>
                                     </td>
-                                    <td class="text-center">
+                                    <td class="text-center align-middle">
                                         <% let badgeClass = ''; %>
                                         <% if (item.status_asset === 'TERSEDIA') { %>
-                                        <% badgeClass = 'badge-success'; %>
+                                            <% badgeClass = 'badge-success'; %>
                                         <% } else if (item.status_asset === 'DIPINJAM') { %>
-                                        <% badgeClass = 'badge-primary'; %>
+                                            <% badgeClass = 'badge-primary'; %>
                                         <% } else if (item.status_asset === 'RUSAK') { %>
-                                        <% badgeClass = 'badge-warning'; %>
+                                            <% badgeClass = 'badge-warning'; %>
                                         <% } else if (item.status_asset === 'HILANG') { %>
-                                        <% badgeClass = 'badge-secondary'; %>
+                                            <% badgeClass = 'badge-secondary'; %>
                                         <% } else if (item.status_asset === 'DIJUAL') { %>
-                                        <% badgeClass = 'badge-danger'; %>
+                                            <% badgeClass = 'badge-danger'; %>
                                         <% } else { %>
-                                        <% badgeClass = 'badge-light'; %>
+                                            <% badgeClass = 'badge-light'; %>
                                         <% } %>
-                                        <span class="p-2 badge <%= badgeClass %>" style="width: 100px; height: 30px;"><%= item.status_asset %></span>
-                                    </td>
 
-                                    <td class="text-center pr-2">
+                                        <!-- Badge status -->
+                                        <span class="p-2 badge <%= badgeClass %>" style="width: 100px; height: 30px;"><%= item.status_asset %></span>
+
+                                        <!-- Nama karyawan muncul jika DIPINJAM -->
+                                        <% if (item.status_asset === 'DIPINJAM') { %>
+                                            <div class="mt-1 text-dark" style="font-size: 13px;">
+                                                <strong><%= item.nama_karyawan %></strong>
+                                            </div>
+                                        <% } %>
+                                    </td>
+                                    <td class="text-center align-middle pr-2">
                                         <a href="/assetEdit/<%= item.id_asset %>" class="btn btn-sm btn-warning"
                                             title="Edit">
                                             <i class="fas fa-edit"></i>

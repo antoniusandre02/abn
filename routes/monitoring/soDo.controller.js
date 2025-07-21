@@ -3,7 +3,9 @@ const bwipjs = require('bwip-js');
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser');
-const { Parser } = require('json2csv');
+const {
+    Parser
+} = require('json2csv');
 
 // GET: List Page
 exports.getListPage = async (req, res) => {
@@ -260,7 +262,9 @@ exports.getHistoryCheck = async (req, res) => {
 
 // export Data for scm
 exports.exportCSV = async (req, res) => {
-    const { search = '', filterDateStart = '', filterDateEnd = '' } = req.query;
+    const {
+        search = '', filterDateStart = '', filterDateEnd = ''
+    } = req.query;
     const searchPattern = `%${search.trim()}%`;
     const user = req.user;
 
@@ -268,7 +272,14 @@ exports.exportCSV = async (req, res) => {
     let filterValues = [];
 
     if (search.trim()) {
-        filterConditions.push(`(ship_by ILIKE $${filterValues.length + 1} OR ekspedisi_note ILIKE $${filterValues.length + 1})`);
+        filterConditions.push(`(
+                m.delivery_order_number ILIKE $${filterValues.length + 1} OR
+                m.sales_order_number ILIKE $${filterValues.length + 1} OR
+                m.customer_name ILIKE $${filterValues.length + 1} OR
+                name_division ILIKE $${filterValues.length + 1} OR
+                m.ship_by ILIKE $${filterValues.length + 1} OR
+                m.ekspedisi_note ILIKE $${filterValues.length + 1} OR
+                w.location_warehouse ILIKE $${filterValues.length + 1})`);
         filterValues.push(searchPattern);
     }
 
@@ -279,16 +290,10 @@ exports.exportCSV = async (req, res) => {
 
     const whereClause = filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : '';
 
-    const query = `
-        SELECT 
-            sales_order_number, delivery_order_number, delivery_order_date, 
-            customer_name, ship_by, ekspedisi_note, receive_name, eta, 
-            resi_number, name_division, location_warehouse
-        FROM monitoring_data
-        JOIN warehouse ON monitoring_data.warehouse_location = warehouse.id_warehouse
-        JOIN division ON monitoring_data.division_team = division.id_division
-        ${whereClause}
-    `;
+    const query = `SELECT sales_order_number, delivery_order_number, delivery_order_date, 
+                        customer_name, ship_by, ekspedisi_note, receive_name, eta, 
+                        resi_number, name_division, location_warehouse
+                    FROM monitoring_data m JOIN warehouse w ON m.warehouse_location = w.id_warehouse JOIN division d ON m.division_team = d.id_division ${whereClause} ORDER BY m.id_monitoring_data DESC`;
 
     try {
         const result = await pool.query(query, filterValues);
@@ -300,20 +305,22 @@ exports.exportCSV = async (req, res) => {
             'eta', 'resi_number', 'name_division', 'location_warehouse'
         ];
         const formattedData = result.rows.map(row => {
-        return {
-            ...row,
-            delivery_order_date: row.delivery_order_date?.toISOString().split('T')[0] || '',
-            eta: row.eta?.toISOString().split('T')[0] || '',
-        };
+            return {
+                ...row,
+                delivery_order_date: row.delivery_order_date?.toISOString().split('T')[0] || '',
+                eta: row.eta?.toISOString().split('T')[0] || '',
+            };
         });
 
-        const parser = new Parser({ fields });
+        const parser = new Parser({
+            fields
+        });
         const csv = parser.parse(formattedData);
         await pool.query(`
             INSERT INTO log_monitoring_data 
             (user_id, name, role_name, delivery_order_number_inputed, inputed_at, keterangan) 
             VALUES ($1, $2, $3, 'Report Downloaded', NOW(), 'Export SO / DO CSV') 
-            RETURNING *`, 
+            RETURNING *`,
             [user.user_id, user.name, user.role_name]
         );
 
@@ -418,7 +425,7 @@ exports.updateSO = async (req, res) => {
     price = price?.trim() === '' ? null : price;
     eta = eta?.trim() === '' ? null : eta;
     invoicing_date = invoicing_date?.trim() === '' ? null : invoicing_date;
-    
+
     try {
         // ✅ Generate barcode dari delivery_order_number baru
         const png = await bwipjs.toBuffer({

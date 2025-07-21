@@ -111,7 +111,7 @@ exports.getPinjamAssetEdit = async (req, res) => {
             SELECT *
             FROM (
                 SELECT pa.id_pinjam_asset, a.id_asset, a.kode_asset, a.nama_asset, a.sn_asset, a.brand_asset, a.tahun_pembelian, ja.jenis_asset, dpa.tanggal_peminjaman, dpa.tanggal_pengembalian, pa.notes,
-                    k.nama_karyawan, k.email_karyawan, d.name_division, dep.department_name,
+                    k.nama_karyawan, k.email_karyawan, k.nomor_hp, d.name_division, dep.department_name,
                     ROW_NUMBER() OVER (PARTITION BY dpa.id_asset ORDER BY dpa.id_detail_pinjam_asset) AS rn
                 FROM pinjam_asset pa
                 JOIN detail_pinjam_asset dpa ON pa.id_pinjam_asset = dpa.id_pinjam_asset

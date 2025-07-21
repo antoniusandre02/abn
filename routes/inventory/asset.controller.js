@@ -26,11 +26,11 @@ exports.getAssetListPage = async (req, res) => {
     }
 
     const whereClause = filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : '';
-    const countQuery = `SELECT COUNT(*) FROM asset a ${whereClause}`;
+    const countQuery = `SELECT COUNT(*) FROM asset a JOIN detail_pinjam_asset dpa ON a.id_asset = dpa.id_asset JOIN karyawan k ON dpa.id_karyawan = k.id_karyawan ${whereClause}`;
     const totalRows = parseInt((await pool.query(countQuery, filterValues)).rows[0].count);
     const totalPages = Math.ceil(totalRows / limit);
 
-    const dataQuery = `SELECT * FROM asset a ${whereClause} ORDER BY a.kode_asset DESC LIMIT $${filterValues.length + 1} OFFSET $${filterValues.length + 2}`;
+    const dataQuery = `SELECT DISTINCT a.id_asset, nama_asset, kode_asset, sn_asset, status_asset, barcode, tahun_pembelian, brand_asset, jenis_asset, notes_asset, nama_karyawan FROM asset a LEFT JOIN detail_pinjam_asset dpa ON a.id_asset = dpa.id_asset LEFT JOIN karyawan k ON dpa.id_karyawan = k.id_karyawan ${whereClause} ORDER BY a.kode_asset DESC LIMIT $${filterValues.length + 1} OFFSET $${filterValues.length + 2}`;
     const dataValues = [...filterValues, limit, offset];
     const result = await pool.query(dataQuery, dataValues);
 

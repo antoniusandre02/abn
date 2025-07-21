@@ -38,7 +38,7 @@
           </a>
         </li>
         <% } %>
-        
+
         <% if ([1, 8, 10, 11, 12, 14].includes(user.role)) { %>
         <!-- SO / DO: Admin, Finance, Admin Gudang -->
         <li class="nav-item">
@@ -101,12 +101,30 @@
 
         <% if ([1, 15].includes(user.role)) { %>
         <!-- E-Warranty: Admin dan Customer Service -->
-        <li class="nav-item">
-          <a href="/eWarranty" class="nav-link">
-            <i class="nav-icon fas fa-file"></i>
-            <p>E-Warranty</p>
+        <li class="nav-item has-treeview">
+          <a href="#" class="nav-link">
+            <i class="nav-icon fas fa-cogs"></i>
+            <p>
+              Callibration
+              <i class="right fas fa-angle-left"></i>
+            </p>
           </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="/eWarranty" class="nav-link">
+                <i class="nav-icon fas fa-file"></i>
+                <p>E-Warranty</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/eWarranty/register" class="nav-link">
+                <i class="nav-icon fas fa-file"></i>
+                <p>E-Warranty Form</p>
+              </a>
+            </li>
+          </ul>
         </li>
+
         <% } %>
       </ul>
     </nav>
