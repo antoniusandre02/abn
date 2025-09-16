@@ -1,5 +1,5 @@
 const express = require('express');
-const app = express();
+const app = express({ caseSensitive: false });
 const path = require('path');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
@@ -7,15 +7,34 @@ const flash = require('connect-flash');
 const pool = require('./db');
 const fs = require('fs');
 require('dotenv').config();
+const swaggerUi = require('swagger-ui-express');
 
+// === SWAGGER ===
+const swaggerModulesDir = path.join(__dirname, 'docs/modules');
+
+fs.readdirSync(swaggerModulesDir).forEach((file) => {
+  if (file.endsWith('.swagger.js')) {
+    const { spec, route } = require(path.join(swaggerModulesDir, file));
+    if (spec && route) {
+      app.use(route, swaggerUi.serve, swaggerUi.setup(spec));
+      console.log(`Swagger UI mounted: ${route}`);
+    }
+  }
+});
 // === Pastikan folder uploads tersedia ===
 const uploadsPath = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsPath)) {
   fs.mkdirSync(uploadsPath);
 }
+app.use((err, req, res, next) => {
+  if (err.status === 413) {
+    return res.redirect('/eWarrantyForm?error=413');
+  }
+  next(err);
+});
 
 // === Middleware dasar ===
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true}));
 app.use(express.json());
 
 // ✅ Session harus sebelum flash
@@ -40,6 +59,8 @@ app.use((req, res, next) => {
   res.locals.successMessageLogin = req.flash('successMessageLogin') || null;
   res.locals.successMessage = req.flash('successMessage') || null;
   res.locals.errorMessage = req.flash('errorMessage') || null;
+  res.locals.toastSuccess = req.flash('toastSuccess') || null;
+  res.locals.toastError = req.flash('toastError') || null;
   next();
 });
 
@@ -68,6 +89,7 @@ io.on('connection', (socket) => {
 
 app.use((req, res, next) => {
   req.io = io;
+  console.log("➡️ Request masuk:", req.method, req.url);
   next();
 });
 
@@ -84,7 +106,7 @@ app.use('/', indexRouter);
 app.use('/', userRoutes);
 app.use('/', monitoringRoutes);
 app.use('/', assetRoutes);
-app.use('/ewarranty/', calibrationRoutes)
+app.use('/', calibrationRoutes);
 
 // Export
 module.exports = {

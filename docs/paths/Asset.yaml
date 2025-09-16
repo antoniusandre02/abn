@@ -1,0 +1,139 @@
+paths:
+  /api/assets:
+    get:
+      summary: Ambil semua data asset
+      tags:
+        - Assets
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Kata kunci pencarian
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Halaman yang diambil
+      responses:
+        '200':
+          description: List asset berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Asset'
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalRows:
+                        type: integer
+
+    post:
+      summary: Tambah asset baru
+      tags:
+        - Assets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Asset'
+      responses:
+        '201':
+          description: Asset berhasil ditambahkan
+        '400':
+          description: Data tidak valid
+
+  /api/assets/{id}:
+    get:
+      summary: Ambil detail asset berdasarkan ID
+      tags:
+        - Assets
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detail asset ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '404':
+          description: Asset tidak ditemukan
+
+    put:
+      summary: Perbarui asset berdasarkan ID
+      tags:
+        - Assets
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Asset'
+      responses:
+        '200':
+          description: Asset berhasil diperbarui
+        '400':
+          description: Request body tidak valid
+        '404':
+          description: Asset tidak ditemukan
+
+    delete:
+      summary: Hapus asset berdasarkan ID
+      tags:
+        - Assets
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Asset berhasil dihapus
+        '404':
+          description: Asset tidak ditemukan
+
+  /api/assets/barcode/{kode_asset}:
+    get:
+      summary: Generate barcode PDF dari kode asset
+      tags:
+        - Assets
+      parameters:
+        - in: path
+          name: kode_asset
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Barcode asset dalam bentuk PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Barcode tidak ditemukan

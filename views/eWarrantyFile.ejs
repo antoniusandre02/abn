@@ -1,0 +1,287 @@
+<% 
+  const productBrand = dataEwarranty.product_brand || '';
+  const productName = dataEwarranty.product_name || '';
+  const productDisplayName = `${productBrand} - ${productName}`;
+
+  const serialNumber = (!dataEwarranty.product_sn || dataEwarranty.product_sn === '-' || dataEwarranty.product_sn.trim() === '') 
+    ? dataEwarranty.product_catalog 
+    : dataEwarranty.product_sn;
+
+  const formattedPurchaseDate = new Date(dataEwarranty.purchase_date).toLocaleDateString('en-US', { day: '2-digit', month: 'long', year: 'numeric' });
+
+  const purchaseFrom = (dataEwarranty.purchase_from === 'Online' || dataEwarranty.purchase_from === 'Direct') 
+    ? 'PT. Abadinusa Usahasemesta' 
+    : 'Distributor';
+
+  const expiredDateFormatted = new Date(dataEwarranty.expired_date).toLocaleDateString('en-US', { day: '2-digit', month: 'long', year: 'numeric' });
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Sertifikat</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    @font-face {
+      font-family: "Myriad Pro Bold";
+      font-style: normal;
+      font-weight: normal;
+      src: url("<%= fontEwarranty %>") format("woff");
+    }
+
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Tahoma, sans-serif;
+    }
+
+    .print-page {
+      width: 210mm;
+      height: 297mm;
+      background-image: url('<%= framePath %>');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      text-align: center;
+      position: relative;
+    }
+
+    .content {
+      width: 80%;
+      padding: 20mm;
+      z-index: 1;
+    }
+
+    h1 {
+      font-family: "Myriad Pro Bold";
+      font-size: 64px;
+      margin: 10px 0;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin: 10px 0;
+    }
+
+    p {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+
+    .logo-container {
+      margin-bottom: 40px;
+    }
+
+    .logo-container img {
+      height: 50px;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .header-row .left {
+      font-size: 14px;
+      text-align: left;
+    }
+
+    .header-row .right img {
+      height: 50px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid black;
+    }
+
+    th,
+    td {
+      padding: 6px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="print-page">
+    <div class="content">
+      <div class="logo-container">
+        <img src="<%= logoPath %>" alt="Logo ABN" />
+      </div>
+      <h1 style="font-family: 'Myriad Pro Bold'; font-weight: normal; letter-spacing: 2px;">
+        <b>WARRANTY CARD</b>
+      </h1>
+      <div class="header-row" style="padding-bottom: 0px;">
+        <div class="left" style="width: 40%">
+          <table>
+            <tbody>
+              <tr>
+                <td><b>No ID : <%= dataEwarranty.ewarranty_code || '---' %></b></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="right">
+          <img src="<%= tagLineAbn %>" alt="Logo ABN" />
+        </div>
+      </div>
+      <table style="margin-top: 10px;">
+        <thead>
+          <tr>
+            <th colspan="2">Product Information</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: left; width: 30%">Product Name</td>
+            <td style="text-align: left"><%= productDisplayName %></td>
+          </tr>
+          <tr>
+            <td style="text-align: left; width: 30%">Serial Number</td>
+            <td style="text-align: left"><%= serialNumber %></td>
+          </tr>
+          <tr>
+            <td style="text-align: left; width: 30%">Date of Purchase</td>
+            <td style="text-align: left"><%= formattedPurchaseDate %></td>
+          </tr>
+          <tr>
+            <td style="text-align: left; width: 30%">Purchase From</td>
+            <td style="text-align: left"><%= purchaseFrom %></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th colspan="2">Customer Information</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align: left; width: 30%">Name</td>
+              <td style="text-align: left"><%= dataEwarranty.customer_name %></td>
+            </tr>
+            <tr>
+              <td style="text-align: left; width: 30%">
+                Institution/Company
+              </td>
+              <td style="text-align: left"><%= dataEwarranty.customer_institution %></td>
+            </tr>
+            <tr>
+              <td style="text-align: left; width: 30%">Department</td>
+              <td style="text-align: left"> -</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table style="margin-top: 10px;">
+          <tbody>
+            <tr>
+              <td style="text-align: left; width: 30%;">Warranty Periode</td>
+              <td style="text-align: left">until <%= expiredDateFormatted %></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <tr>
+              <th>WARRANTY CONDITION</th>
+            </tr>
+          </thead>
+          <tbody style="font-size: 11px">
+            <tr>
+              <td style="text-align: left; width: 30%">
+                The Warranty DOES NOT apply to the following :
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: left; width: 30%">
+                * The device problem caused by incorrect usage on application
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: left; width: 30%">
+                * Conditions that caused the damage on device part (example :
+                fall accidentally or using not recommended solutions)
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: left; width: 30%">
+                * External damage caused by application such as : exposed to
+                dust, unclean, or scratched on device
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: left; width: 30%">
+                * The device repairs are not carried out by authorized service
+                representative that caused changes from principal standard
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: left; width: 30%">
+                * In case serial number was erased or change
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: left; width: 30%">
+                * The device problem caused by unpredictable causes (force
+                major) such as : fire, flood, earthquake, electrical voltage,
+                etc
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: left; width: 30%">
+                * Shipping costs are borne by the buyer
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="padding: 0px">
+        <div style="padding-top: 20px"><b>PT. ABADINUSA USAHASEMESTA</b></div>
+        <p style="font-size: 12px">
+          Jl. Raden Saleh No. 45 G, Jakarta Pusat, Telp : 021 3101017, HP/WA :
+          0811 131 0131
+          <br />
+          Jl. Kopo Bihbul No. 86 B, Bandung, Jawa Barat, Telp : 022 541 4666
+          <br />
+          email : workshop@abadinusa.co.id / servicecenter@abadinusa.co.id
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

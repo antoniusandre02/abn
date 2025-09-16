@@ -7,6 +7,12 @@
     border: none;
     background-color: #fff;
     margin-bottom: 20px;
+    flex: 1;
+  }
+
+  .card-container {
+    display: flex;
+    align-items: stretch;
   }
 
   .card-header {
@@ -27,6 +33,7 @@
   .table {
     font-size: 0.95rem;
     color: #222;
+    table-layout: fixed;
   }
 
   .table th {
@@ -36,6 +43,7 @@
   }
 
   .table td {
+    height: 55px;
     vertical-align: middle;
     padding: 0.5rem;
   }
@@ -61,6 +69,10 @@
   .text-neutral {
     color: #333;
     font-weight: 600;
+  }
+
+  .text-table{
+    text-transform: capitalize;
   }
 
   .wrapper {
@@ -181,7 +193,7 @@
                       <thead style="font-size: 16px; text-align: center">
                         <tr>
                           <th style="width: 115px; vertical-align: middle">
-                            SO/DO Number
+                            SO/DO / Order Number
                           </th>
                           <th style="vertical-align: middle">Customer Name</th>
                           <th style="width: 100px; vertical-align: middle">
@@ -208,10 +220,14 @@
                         </tr>
                         <% } %> <% } else { %> <% pickedData.forEach(item => {
                         %>
-                        <tr class="align-middle" style="height: 55px">
+                        <tr class="align-middle text-table" style="height: 55px; text-transform: capitalize;">
                           <td style="text-align: center; width: 115px">
-                            <%= item.sales_order_number %> / <%=
-                            item.delivery_order_number %>
+                            <% if ((!item.sales_order_number || item.sales_order_number.trim() === '') 
+                                && (!item.delivery_order_number || item.delivery_order_number.trim() === '')) { %>
+                              <%= item.order_number %>
+                            <% } else { %>
+                              <%= item.sales_order_number || '-' %> / <%= item.delivery_order_number || '-' %>
+                            <% } %>
                           </td>
                           <td style="vertical-align: middle; font-size: 16px">
                             <div class="clamp-2-lines">
@@ -260,7 +276,7 @@
                       <thead style="font-size: 16px; text-align: center">
                         <tr>
                           <th style="width: 115px; vertical-align: middle">
-                            SO/DO Number
+                            SO/DO / Order Number
                           </th>
                           <th style="vertical-align: middle">Customer Name</th>
                           <th style="width: 100px; vertical-align: middle">
@@ -289,11 +305,15 @@
                         %>
                         <tr class="align-middle" style="height: 55px">
                           <td style="text-align: center; width: 115px">
-                            <%= item.sales_order_number %> / <%=
-                            item.delivery_order_number %>
+                            <% if ((!item.sales_order_number || item.sales_order_number.trim() === '') 
+                                && (!item.delivery_order_number || item.delivery_order_number.trim() === '')) { %>
+                              <%= item.order_number %>
+                            <% } else { %>
+                              <%= item.sales_order_number || '-' %> / <%= item.delivery_order_number || '-' %>
+                            <% } %>
                           </td>
-                          <td style="vertical-align: middle; font-size: 16px">
-                            <div class="clamp-2-lines">
+                          <td style="vertical-align: middle; font-size: 16px; ">
+                            <div style="text-transform: capitalize;" class="clamp-2-lines">
                               <%= item.customer_name %>
                             </div>
                           </td>
@@ -342,7 +362,7 @@
                       <thead style="font-size: 16px; text-align: center">
                         <tr>
                           <th style="width: 115px; vertical-align: middle">
-                            SO/DO Number
+                            SO/DO / Order Number
                           </th>
                           <th style="vertical-align: middle">Customer Name</th>
                           <th style="width: 100px; vertical-align: middle">
@@ -371,8 +391,12 @@
                         %>
                         <tr class="align-middle" style="height: 55px">
                           <td style="text-align: center; width: 115px">
-                            <%= item.sales_order_number %> / <%=
-                            item.delivery_order_number %>
+                            <% if ((!item.sales_order_number || item.sales_order_number.trim() === '') 
+                                && (!item.delivery_order_number || item.delivery_order_number.trim() === '')) { %>
+                              <%= item.order_number %>
+                            <% } else { %>
+                              <%= item.sales_order_number || '-' %> / <%= item.delivery_order_number || '-' %>
+                            <% } %>
                           </td>
                           <td style="vertical-align: middle; font-size: 16px">
                             <div class="clamp-2-lines">
@@ -475,11 +499,15 @@
       }
     } else {
       data.forEach((item) => {
+        const soDoDisplay = (!item.sales_order_number || item.sales_order_number.trim() === '') &&
+                                (!item.delivery_order_number || item.delivery_order_number.trim() === '')
+                                ? item.order_number
+                                : `${item.sales_order_number || '-'} / ${item.delivery_order_number || '-'}`;
         const tr = document.createElement("tr");
         tr.classList.add("align-middle");
         tr.innerHTML = `
             <td style="text-align: center; width: 115px; vertical-align: middle; height: 55px;">
-            ${item.sales_order_number} / ${item.delivery_order_number}
+              ${soDoDisplay}
             </td>
             <td style="vertical-align: middle; height: 55px; font-size: 16px;">
                 <div class="clamp-2-lines">${item.customer_name}</div>

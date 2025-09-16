@@ -1,0 +1,140 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+<div class="content-wrapper p-3">
+    <h3 class="mb-4">Kelola E-Warranty - <%= summaryBarcodes[0].delivery_order_number %></h3>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-3" id="barcodeTabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#available">Available</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#claimed">Claimed</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- Available Tab -->
+        <div class="tab-pane fade show active" id="available">
+            <table id="tableAvailable" class="table table-bordered w-100">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Serial Number</th>
+                        <th>Expired At</th>
+                        <th>Pilih</th>
+                    </tr>
+                </thead>
+            </table>
+            <button id="btnPrintSelected" class="btn btn-warning mt-2">Print Selected</button>
+        </div>
+
+        <!-- Claimed Tab -->
+        <div class="tab-pane fade" id="claimed">
+            <table id="tableClaimed" class="table table-bordered w-100">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Serial Number</th>
+                        <th>Expired At</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-right mt-3">
+        <a href="/soDo/view/<%= id_monitoring_data %>" class="btn btn-secondary">Kembali ke Detail</a>
+    </div>
+</div>
+
+<%- include('layout/footer') %>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+    const idMonitoring = "<%= id_monitoring_data %>";
+    // Ambil catalog pertama aja dulu (atau bisa dikirim via tombol)
+    const catalog = "<%= summaryBarcodes[0].no_catalog %>";
+
+    $(document).ready(function () {
+        // Table Available
+        $("#tableAvailable").DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: `/soDo/get-barcodes/${idMonitoring}/${catalog}?status=available`,
+            columns: [{
+                    data: 0
+                },
+                {
+                    data: 1
+                },
+                {
+                    data: 2
+                },
+                {
+                    data: 3,
+                    orderable: false,
+                    searchable: false
+                }
+            ]
+        });
+
+        // Table Claimed
+        $("#tableClaimed").DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: `/soDo/get-barcodes/${idMonitoring}/${catalog}?status=claimed`,
+            columns: [{
+                    data: 0
+                },
+                {
+                    data: 1
+                },
+                {
+                    data: 2
+                },
+                {
+                    data: 3
+                }
+            ]
+        });
+
+        $("#btnPrintSelected").click(async function () {
+            const selected = [];
+            $(".barcode-check:checked").each(function () {
+                selected.push($(this).val());
+            });
+
+            if (selected.length === 0) {
+                alert("Pilih minimal 1 barcode dulu!");
+                return;
+            }
+
+            try {
+                // 1. Extend JWT + generate PDF
+                const res = await fetch("/soDo/extend-print", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        uuids: selected
+                    })
+                });
+
+                if (!res.ok) throw new Error("Gagal extend & print");
+                const blob = await res.blob();
+
+                // 2. Buka PDF hasil print
+                const url = URL.createObjectURL(blob);
+                const w = window.open(url);
+                if (!w) alert("Popup diblokir, izinkan popup untuk melihat PDF");
+            } catch (err) {
+                console.error(err);
+                alert("Terjadi error saat extend & print barcode.");
+            }
+        });
+    });
+</script>

@@ -13,7 +13,9 @@
       return `${y}-${m}-${da}`;
     }
   %>
-  <form id="editForm" data-role="<%= user.role %>" action="/update/<%= item.id_monitoring_data %>" method="POST">
+  <form id="editForm" data-role="<%= user.role %>" data-id="<%= item.id_monitoring_data %>" action="/update/<%= item.id_monitoring_data %>" method="POST">
+    <input type="hidden" value="<%= item.id_monitoring_data %>" >
+    <input type="hidden" id="tempItems" name="tempItems">
     <div class="row">
       <div class="col-md-6">
         <div class="form-group">
@@ -38,7 +40,7 @@
       <div class="col-md-6">
         <div class="form-group">
           <label>Sales Order Number</label>
-          <input type="text" class="form-control" name="sales_order_number" value="<%= item.sales_order_number %>" <% if (role == 8 || role == 10 || role == 11 || role == 12) { %> readonly <% } %>>
+          <input type="text" class="form-control" name="sales_order_number" placeholder= "Input Sales Order Number" value="<%= item.sales_order_number %>" <% if (role == 8 || role == 10 || role == 11 || (role == 12 && item.division_team != 3)) { %> readonly <% } %>>
         </div>
       </div>
     </div>
@@ -48,14 +50,14 @@
         <div class="form-group">
           <label>Sales Order Date</label>
           <input type="date" class="form-control" name="sales_order_date"
-            value="<%= formatDateInput(item.sales_order_date) %>" <% if (role == 8 || role == 10 || role == 11 || role == 12) { %> readonly <% } %>>
+            value="<%= formatDateInput(item.sales_order_date) %>" <% if (role == 8 || role == 10 || role == 11 || (role == 12 && item.division_team != 3)) { %> readonly <% } %>>
         </div>
       </div>
 
       <div class="col-md-6">
         <div class="form-group">
           <label>Delivery Order Number</label>
-          <input type="text" class="form-control" name="delivery_order_number" value="<%= item.delivery_order_number %>" <% if (role == 8 || role == 10 || role == 11 || role == 12) { %> readonly <% } %>>
+          <input type="text" class="form-control" name="delivery_order_number" placeholder= "Input Delivery Order Number" value="<%= item.delivery_order_number %>" <% if (role == 8 || role == 10 || role == 11 || (role == 12 && item.division_team != 3)) { %> readonly <% } %>>
         </div>
       </div>
     </div>
@@ -82,7 +84,7 @@
         <div class="form-group">
           <label>Delivery Order Date</label>
           <input type="date" class="form-control" name="delivery_order_date"
-            value="<%= formatDateInput(item.delivery_order_date) %>" <% if (role == 8 || role == 10 || role == 11 || role == 12) { %> readonly <% } %>>
+            value="<%= formatDateInput(item.delivery_order_date) %>" <% if (role == 8 || role == 10 || role == 11 || (role == 12 && item.division_team != 3)) { %> readonly <% } %>>
         </div>
       </div>
     </div>
@@ -177,6 +179,106 @@
     </div>
     <% } %>
 
+    <% if (user && [1, 16, 10, 11, 12].includes(user.role)) { %>
+    <div class="form-group">
+      <label>Order Number</label>
+      <input type="text" class="form-control" id="order_number" name="order_number"
+        value="<%= item.order_number %>" <% if ([10, 11, 12, 14].includes(user.role)) { %> readonly <% } %>>
+    </div>
+    <% } %>
+    <!-- Garis Pemisah dan Judul -->
+    <hr class="my-4">
+    <h5 class="text font-weight-bold mb-3">Non-Sparepart & Non-Consumable</h5>
+    <div class="mt-0 ml-3 mr-3 mb-0 align-items-center">
+      <div class="form-group row align-items-end " style="gap: 8px;">
+          <div style="width: 15%;">
+              <label>No Catalog</label>
+              <input type="text" class="form-control" id="no_catalog" name="no_catalog" />
+          </div>
+          <div style="width: 15%;">
+              <label>Serial Number</label>
+              <input type="text" class="form-control" id="serial_number" name="serial_number" />
+          </div>
+          <div style="width: 23%;">
+              <label>Description</label>
+              <input type="text" class="form-control" id="product_name" name="product_name" />
+          </div>
+          <div style="width: 10%;">
+              <label>Quantity</label>
+              <input type="number" class="form-control" id="qty_product" name="qty_product" />
+          </div>
+          <div style="width: 20%;">
+              <label for="keterangan">Keterangan</label>
+              <select class="form-control" id="keterangan" name="keterangan">
+                  <option value="">-- Pilih Keterangan --</option>
+                  <option value="Pcs">Pcs</option>
+                  <option value="Pack">Pack</option>
+                  <option value="Unit">Unit</option>
+              </select>
+          </div>
+          <div style="width: 10%;">
+              <label class="invisible">Tambah</label>
+              <button type="button" class="btn btn-success" id="btnAddDetailMonitoring">
+                  Tambah
+              </button>
+          </div>
+      </div>
+    </div>
+    <!-- Tabel detail -->
+    <div class="mt-3 card">
+        <div class="card-body p-2">
+            <table class="table table-bordered" id="addedItemsTable">
+                <thead>
+                    <tr>
+                        <th>No Catalog</th>
+                        <th>Serial Number</th>
+                        <th>Description</th>
+                        <th>Quantity</th>
+                        <th>Keterangan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% details.forEach((d, i) => { %>
+                    <tr data-index="<%= i %>">
+                        <td style="width: 20%;">
+                          <input type="hidden" name="id_detail_monitoring_data" value="<%= d.id_detail_monitoring_data %>"/>
+                          <input type="text" class="form-control" value="<%= d.no_catalog %>" />
+                        </td>
+                        <td style="width: 20%;"><input type="text" class="form-control" value="<%= d.serial_number %>" />
+                        </td>
+                        <td style="width: 40%;"><input type="text" class="form-control" value="<%= d.product_name %>" /></td>
+                        <td style="width: 10%;">
+                          <input type="number" class="form-control" 
+                                value="<%= d.qty_product %>" 
+                                min="<%= d.claimed_count || 0 %>"
+                                <%= d.claimed_count >= d.qty_product ? 'disabled' : '' %> />
+                          <% if (d.claimed_count > 0) { %>
+                            <% if (d.claimed_count >= d.qty_product) { %>
+                              <small class="text-danger">Semua sudah klaim, tidak bisa diubah</small>
+                            <% } else { %>
+                              <small class="text-muted">Minimal: <%= d.claimed_count %> (sudah klaim)</small>
+                            <% } %>
+                          <% } %>
+                        </td>
+                        <td style="width: 20%;">
+                          <select class="form-control" name="detail_keterangan[]">
+                            <option value="Pcs"  <%= d.keterangan === 'Pcs' ? 'selected' : '' %>>Pcs</option>
+                            <option value="Pack" <%= d.keterangan === 'Pack' ? 'selected' : '' %>>Pack</option>
+                            <option value="Unit" <%= d.keterangan === 'Unit' ? 'selected' : '' %>>Unit</option>
+                          </select>
+                        </td>
+                        <td style="width: 10%; text-align: center; vertical-align: middle;"><button
+                                type="button" class="btn btn-danger btn-sm btn-remove"
+                                style="text-align: center;"><i class="fa fa-times"
+                                    aria-hidden="true"></i></button></td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr class="my-4">
     <div class="form-group text-right">
       <a href="/soDo" class="btn btn-secondary">Batal</a>
       <button type="submit" id="submitBtn" class="btn btn-primary">Simpan Perubahan</button>
@@ -188,43 +290,64 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode"></script>
-  
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  document.getElementById('editForm').addEventListener('submit', async function (e) {
-    const role = parseInt(this.dataset.role);
+  let tempItems = <%-JSON.stringify(details.map(d => ({
+      id_detail_monitoring_data:  d.id_detail_monitoring_data,
+      no_catalog: d.no_catalog,
+      serial_number: d.serial_number,
+      product_name: d.product_name,
+      qty_product: d.qty_product,
+      keterangan: d.keterangan,
+      claimed_count: d.claimed_count // ✅ ditambahkan
+  })))%>;
 
-    if (role === 8) {
-      e.preventDefault();
+  function renderTable() {
+    const tbody = $('#addedItemsTable tbody');
+    tbody.empty();
+    tempItems.forEach((item, index) => {
+        let claimInfo = '';
+        let qtyInput = '';
+        let actionBtn = '';
 
-      const formData = new FormData(this);
-      const data = new URLSearchParams();
-      for (const pair of formData) {
-        data.append(pair[0], pair[1]);
-      }
-
-      try {
-        const response = await fetch(this.action, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: data
-        });
-
-        if (response.ok) {
-          await exportRowFinanceToPDF(); // ambil data langsung dari form
-          window.location.href = "/soDo";
+        if (item.claimed_count && item.claimed_count >= item.qty_product) {
+            qtyInput = `<input type="number" class="form-control" 
+                                value="${item.qty_product}" disabled />`;
+            claimInfo = `<small class="text-danger">Semua sudah klaim, tidak bisa diubah</small>`;
+            actionBtn = `<button type="button" class="btn btn-secondary btn-sm" disabled>X</button>`;
         } else {
-          alert("Gagal menyimpan perubahan.");
+            qtyInput = `<input type="number" class="form-control" value="${item.qty_product}" min="${item.claimed_count || 0}" />`;
+            if (item.claimed_count > 0) {
+              const editable = item.qty_product - item.claimed_count;
+              claimInfo = `<small class="text-muted">Sudah Claim: ${item.claimed_count} | Bisa diubah: ${editable} </small>`;
+            }
+            actionBtn = `<button type="button" class="btn btn-danger btn-sm btn-remove">X</button>`;
         }
-      } catch (err) {
-        console.error(err);
-        alert("Terjadi kesalahan.");
-      }
-    }
-  });
-</script>
-<script>
+
+        tbody.append(`
+            <tr data-index="${index}">
+                <td>
+                  <!-- ✅ tambahkan hidden input dengan class id-detail -->
+                  <input type="hidden" class="id-detail" value="${item.id_detail_monitoring_data || ''}" />
+                  <input type="text" class="form-control" value="${item.no_catalog}" ${item.claimed_count >= item.qty_product ? 'disabled' : ''}/>
+                </td>
+                <td><input type="text" class="form-control" value="${item.serial_number}" ${item.claimed_count >= item.qty_product ? 'disabled' : ''}/></td>
+                <td><input type="text" class="form-control" value="${item.product_name}" ${item.claimed_count >= item.qty_product ? 'disabled' : ''}/></td>
+                <td>${qtyInput} ${claimInfo}</td>
+                <td>
+                  <select class="form-control" ${item.claimed_count >= item.qty_product ? 'disabled' : ''}>
+                    <option value="Pcs"  ${item.keterangan === 'Pcs' ? 'selected' : ''}>Pcs</option>
+                    <option value="Pack" ${item.keterangan === 'Pack' ? 'selected' : ''}>Pack</option>
+                    <option value="Unit" ${item.keterangan === 'Unit' ? 'selected' : ''}>Unit</option>
+                  </select>
+                </td>
+                <td>${actionBtn}</td>
+            </tr>
+        `);
+    });
+  }
+
+
   async function exportRowFinanceToPDF() {
     const { jsPDF } = window.jspdf;
 
@@ -236,9 +359,7 @@
 
     const formatDate = (str) => {
       if (!str || str === '-') return "-";
-      const parts = str.split(/[\/\-]/);
-      if (parts.length !== 3) return str;
-      const [year, month, day] = str.split('-'); // input type="date" => yyyy-mm-dd
+      const [year, month, day] = str.split('-');
       const date = new Date(`${year}-${month}-${day}`);
       if (isNaN(date)) return str;
       return date.toLocaleDateString('en-GB', {
@@ -246,25 +367,20 @@
       }).replace(/ /g, '-');
     };
 
-    // Ambil data dari form input
     const getValue = (name) => document.querySelector(`[name="${name}"]`)?.value || '-';
 
     const doNumber = getValue('delivery_order_number');
-    const doDate = getValue('delivery_order_date');
     const customer = getValue('customer_name');
     const shipBy = getValue('ship_by');
     const receiveName = getValue('receive_name');
     const eta = getValue('eta');
     const invoicingDate = getValue('invoicing_date');
     const location = getValue('location_warehouse_name');
-    
-    const todayFormatted = formatDate(new Date().toISOString().split('T')[0]);
 
     // Outline
     doc.setLineWidth(0.3);
     doc.rect(2, 2, 54, 25);
 
-    // Layout
     let xLeft = 5;
     let xRight = 53;
     let y = 5;
@@ -292,4 +408,130 @@
 
     doc.save(`finance-label-${doNumber}.pdf`);
   }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    renderTable();
+
+    // Notifikasi dari query param
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const msg = urlParams.get('msg');
+    if (status && msg) {
+      Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: status,
+          title: msg,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true
+      });
+    }
+
+    // Tambah item detail
+    $('#btnAddDetailMonitoring').on('click', () => {
+        const no_catalog = $('#no_catalog').val().trim();
+        const serial_number = $('#serial_number').val().trim();
+        const product_name = $('#product_name').val().trim();
+        const qty_product = $('#qty_product').val().trim();
+        const keterangan = $('#keterangan').val();
+
+        if (!no_catalog && !serial_number || !product_name || !qty_product || !keterangan) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Lengkapi semua field detail!',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2500
+          });
+          return;
+        }
+        tempItems.push({no_catalog, serial_number, product_name, qty_product, keterangan });
+        renderTable();
+        $('#no_catalog, #serial_number, #product_name, #qty_product').val('');
+        $('#keterangan').val('');
+    });
+
+    // Hapus row
+    $('#addedItemsTable').on('click', '.btn-remove', function () {
+        const index = $(this).closest('tr').data('index');
+        tempItems.splice(index, 1);
+        renderTable();
+    });
+
+    // Submit form
+    $('#editForm').on('submit', async function (e) {
+        const rows = $('#addedItemsTable tbody tr');
+        tempItems = [];
+
+        rows.each(function () {
+          // ambil semua input di cell pertama (No Catalog)
+          const noCatalogCell = $(this).find('td:eq(0)');
+          const id_detail_monitoring_data = noCatalogCell.find('input.id-detail').val(); // hidden
+          const no_catalog = noCatalogCell.find('input[type=text]').val().trim();       // text box
+
+          const serial_number = $(this).find('td:eq(1) input').val().trim();
+          const product_name = $(this).find('td:eq(2) input').val().trim();
+          const qty_product = $(this).find('td:eq(3) input').val().trim();
+          const keterangan = $(this).find('td:eq(4) select').val();
+
+          if (no_catalog || serial_number) {
+              tempItems.push({
+                  id_detail_monitoring_data: id_detail_monitoring_data && id_detail_monitoring_data !== "undefined" && id_detail_monitoring_data !== "" ? id_detail_monitoring_data : null,
+                  no_catalog,
+                  serial_number,
+                  product_name,
+                  qty_product,
+                  keterangan
+              });
+          }
+      });
+
+
+        if (tempItems.length === 0) {
+            e.preventDefault();
+            Swal.fire({
+              icon: 'warning',
+              title: 'Nomor Catalog Wajib diisi!',
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 2500
+            });
+            return;
+        }
+
+        $('#tempItems').val(JSON.stringify(tempItems));
+
+        const role = parseInt(this.dataset.role);
+        if (role === 8) {
+          e.preventDefault();
+
+          const formData = new FormData(this);
+          const data = new URLSearchParams();
+          for (const pair of formData) {
+            data.append(pair[0], pair[1]);
+          }
+
+          try {
+            const response = await fetch(this.action, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: data
+            });
+
+            if (response.ok) {
+              await exportRowFinanceToPDF();
+              window.location.href = "/soDo";
+            } else {
+              alert("Gagal menyimpan perubahan.");
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Terjadi kesalahan.");
+          }
+        }
+    });
+  });
 </script>

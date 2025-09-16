@@ -1,6 +1,6 @@
 # ABN Monitoring System
 
-Aplikasi monitoring proses SO/DO berbasis Node.js + Express + PostgreSQL.
+Aplikasi monitoring proses pendistribusian barang disisi Tim SCM berbasis Node.js + Express + PostgreSQL.
 
 ## 📦 Fitur
 - Login berbasis role
@@ -8,6 +8,8 @@ Aplikasi monitoring proses SO/DO berbasis Node.js + Express + PostgreSQL.
 - Scan barcode dan logging aktivitas
 - Dashboard real-time (WebSocket)
 - Role akses Admin, Operator, Finance, Display
+- e warranty module (TBC) secara frameworknya udah jalan tinggal mencari solusi
+-
 
 ## 🚀 Cara Menjalankan
 1. Clone repository:

@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { nanoid } = require('nanoid');
 
 // Token default (misal untuk login/session 1 hari)
 const generateToken = (user) => {
@@ -26,8 +27,14 @@ const verifyToken = (token) => {
   return jwt.verify(token, process.env.JWT_SECRET);
 };
 
+// Token untuk eWarranty link (30 hari)
+const generateEwarrantyToken = (id, expiresIn = '41d') => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn });
+};
+
 module.exports = {
   generateToken,
   generateTokenReject,
-  verifyToken
+  verifyToken,
+  generateEwarrantyToken
 };

@@ -1,0 +1,47 @@
+components:
+  schemas:
+    Asset:
+      type: object
+      required:
+        - nama_asset
+        - jenis_asset
+        - status_asset
+        - tahun_pembelian
+        - brand_asset
+      properties:
+        id_asset:
+          type: integer
+          example: 1
+        kode_asset:
+          type: string
+          example: "ABN-01001"
+        nama_asset:
+          type: string
+          example: "Laptop Lenovo"
+        sn_asset:
+          type: string
+          example: "SN123456789"
+        status_asset:
+          type: string
+          example: "TERSEDIA"
+        tahun_pembelian:
+          type: string
+          example: "2024"
+        brand_asset:
+          type: string
+          example: "Lenovo"
+        jenis_asset:
+          type: string
+          example: "Elektronik"
+        notes_asset:
+          type: string
+          example: "Digunakan untuk desain"
+        nama_karyawan:
+          type: string
+          example: "Budi"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time

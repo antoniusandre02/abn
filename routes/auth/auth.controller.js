@@ -61,9 +61,17 @@ exports.login = async (req, res) => {
             VALUES ($1, $2, NOW(), $3)
         `, [user.name, user.role_name, user.user_id]);
 
-        if (user.id_role === 13) return res.redirect('/karyawan');
-        req.flash('successMessageLogin', 'Berhasil login sebagai ' + user.name);
-        return res.redirect('/dashboard');
+        if (user.id_role === 13) {
+            req.flash('successMessageLogin', 'Berhasil login sebagai ' + user.name);
+            return res.redirect('/karyawan');
+        } else if (user.id_role === 15) {
+            req.flash('successMessageLogin', 'Berhasil login sebagai ' + user.name);
+            return res.redirect('/eWarranty');
+        } else {
+            req.flash('successMessageLogin', 'Berhasil login sebagai ' + user.name);
+            return res.redirect('/dashboard');
+        }
+
     } catch (err) {
         console.error(err);
         req.flash('errorMessage', 'Login error');

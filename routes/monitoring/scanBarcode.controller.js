@@ -4,7 +4,7 @@ const moment = require('moment');
 const statusRoleMap = {
     Picked: [1, 2, 3, 12],
     Packed: [1, 4, 5, 12],
-    Shipped: [1, 6, 7, 12]
+    Shipped: [1, 6, 7, 12, 16]
 };
 
 exports.getScanBarcodePage = (req, res) => {
@@ -27,7 +27,7 @@ exports.handleScanBarcode = async (req, res) => {
 
     try {
         const result = await pool.query(
-            'SELECT * FROM monitoring_data WHERE delivery_order_number = $1',
+            'SELECT * FROM monitoring_data WHERE delivery_order_number = $1 OR order_number = $1',
             [barcode_do]
         );
 
@@ -38,6 +38,24 @@ exports.handleScanBarcode = async (req, res) => {
         }
 
         const data = result.rows[0];
+        console.log(data);
+        console.log(barcode_do);
+        console.log(user);
+        // ❌ Larangan untuk role 16 scan DO-XXX (tanpa peduli division)
+        if (user.role === 16 && barcode_do.startsWith('DO-')) {
+            return res.render('scanBarcode', {
+                message: 'Admin E-Commerce tidak boleh scan order berawalan "DO-".'
+            });
+        }
+
+        // ✅ Validasi tambahan khusus division_team = 3
+        if (parseInt(data.division_team, 10) === 3 && ![1, 16].includes(user.role)) {
+            return res.render('scanBarcode', {
+                message: 'Kamu tidak memiliki akses untuk scan pada divisi e-Commerce.'
+            });
+        }
+
+
         const now = moment().format('YYYY-MM-DD HH:mm:ss');
         const currentStatus = data.status || 'Draft';
 
@@ -73,7 +91,7 @@ exports.handleScanBarcode = async (req, res) => {
                 message: 'Status berhasil diupdate: Packed'
             },
             Shipped: {
-                query: `UPDATE monitoring_data SET status = 'Shipped', shipped_date = $1, shipped_by = $2, is_done = true, update_at = NOW() WHERE delivery_order_number = $3`,
+                query: `UPDATE monitoring_data SET status = 'Shipped', shipped_date = $1, shipped_by = $2, is_done = true, update_at = NOW() WHERE delivery_order_number = $3 OR order_number = $3`,
                 message: 'Status berhasil diupdate: Shipped'
             }
         } [nextStatus];

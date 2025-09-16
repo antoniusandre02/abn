@@ -191,6 +191,11 @@
         </div>
       </div>
     </div>
+    <div class="form-group">
+      <label>Order Number</label>
+      <input type="text" class="form-control" id="order_number" name="order_number"
+        value="<%= item.order_number %>" readonly>
+    </div>
       <div class="form-group">
       <label>Info ke Invoicing Diterima</label>
       <input type="date" class="form-control" id="invoicingDate" name="invoicing_date"
@@ -207,6 +212,91 @@
           disabled
         />
       </div>
+      <!-- Garis Pemisah dan Judul -->
+    <hr class="my-4">
+    <h3 class="text font-weight-bold mb-3">Detail Items</h3>
+    <h5 class="text font-weight-bold mb-3">Non-Sparepart & Non-Consumable</h5>
+    <!-- Tabel detail -->
+    <div class="mt-3 card">
+        <div class="card-body p-2">
+            <table class="table table-bordered" id="addedItemsTable">
+                <thead>
+                    <tr>
+                        <th>No Catalog</th>
+                        <th>Serial Number</th>
+                        <th>Description</th>
+                        <th>Quantity</th>
+                        <th>Keterangan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  <% details.forEach((d, i) => { %>
+                  <tr data-index="<%= i %>">
+                    <td style="width: 15%;">
+                      <input type="hidden" name="id_detail_monitoring_data" value="<%= d.id_detail_monitoring_data %>"/>
+                      <input type="text" class="form-control" 
+                            value="<%= d.no_catalog %>" 
+                            <%= d.claimed_count >= d.qty_product ? 'disabled' : '' %> />
+                    </td>
+
+                    <td style="width: 15%;">
+                      <input type="text" class="form-control" 
+                            value="<%= d.serial_number %>" 
+                            <%= d.claimed_count >= d.qty_product ? 'disabled' : '' %> />
+                    </td>
+
+                    <td style="width: 40%;">
+                      <input type="text" class="form-control" 
+                            value="<%= d.product_name %>" 
+                            <%= d.claimed_count >= d.qty_product ? 'disabled' : '' %> />
+                    </td>
+
+                    <td style="width: 15%;">
+                      <% if (d.claimed_count && d.claimed_count >= d.qty_product) { %>
+                        <input type="number" class="form-control" 
+                              value="<%= d.qty_product %>" 
+                              disabled />
+                        <small class="text-danger d-block mt-1">Semua sudah klaim</small>
+                      <% } else { %>
+                        <input type="number" class="form-control" 
+                              value="<%= d.qty_product %>" 
+                              min="<%= d.claimed_count || 0 %>" />
+                        <% if (d.claimed_count > 0) { %>
+                          <small class="text-muted d-block mt-1">
+                            Sudah Claim: <%= d.claimed_count %> | Sisa <strong> <%= d.qty_product - d.claimed_count %> </strong> Barcode yang tersedia.
+                          </small>
+                        <% } %>
+                      <% } %>
+                    </td>
+
+
+                    <td style="width: 20%;">
+                      <select class="form-control" name="detail_keterangan[]"
+                              <%= d.claimed_count >= d.qty_product ? 'disabled' : '' %>>
+                        <option value="Pcs"  <%= d.keterangan === 'Pcs' ? 'selected' : '' %>>Pcs</option>
+                        <option value="Pack" <%= d.keterangan === 'Pack' ? 'selected' : '' %>>Pack</option>
+                        <option value="Unit" <%= d.keterangan === 'Unit' ? 'selected' : '' %>>Unit</option>
+                      </select>
+                    </td>
+
+                    <td style="width: 10%; text-align: center; vertical-align: middle;">
+                      <a href="/soDo/get-barcode-ewarranty/<%= d.id_detail_monitoring_data %>">
+                        <button type="button" class="btn btn-warning btn-sm btn-qrcode"
+                              style="text-align: center;" title="Kelola Barcode E-Warranty"
+                              <%= d.claimed_count >= d.qty_product ? 'disabled' : '' %>>
+                          <i class="fa fa-qrcode" aria-hidden="true"></i>
+                        </button>
+                      </a>
+                    </td>
+                  </tr>
+                  <% }) %>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <hr class="my-4">
       <div class="form-group text-right">
         <a href="/soDo" class="btn btn-primary">Kembali</a>
       </div>

@@ -1,6 +1,4 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
-  <!-- SweetAlert2 -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <style>
     .pagination a {
@@ -242,7 +240,63 @@
                           name="ekspedisi_note">
                       </div>
                       <% } %>
-
+                      <!-- Garis Pemisah dan Judul -->
+                      <hr class="my-4">
+                      <h5 class="text font-weight-bold mb-3">Non-Sparepart & Non-Consumable</h5>
+                      <div class="mt-0 ml-3 mr-3 mb-0 align-items-center">
+                        <div class="form-group row align-items-end " style="gap: 8px;">
+                            <div style="width: 15%;">
+                                <label>No Catalog</label>
+                                <input type="text" class="form-control" id="no_catalog" name="no_catalog" />
+                            </div>
+                            <div style="width: 15%;">
+                                <label>Serial Number</label>
+                                <input type="text" class="form-control" id="serial_number" name="serial_number" />
+                            </div>
+                            <div style="width: 23%;">
+                                <label>Description</label>
+                                <input type="text" class="form-control" id="product_name" name="product_name" />
+                            </div>
+                            <div style="width: 10%;">
+                                <label>Quantity</label>
+                                <input type="number" class="form-control" id="qty_product" name="qty_product" />
+                            </div>
+                            <div style="width: 20%;">
+                                <label for="keterangan">Keterangan</label>
+                                <select class="form-control" id="keterangan" name="keterangan">
+                                    <option value="">-- Pilih Keterangan --</option>
+                                    <option value="Pcs">Pcs</option>
+                                    <option value="Pack">Pack</option>
+                                    <option value="Unit">Unit</option>
+                                </select>
+                            </div>
+                            <div style="width: 10%;">
+                                <label class="invisible">Tambah</label>
+                                <button type="button" class="btn btn-success" id="btnAddDetailMonitoring">
+                                    Tambah
+                                </button>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="p-2">
+                          <div class="card p-2">
+                              <div class="card-body p-0" style="overflow-y: auto; max-height: 225px">
+                                  <table class="table table-bordered" id="addedItemsTable">
+                                      <thead>
+                                          <tr>
+                                              <th style="width: 15%;">No Catalog</th>
+                                              <th style="width: 15%;">Serial Number</th>
+                                              <th style="width: 20%;">Description</th>
+                                              <th style="width: 10%;">Quantity</th>
+                                              <th style="width: 20%;">Keterangan</th>
+                                              <th style="width: 10%;">Aksi</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody></tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
                     </div>
                     <div class="modal-footer justify-content-between">
                       <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -317,18 +371,44 @@
                     <tbody id="searchResults">
                       <% if (data && data.length > 0) { %>
                       <% data.forEach((item, index) => { %>
-                      <tr id="row-<%= item.id_monitoring_data %>" style="<%= item.status === 'Cancel / Deleted' ? 'background-color: #F7CACA; color: black;' : '' %>">
+                      <tr id="row-<%= item.export_id%>" style="<%= item.status === 'Cancel / Deleted' ? 'background-color: #F7CACA; color: black;' : '' %>">
                         <!-- No -->
                         <td style="text-align: center; vertical-align: middle;"><%= (currentPage - 1) * itemsPerPage + index + 1 %></td>
                         <!-- SO Number -->
-                        <td style="text-align: center; vertical-align: middle;"><%= item.sales_order_number %></td>
+                        <td style="text-align: center; vertical-align: middle;">
+                        <% if (item.sales_order_number) { %>
+                            <%= item.sales_order_number %>
+                          <% } else { %>
+                            <span class="badge badge-danger text-wrap p-2" style="line-height: 13px;">Sales Order Number Belum Diinput</span>
+                          <% } %>
+                        </td>
                         <!-- DO Number -->
-                        <td style="text-align: center; vertical-align: middle;"><%= item.delivery_order_number %></td>
+                        <td style="text-align: center; vertical-align: middle;">
+                          <% if (item.delivery_order_number) { %>
+                            <%= item.delivery_order_number %>
+                          <% } else { %>
+                            <span class="badge badge-danger text-wrap p-2" style="line-height: 13px;">Delivery Order Number Belum Diinput</span>
+                          <% } %>
+                        </td>
                         <!-- DO Date -->
-                        <td style="text-align: center; vertical-align: middle;"><%= new Date(item.delivery_order_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/ /g, '-') %></td>
+                        <td style="text-align: center; vertical-align: middle;">
+                          <% if (item.delivery_order_date) { %>
+                            <%= new Date(item.delivery_order_date)
+                                  .toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
+                                  .replace(/ /g, '-') %>
+                          <% } else { %>
+                            <span class="badge badge-danger text-wrap p-2" style="line-height: 13px;">Delivery Order Date Belum Diinput</span>
+                          <% } %>
+                        </td>
                         <!-- Barcode -->
                         <td style="text-align: center; vertical-align: middle;">
-                          <img src="data:image/png;base64,<%= item.barcode_do %>" alt="Barcode DO" style="margin: 0 auto; width: 150px; height: 60px; object-fit: contain; display: block;">
+                          <% if (item.barcode_do) { %>
+                            <img src="data:image/png;base64,<%= item.barcode_do %>" 
+                                alt="Barcode DO" 
+                                style="margin: 0 auto; width: 150px; height: 60px; object-fit: contain; display: block;">
+                          <% } else { %>
+                            <span class="badge badge-danger text-wrap p-2">Barcode belum ada</span>
+                          <% } %>
                         </td>
                         <!-- Customer -->
                         <td style="vertical-align: middle;"><%= item.customer_name %></td>
@@ -400,7 +480,7 @@
                             <% if (user.role === 1) { %>
                               <!-- Button Print Finance (Invoicing) -->
                               <button 
-                                onclick="exportRowFinanceToPDF(<%= item.id_monitoring_data %>)" 
+                                onclick="exportRowFinanceToPDF(<%= item.export_id %>)"
                                 class="btn btn-sm btn-primary d-flex align-items-center justify-content-center"
                                 style="width: 35px; height: 35px;"
                                 title="Cetak Invoice">
@@ -409,16 +489,56 @@
 
                               <!-- Button Print Barcode -->
                               <button 
-                                onclick="exportRowToPDF(<%= item.id_monitoring_data %>)" 
+                                onclick="exportRowToPDF(<%= item.export_id %>)" 
                                 class="btn btn-sm btn-info d-flex align-items-center justify-content-center"
                                 style="width: 35px; height: 35px;"
                                 title="Cetak Barcode">
                                 <i class="fas fa-barcode fa-lg"></i>
                               </button>
+                              <!-- Button Print Barcode E-Warranty -->
+                              <% if (item.detail_items.length > 0 && item.unclaimed_count > 0 && item.status !== 'Cancel / Deleted') { %>
+                                <!-- Tombol aktif -->
+                                <button 
+                                  onclick="exportEwarrantyToPDF(<%= item.export_id %>)" 
+                                  class="btn btn-sm btn-light btn-outline-dark d-flex align-items-center justify-content-center"
+                                  style="width: 35px; height: 35px;"
+                                  title="Cetak E-Warranty">
+                                  <i class="fas fa-qrcode fa-lg"></i>
+                                </button>
+                              <% } else { %>
+                                <!-- Tombol disabled -->
+                                <button 
+                                  class="btn btn-sm btn-dark btn-outline-dark d-flex align-items-center justify-content-center" 
+                                  style="width: 35px; height: 35px;"
+                                  title="Barcode Tidak Tersedia" 
+                                  disabled>
+                                  <i class="fas fa-qrcode fa-lg"></i>
+                                </button>
+                              <% } %>
 
+                              <!-- Button Extend Link E-Warranty -->
+                              <% if (item.detail_items.length > 0 && item.unclaimed_count > 0 && item.status !== 'Cancel / Deleted') { %>
+                                <!-- Tombol aktif -->
+                                <button 
+                                  onclick="extendEwarrantyLink(<%= item.export_id %>)" 
+                                  class="btn btn-sm btn-light btn-outline-dark d-flex align-items-center justify-content-center"
+                                  style="width: 35px; height: 35px;"
+                                  title="Extend E-Warranty Link">
+                                  <i class="fas fa-calendar-plus fa-lg"></i>
+                                </button>
+                              <% } else { %>
+                                <!-- Tombol disabled -->
+                                <button 
+                                  class="btn btn-sm btn-dark btn-outline-dark d-flex align-items-center justify-content-center" 
+                                  style="width: 35px; height: 35px;"
+                                  title="Sudah Claim E-Warranty" 
+                                  disabled>
+                                  <i class="fas fa-calendar-plus fa-lg"></i>
+                                </button>
+                              <% } %>
                               <!-- Button Edit -->
                               <a 
-                                href="/Edit/<%= item.id_monitoring_data %>" 
+                                href="/Edit/<%= item.export_id %>" 
                                 class="btn btn-sm btn-warning d-flex align-items-center justify-content-center"
                                 style="width: 35px; height: 35px;"
                                 title="Edit Data">
@@ -427,7 +547,7 @@
 
                               <!-- Button View -->
                               <a 
-                                href="/View/<%= item.id_monitoring_data %>" 
+                                href="/View/<%= item.export_id %>" 
                                 class="btn btn-sm btn-secondary d-flex align-items-center justify-content-center"
                                 style="width: 35px; height: 35px;"
                                 title="Lihat Detail">
@@ -437,7 +557,7 @@
                               <!-- Button Terima Invoicing -->
                               <% if (item.eta && item.ship_by && item.ship_by.trim() !== '' && item.receive_name && item.receive_name.trim() !== '') { %>
                                 <button 
-                                  onclick="exportRowFinanceToPDF(<%= item.id_monitoring_data %>)" 
+                                  onclick="exportRowFinanceToPDF(<%= item.export_id %>)"
                                   class="btn btn-sm btn-success d-flex align-items-center justify-content-center"
                                   style="width: 35px; height: 35px;"
                                   title="Info ke Invoicing Diterima">
@@ -447,7 +567,7 @@
                                 <button 
                                   class="btn btn-sm btn-secondary d-flex align-items-center justify-content-center" 
                                   style="width: 35px; height: 35px;"
-                                  title="Lengkapi ETA & Pengirim" 
+                                  title="<%= Number(item.division_team) === 3 ? 'Akses dibatasi untuk Division E-Commerce' : 'Lengkapi ETA & Pengirim' %>" 
                                   disabled>
                                   <i class="fas fa-check-square fa-lg"></i>
                                 </button>
@@ -459,15 +579,15 @@
                                 class="btn btn-sm btn-danger d-flex align-items-center justify-content-center"
                                 style="width: 35px; height: 35px;"
                                 title="Cancel / Delete"
-                                onclick="handleCancelDelete(<%= item.id_monitoring_data %>, '<%= item.delivery_order_number %>')"
+                                onclick="handleCancelDelete(<%= item.export_id %>, '<%= item.delivery_order_number %>')"
                               >
                                 <i class="fas fa-trash fa-lg"></i>
                               </button>
                             <!-- FINANCE ROLE -->
                             <% } else if (user.role === 8) { %>
-                              <% if (item.eta && item.ship_by && item.ship_by.trim() !== '') { %>
+                              <% if (item.eta && item.ship_by && item.ship_by.trim() !== ''  && Number(item.division_team) !== 3) { %>
                                 <button 
-                                  onclick="exportRowFinanceToPDF(<%= item.id_monitoring_data %>)" 
+                                  onclick="exportRowFinanceToPDF(<%= item.export_id %>)"
                                   class="btn btn-sm btn-success d-flex align-items-center justify-content-center"
                                   style="width: 35px; height: 35px;"
                                   title="Info ke Invoicing Diterima">
@@ -477,7 +597,7 @@
                                 <button 
                                   class="btn btn-sm btn-secondary d-flex align-items-center justify-content-center" 
                                   style="width: 35px; height: 35px;"
-                                  title="Lengkapi ETA & Pengirim" 
+                                  title="<%= Number(item.division_team) === 3 ? 'Akses dibatasi untuk Division E-Commerce' : 'Lengkapi ETA & Pengirim' %>" 
                                   disabled>
                                   <i class="fas fa-check-square fa-lg"></i>
                                 </button>
@@ -486,7 +606,7 @@
                             <!-- Admin Gudang Kopo dan Saleh Dan Supervisor -->
                             <% } else if ([10, 11, 12].includes(user.role)) { %>
                               <button 
-                                onclick="exportRowToPDF(<%= item.id_monitoring_data %>)" 
+                                onclick="exportRowToPDF(<%= item.export_id %>)" 
                                 class="btn btn-sm btn-info d-flex align-items-center justify-content-center"
                                 style="width: 35px; height: 35px;"
                                 title="Cetak Barcode">
@@ -494,17 +614,37 @@
                               </button>
 
                               <a 
-                                href="/Edit/<%= item.id_monitoring_data %>" 
+                                href="/Edit/<%= item.export_id %>" 
                                 class="btn btn-sm btn-warning d-flex align-items-center justify-content-center"
                                 style="width: 35px; height: 35px;"
                                 title="Edit Data">
                                 <i class="fas fa-edit fa-lg"></i>
                               </a>
 
+                              <!-- Button Print Barcode E-Warranty -->
+                              <% if (item.detail_items.length > 0 && item.unclaimed_count > 0 && item.status !== 'Cancel / Deleted') { %>
+                                <!-- Tombol aktif -->
+                                <button 
+                                  onclick="exportEwarrantyToPDF(<%= item.id_monitoring_data %>)" 
+                                  class="btn btn-sm btn-light btn-outline-dark d-flex align-items-center justify-content-center"
+                                  style="width: 35px; height: 35px;"
+                                  title="Cetak E-Warranty">
+                                  <i class="fas fa-qrcode fa-lg"></i>
+                                </button>
+                              <% } else { %>
+                                <!-- Tombol disabled -->
+                                <button 
+                                  class="btn btn-sm btn-light btn-outline-dark d-flex align-items-center justify-content-center" 
+                                  style="width: 35px; height: 35px;"
+                                  title="Barcode Tidak Tersedia" 
+                                  disabled>
+                                  <i class="fas fa-qrcode fa-lg"></i>
+                                </button>
+                              <% } %>
                             <!-- Sales Admin -->
-                            <% } else if (user.role === 14) { %>
+                            <% } else if ([14, 16].includes(user.role)) { %>
                               <a 
-                                href="/View/<%= item.id_monitoring_data %>" 
+                                href="/View/<%= item.export_id %>" 
                                 class="btn btn-sm btn-secondary d-flex align-items-center justify-content-center"
                                 style="width: 35px; height: 35px;"
                                 title="Lihat Detail">
@@ -577,183 +717,453 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Reset Button
-    const resetButton = document.getElementById('resetButton');
-    if (resetButton) {
-      resetButton.addEventListener('click', function (e) {
-        e.preventDefault();
-        window.location.href = `/soDo`;
-      });
-    }
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Reset Button
+      const resetButton = document.getElementById('resetButton');
+      if (resetButton) {
+        resetButton.addEventListener('click', function (e) {
+          e.preventDefault();
+          window.location.href = `/soDo`;
+        });
+      }
 
-    // Confirm Submit
-    const confirmBtn = document.getElementById('confirmSubmit');
-    const formCreate = document.querySelector('form[action="/create"]');
-    if (confirmBtn && formCreate) {
-      confirmBtn.addEventListener('click', function () {
-        Swal.fire({
-          title: 'Apakah Anda yakin?',
-          text: "Data SO/DO akan disimpan.",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Ya, simpan!',
-          cancelButtonText: 'Batal'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            formCreate.submit();
+      // Confirm Submit
+      const confirmBtn = document.getElementById('confirmSubmit');
+      const formCreate = document.querySelector('form[action="/create"]');
+      if (confirmBtn && formCreate) {
+        confirmBtn.addEventListener('click', function () {
+          Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Data SO/DO akan disimpan.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, simpan!',
+            cancelButtonText: 'Batal'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              formCreate.submit();
+            }
+          });
+        });
+      }
+
+      // Filter Button
+      const filterButton = document.getElementById('filterButton');
+      const searchInput = document.getElementById('search');
+      const startDate = document.getElementById('filterDateStart');
+      const endDate = document.getElementById('filterDateEnd');
+
+      function handleFilter() {
+        const query = new URLSearchParams();
+
+        if (searchInput.value.trim() !== '') {
+          query.append('search', searchInput.value.trim());
+        }
+        if (startDate.value) {
+          query.append('filterDateStart', startDate.value);
+        }
+        if (endDate.value) {
+          query.append('filterDateEnd', endDate.value);
+        }
+
+        window.location.href = `/soDo?${query.toString()}`;
+      }
+
+      // Klik tombol filter
+      filterButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        handleFilter();
+      });
+
+      // Enter di input pencarian atau tanggal
+      [searchInput, startDate, endDate].forEach((input) => {
+        input.addEventListener('keypress', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handleFilter();
           }
         });
       });
-    }
 
-    // Filter Button
-    const filterButton = document.getElementById('filterButton');
-    const searchInput = document.getElementById('search');
-    const startDate = document.getElementById('filterDateStart');
-    const endDate = document.getElementById('filterDateEnd');
-
-    function handleFilter() {
-      const query = new URLSearchParams();
-
-      if (searchInput.value.trim() !== '') {
-        query.append('search', searchInput.value.trim());
-      }
-      if (startDate.value) {
-        query.append('filterDateStart', startDate.value);
-      }
-      if (endDate.value) {
-        query.append('filterDateEnd', endDate.value);
-      }
-
-      window.location.href = `/soDo?${query.toString()}`;
-    }
-
-    // Klik tombol filter
-    filterButton.addEventListener('click', function (e) {
-      e.preventDefault();
-      handleFilter();
+      // Barcode Rendering
+      <% if (data && data.length > 0) { %>
+        <% data.forEach(item => { %>
+          JsBarcode("#barcode-<%= item.id_monitoring_data %>", "<%= item.delivery_order_number %>", {
+            format: "CODE128",
+            displayValue: true,
+            width: 2,
+            height: 40
+          });
+        <% }); %>
+      <% } %>
     });
 
-    // Enter di input pencarian atau tanggal
-    [searchInput, startDate, endDate].forEach((input) => {
-      input.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          handleFilter();
+    async function exportRowToPDF(id) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [50, 70] });
+      const row = document.querySelector(`#row-${id}`);
+      
+      if (!row) {
+        return Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Data tidak ditemukan!', showConfirmButton: false, timer: 2500 });
+      }
+      const cells = Array.from(row.querySelectorAll('td'));
+      const doNumber = cells[2]?.innerText.trim();
+      const barcodeImg = row.querySelector("img");
+      if (!barcodeImg || !barcodeImg.src.startsWith("data:image")) {
+        return Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Barcode tidak ditemukan!', showConfirmButton: false, timer: 2500 });
+      }
+      const imgProps = doc.getImageProperties(barcodeImg.src);
+      const imgWidth = 58;
+      const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+      const xCenter = (70 - imgWidth) / 2;
+      const yCenter = (50 - imgHeight) / 2;
+      doc.addImage(barcodeImg.src, 'PNG', xCenter, yCenter, imgWidth, imgHeight);
+      doc.save(`barcode-${doNumber}.pdf`);
+    }
+
+    async function exportRowFinanceToPDF(id) {
+      const { jsPDF } = window.jspdf;
+      const row = document.querySelector(`#row-${id}`);
+      
+      if (!row) {
+        return Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Data tidak ditemukan!', showConfirmButton: false, timer: 2500 });
+      }
+      try {
+        const response = await fetch(`/invoice-export/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const result = await response.json();
+        if (!result.success) {
+          return Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: result.message || 'Gagal update invoicing_date',
+            showConfirmButton: false,
+            timer: 3000
+          });
+        }
+
+        const detailResp = await (await fetch(`/detail/${id}`)).json();
+        if (!detailResp.success || !detailResp.data?.length) {
+          return Swal.fire({
+              toast: true,
+              icon: 'error',
+              title: 'Detail tidak ditemukan',
+              showConfirmButton: false,
+              timer: 3000
+          });
+        }
+        const detail = detailResp.data[0];
+
+        // helper
+        const safe = (val, fallback = "-") => (val === null || val === undefined ? fallback : String(val));
+        const formatDate = (str) =>
+        str ? new Date(str).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : "-";
+        const formatRupiah = (n) =>
+        (n && !isNaN(n)) ? 'Rp. ' + Number(n).toLocaleString('id-ID') + ',00' : '-';
+
+        // create pdf
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [70, 43] });
+        doc.setLineWidth(0.3);
+        doc.rect(2, 2, 66, 39);
+
+        let xLeft = 5, xRight = 65, y = 8;
+        doc.setFontSize(9).setFont("helvetica", "bold").text(safe(detail.delivery_order_number), xLeft, y);
+        doc.setFont("helvetica", "normal").text(safe(formatDate(detail.eta)), xRight, y, { align: "right" });
+
+        y += 5;
+        doc.text(safe(detail.customer_name), xLeft, y); y += 5;
+        doc.text(safe(detail.ship_by), xLeft, y); y += 5;
+        doc.text(safe(detail.receive_name), xLeft, y); y += 5;
+        doc.text(safe(detail.resi_number), xLeft, y); y += 5;
+        doc.text(safe(formatRupiah(detail.price)), xLeft, y); y += 5;
+
+        doc.setFont("helvetica", "italic").setFontSize(8);
+        doc.text(`INFO dr GUDANG ${safe(detail.location_warehouse)} Tgl.`, xLeft, y);
+        doc.text(safe(formatDate(detail.invoicing_date)), xRight, y, { align: "right" });
+
+        doc.save(`finance-label-${safe(detail.delivery_order_number)}.pdf`);
+
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Update & export berhasil!',
+          showConfirmButton: false,
+          timer: 3000
+        });
+
+        location.reload();
+      } catch (err) {
+          console.error('Gagal export:', err);
+          Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: err.message || 'Gagal export',
+          showConfirmButton: false,
+          timer: 3000
+          });
+      }
+    }
+
+    document.getElementById("exportRowToCsv")?.addEventListener("click", function (e) {
+      e.preventDefault();
+      const urlParams = new URLSearchParams(window.location.search);
+      window.location.href = `/soDo/export-csv${urlParams.toString() ? '?' + urlParams.toString() : ''}`;
+    });
+
+    function handleCancelDelete(id, doNumber) {
+      Swal.fire({
+        title: 'Yakin ingin Cancel / Delete?',
+        text: `Data DO ${doNumber} akan dicancel atau didelete.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#aaa',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = `/cancelDelete/${id}`;
+          document.body.appendChild(form);
+          form.submit();
+        }
+      });
+    }
+  </script>
+
+  <script>
+    async function exportEwarrantyToPDF(id) {
+      try {
+        const res = await fetch(`/soDo/get-barcode-file/${id}`);
+        if (!res.ok) throw new Error('Barcode not found');
+
+        const { data } = await res.json(); // ⬅️ ambil array of objects {uuid, serial_number, no_catalog}
+        
+        const { jsPDF } = window.jspdf;
+        const docWidth = 50 * 2.83465;
+        const docHeight = 70 * 2.83465;
+
+        const doc = new jsPDF({
+          orientation: 'portrait',
+          unit: 'pt',
+          format: [docWidth, docHeight]
+        });
+
+        let isFirst = true;
+        for (const item of data) {
+          const image = await loadImage(`/barcodes/${item.uuid}`);
+
+          if (!isFirst) doc.addPage([docWidth, docHeight]);
+          isFirst = false;
+
+          const centerX = docWidth / 2;
+          let yText = 10;
+
+          // Header teks
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.text("SCAN ME FOR", centerX, yText, { align: 'center' });
+          doc.text("REGISTER E-WARRANTY", centerX, yText + 12, { align: 'center' });
+
+          // Barcode
+          const barcodeY = yText + 20;
+          const barcodeWidth = 135;
+          const barcodeHeight = 135;
+          const barcodeX = (docWidth - barcodeWidth) / 2;
+          doc.addImage(image, 'PNG', barcodeX, barcodeY, barcodeWidth, barcodeHeight);
+
+          // Keterangan: serial_number atau no_catalog
+          const bottomTextY = barcodeY + barcodeHeight + 13;
+          const label = (item.serial_number && item.serial_number.trim() !== '')
+          ? item.serial_number
+          : (item.no_catalog && item.no_catalog.trim() !== '' ? item.no_catalog : '-');
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(8);
+          console.log("Label yang dipakai:", label, typeof label);
+          doc.text(label, centerX, bottomTextY, { align: 'center' });
+
+          // Garansi dan kontak
+          const lines = [
+            "Garansi hanya berlaku 1 Tahun."
+          ];
+
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7);
+          lines.forEach((line, index) => {
+            doc.text(line, centerX, bottomTextY + 10 + index * 8, { align: 'center' });
+          });
+        }
+
+        doc.autoPrint();
+        const pdfUrl = doc.output('bloburl');
+        window.open(pdfUrl, '_blank');
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Barcode is ready to print.',
+          timer: 1500,
+          showConfirmButton: false
+        });
+
+      } catch (err) {
+        console.error('❌ Failed to print barcode:', err);
+        console.log("error cetak barcode",err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Print Failed',
+          text: 'Failed to print barcode E-Warranty',
+        });
+      }
+    }
+
+    function loadImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const btnAddDetail = document.getElementById('btnAddDetailMonitoring');
+      const tableBody = document.querySelector('#addedItemsTable tbody');
+
+      btnAddDetail.addEventListener('click', function () {
+        const noCatalog = document.getElementById('no_catalog').value.trim();
+        const snProduct = document.getElementById('serial_number').value.trim();
+        const productName = document.getElementById('product_name').value.trim();
+        const qty = document.getElementById('qty_product').value.trim();
+        const keterangan = document.getElementById('keterangan').value.trim();
+
+        // Validasi sederhana
+        if (!noCatalog && !serial_number || !productName || !qty || !keterangan) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Lengkapi semua field detail!',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2500
+          });
+          return;
+        }
+
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+          <td><input type="hidden" name="detail_no_catalog[]" value="${noCatalog}">${noCatalog}</td>
+          <td><input type="hidden" name="detail_serial_number[]" value="${snProduct}">${snProduct}</td>
+          <td><input type="hidden" name="detail_product_name[]" value="${productName}">${productName}</td>
+          <td><input type="hidden" name="detail_qty_product[]" value="${qty}">${qty}</td>
+          <td><input type="hidden" name="detail_keterangan[]" value="${keterangan}">${keterangan}</td>
+          <td><button type="button" class="btn btn-danger btn-sm btnRemoveRow">Hapus</button></td>
+        `;
+        tableBody.appendChild(newRow);
+
+        // Reset input
+        document.getElementById('no_catalog').value = '';
+        document.getElementById('serial_number').value = '';
+        document.getElementById('product_name').value = '';
+        document.getElementById('qty_product').value = '';
+        document.getElementById('keterangan').value = '';
+      });
+
+      // Event delegation untuk tombol hapus
+      document.querySelector('#addedItemsTable').addEventListener('click', function (e) {
+        if (e.target && e.target.classList.contains('btnRemoveRow')) {
+          e.target.closest('tr').remove();
         }
       });
     });
-
-    // Barcode Rendering
-    <% if (data && data.length > 0) { %>
-      <% data.forEach(item => { %>
-        JsBarcode("#barcode-<%= item.id_monitoring_data %>", "<%= item.delivery_order_number %>", {
-          format: "CODE128",
-          displayValue: true,
-          width: 2,
-          height: 40
-        });
-      <% }); %>
-    <% } %>
-  });
-
-  async function exportRowToPDF(id) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [45, 15] });
-    const row = document.querySelector(`#row-${id}`);
-    if (!row) {
-      return Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Data tidak ditemukan!', showConfirmButton: false, timer: 2500 });
-    }
-    const cells = Array.from(row.querySelectorAll('td'));
-    const doNumber = cells[2]?.innerText.trim();
-    const barcodeImg = row.querySelector("img");
-    if (!barcodeImg || !barcodeImg.src.startsWith("data:image")) {
-      return Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Barcode tidak ditemukan!', showConfirmButton: false, timer: 2500 });
-    }
-    const imgProps = doc.getImageProperties(barcodeImg.src);
-    const imgWidth = 38;
-    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-    const xCenter = (45 - imgWidth) / 2;
-    const yCenter = (15 - imgHeight) / 2;
-    doc.addImage(barcodeImg.src, 'PNG', xCenter, yCenter, imgWidth, imgHeight);
-    doc.save(`barcode-${doNumber}.pdf`);
-  }
-
-  async function exportRowFinanceToPDF(id) {
-    const { jsPDF } = window.jspdf;
-    const row = document.querySelector(`#row-${id}`);
-    if (!row) {
-      return Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Data tidak ditemukan!', showConfirmButton: false, timer: 2500 });
-    }
-    try {
-      const response = await fetch(`/invoice-export/${id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const result = await response.json();
-      if (!result.success) throw new Error(result.error || 'Gagal update invoicing_date');
-
-      const detail = await (await fetch(`/detail/${id}`)).json();
-      const formatDate = (str) => str ? new Date(str).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : "-";
-      const formatRupiah = (n) => (n && !isNaN(n)) ? 'Rp. ' + Number(n).toLocaleString('id-ID') + ',00' : '-';
-
-      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [70, 43] });
-      doc.setLineWidth(0.3);
-      doc.rect(2, 2, 66, 39);
-
-      let xLeft = 5, xRight = 65, y = 8;
-      doc.setFontSize(9).setFont("helvetica", "bold").text(detail.delivery_order_number, xLeft, y);
-      doc.setFont("helvetica", "normal").text(formatDate(detail.eta), xRight, y, { align: "right" });
-
-      y += 5;
-      doc.text(detail.customer_name, xLeft, y); y += 5;
-      doc.text(detail.ship_by || "-", xLeft, y); y += 5;
-      doc.text(detail.receive_name || "-", xLeft, y); y += 5;
-      doc.text(detail.resi_number || '-', xLeft, y); y += 5;
-      doc.text(formatRupiah(detail.price), xLeft, y); y += 5;
-
-      doc.setFont("helvetica", "italic").setFontSize(8);
-      doc.text(`INFO dr GUDANG ${detail.location_warehouse} Tgl.`, xLeft, y);
-      doc.text(formatDate(detail.invoicing_date), xRight, y, { align: "right" });
-
-      doc.save(`finance-label-${detail.delivery_order_number}.pdf`);
-
-      Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Update & export berhasil!', showConfirmButton: false, timer: 3000 });
-      location.reload();
-    } catch (err) {
-      console.error('Gagal export:', err);
-      Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: err.message || 'Gagal export', showConfirmButton: false, timer: 3000 });
-    }
-  }
-
-  document.getElementById("exportRowToCsv")?.addEventListener("click", function (e) {
-    e.preventDefault();
-    const urlParams = new URLSearchParams(window.location.search);
-    window.location.href = `/soDo/export-csv${urlParams.toString() ? '?' + urlParams.toString() : ''}`;
-  });
-
-  function handleCancelDelete(id, doNumber) {
-    Swal.fire({
-      title: 'Yakin ingin Cancel / Delete?',
-      text: `Data DO ${doNumber} akan dicancel atau didelete.`,
-      icon: 'warning',
+  </script>
+  <script>
+  async function extendEwarrantyLink(id) {
+    const confirm = await Swal.fire({
+      title: 'Extend E-Warranty?',
+      text: 'This will generate a new QR link valid for 40 days.',
+      icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#aaa',
-      confirmButtonText: 'Ya, hapus!',
-      cancelButtonText: 'Batal'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/cancelDelete/${id}`;
-        document.body.appendChild(form);
-        form.submit();
-      }
+      confirmButtonText: 'Yes, extend it!',
+      cancelButtonText: 'Cancel',
     });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const res = await fetch(`/soDo/extend-ewarranty/${id}`, {
+        method: 'POST'
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Link Extended',
+          text: 'E-Warranty link successfully extended!',
+        });
+      } else {
+        throw new Error(result.message);
+      }
+
+    } catch (err) {
+      console.error('❌ Failed to extend:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed',
+        text: err.message || 'Something went wrong',
+      });
+    }
   }
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const msg = urlParams.get('msg');
+
+    if (status && msg) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: status, // "success" atau "error"
+            title: decodeURIComponent(msg),
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+
+        // Hapus query params biar tidak muncul saat refresh
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+    }
+});
+</script>
+<script>
+  <% if (locals.errorMessage && errorMessage.length > 0) { %>
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: '<%= errorMessage[0] %>',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+  <% } %>
 </script>

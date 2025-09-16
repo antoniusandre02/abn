@@ -1,10 +1,8 @@
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
-const {
-    generateMemoEmailHTML
-} = require('./emailTemplateMemo');
-
+const { generateMemoEmailHTML } = require('./emailTemplateMemo');
+const { generateEWarrantyEmailHTML } = require('./emailTemplateEWarranty');
 // ✅ Inisialisasi transporter
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -84,6 +82,61 @@ exports.sendMemoWithPDF = async ({
         console.log('✅ Email TO & CC berhasil dikirim');
     } catch (error) {
         console.error('❌ Gagal kirim email:', error);
+        throw error;
+    }
+};
+
+// Kirim E-Warranty dengan attachment PDF
+
+exports.sendEWarrantyPDF = async ({
+    to,
+    bcc,
+    customer_name,
+    created_at,
+    expired_date,
+    product_brand,
+    product_name,
+    product_sn,
+    product_catalog,
+    pdfPath
+}) => {
+    try {
+        const html = generateEWarrantyEmailHTML({
+            customerName: customer_name,
+            created_at,
+            expired_date,
+            product_brand,
+            product_name,
+            product_sn,
+            product_catalog
+        });
+
+        await transporter.sendMail({
+            from: `"ABN E-Warranty" no-reply@abadinusa.co.id`,
+            replyTo: 'no-reply@abadinusa.co.id',
+            to,
+            bcc: bcc,
+            subject: `Confirmation e-Warranty PT. Abadinusa Usahasemesta`,
+            html,
+            attachments: [{
+                filename: `E-Warranty - ${customer_name}.pdf`,
+                path: pdfPath
+                },
+                {
+                    filename: 'logoabn.png',
+                    path: path.join(__dirname, '../public/adminlte/dist/img/logoabn.png'),
+                    cid: 'logoabn' // dipanggil dari HTML
+                },
+                {
+                    filename: 'serving-quality.jpg',
+                    path: path.join(__dirname, '../public/adminlte/dist/img/unnamed.jpg'),
+                    cid: 'servingQuality' // dipanggil dari HTML
+                }]
+        });
+
+        console.log('✅ E-Warranty Email sent successfully');
+    } catch (error) {
+        console.error('❌ Failed to send E-Warranty Email:', error);
         throw error;
     }
 };

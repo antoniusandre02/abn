@@ -1,0 +1,152 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+
+<div class="content-wrapper p-3">
+    <h3 style="text-align: center; margin-bottom: 30px">Edit E-Warranty</h3>
+    <%
+        function formatDateInput(date) {
+        if (!date) return '';
+        const d = new Date(date);
+        const y = d.getFullYear();
+        const m = ('0' + (d.getMonth() + 1)).slice(-2);
+        const da = ('0' + d.getDate()).slice(-2);
+        return `${y}-${m}-${da}`;
+        }
+    %>
+    <form id="approveForm" data-role="<%= user.role %>" action="/eWarranty/editEwarranty/<%= item.id_ewarranty %>"
+        method="POST">
+        <div class="row">
+            <!-- KIRI -->
+            <div class="col-md-6">
+                <!-- Customer Info -->
+                <div class="form-group">
+                    <label class="form-label">Customer Name</label>
+                    <input type="text" class="form-control" name="customer_name" value="<%= item.customer_name %>"
+                        <% if ([15].includes(user.role)) { %> <% if ([15].includes(user.role)) { %> readonly <% } %>
+                        <% } %> />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Company Name</label>
+                    <input type="text" class="form-control" name="company_name" value="<%= item.customer_company %>"
+                        <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" name="email" value="<%= item.customer_email %>"
+                        <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="text" class="form-control" name="phone" value="<%= item.customer_phone %>"
+                        <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <textarea class="form-control" name="address" style="height: 123px; resize: none"
+                        <% if ([15].includes(user.role)) { %> readonly <% } %>><%= item.customer_address %></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Installation Date / Date Received</label>
+                    <input type="date" class="form-control" name="installation_date"
+                        value="<%= formatDateInput(item.installation_date) ? formatDateInput(item.installation_date) : '' %>" <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Institution Type</label>
+                    <select class="form-control" id="customer_institution" name="customer_institution" required <% if ([15].includes(user.role)) { %> readonly <% } %>>
+                        <option value="">-- Select Institution Type --</option>
+                        <option value="Government" <%= item.customer_institution === 'Government' ? 'selected' : '' %>>Government</option>
+                        <option value="Company" <%= item.customer_institution === 'Company' ? 'selected' : '' %>>Private Company</option>
+                        <option value="Institute" <%= item.customer_institution === 'Institute' ? 'selected' : '' %>>Educational Institute</option>
+                        <option value="Hospital" <%= item.customer_institution === 'Hospital' ? 'selected' : '' %>>Hospital</option>
+                        <option value="Private" <%= item.customer_institution === 'Private' ? 'selected' : '' %>>Individual / Personal</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- KANAN -->
+            <div class="col-md-6">
+                <!-- Product Info -->
+                <div class="form-group">
+                    <label class="form-label">Product Brand</label>
+                    <input type="text" class="form-control" name="product_brand" value="<%= item.product_brand %>"
+                        <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Product Name</label>
+                    <input type="text" class="form-control autofilled" name="product_name"
+                        value="<%= item.product_name %>" <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Catalog Number</label>
+                    <input type="text" class="form-control autofilled" name="catalog_number"
+                        value="<%= item.product_catalog %>" <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Serial Number Product</label>
+                    <input type="text" class="form-control" name="serial_number" value="<%= item.product_sn %>"
+                        <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Color</label>
+                    <input type="text" class="form-control" name="color" value="<%= item.product_color %>"
+                        <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Purchase Date</label>
+                    <input type="date" class="form-control" name="purchase_date"
+                        value="<%= formatDateInput(item.purchase_date) ? formatDateInput(item.purchase_date) : '' %>"
+                        <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Purchase From</label>
+                    <div style="padding: 5px;">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="purchase_method" value="Online"
+                                <%= item.purchase_from === 'Online' ? 'checked' : '' %>
+                                <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                            <label class="form-check-label">Online</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="purchase_method" value="Direct"
+                                <%= item.purchase_from === 'Direct' ? 'checked' : '' %>
+                                <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                            <label class="form-check-label">Direct</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="purchase_method" value="Distributor"
+                                <%= item.purchase_from === 'Distributor' ? 'checked' : '' %>
+                                <% if ([15].includes(user.role)) { %> readonly <% } %> />
+                            <label class="form-check-label">Distributor</label>
+                        </div>
+                    </div>
+                </div>
+                <!-- Upload Foto Produk / Tanda Terima -->
+                <div class="form-group">
+                    <label class="form-label">Product Receipt</label>
+                    <div style="padding: 2px;">
+                        <% if (item.receipt) { %>
+                        <a href="/eWarranty/view-receipt/<%= item.receipt_file_name %>" target="_blank"
+                            class="btn btn-outline-primary">Lihat File</a>
+                        <% } else { %>
+                        <span class="text-muted">Tidak ada file terlampir</span>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group text-right">
+            <% if (role == 1) { %>
+                <a href="/eWarranty" class="btn btn-secondary">Batal</a>
+                <button type="submit" id="submitBtn" class="btn btn-primary">Edit E-Warranty</button>
+            <% } else { %>
+                <a href="/eWarranty" class="btn btn-secondary">Batal</a>
+            <% } %>
+        </div>
+    </form>
+</div>
+
+<%- include('layout/footer') %>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode"></script>
