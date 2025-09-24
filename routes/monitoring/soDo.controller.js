@@ -509,8 +509,8 @@ exports.getBarcodeLink = async (req, res) => {
 exports.getManageEwarranty = async (req, res) => {
     const {
         id
-    } = req.params; // id_monitoring_data
-
+    } = req.params; // id_detail_monitoring_data
+    
     try {
         const result = await pool.query(
             `SELECT m.delivery_order_number, 
@@ -564,7 +564,8 @@ exports.getManageEwarranty = async (req, res) => {
         });
 
         res.render("soDoBarcodes", {
-            id_monitoring_data: id,
+            id_detail_monitoring_data: id,
+            id_monitoring_data: result.rows.length ? result.rows[0].id_monitoring_data : null,
             summaryBarcodes: Object.values(grouped)
         });
     } catch (err) {
@@ -588,12 +589,15 @@ exports.getBarcodesByCatalog = async (req, res) => {
     } = req.query;
 
     try {
-        // Base query
-        let where = `mel.id_detail_monitoring_data = $1 AND dmd.no_catalog = $2`;
+        const startInt = parseInt(start, 10) || 0;
+        const lengthInt = parseInt(length, 10) || 10;
+
+        // Base params
         const params = [id, catalog];
+        let where = `mel.id_monitoring_data = $1 AND dmd.no_catalog = $2`;
         let paramIndex = 3;
 
-        // Filter by status (available/claimed)
+        // Status filter
         if (status === "available") {
             where += ` AND mel.is_claimed = false`;
         } else if (status === "claimed") {
@@ -607,56 +611,62 @@ exports.getBarcodesByCatalog = async (req, res) => {
             paramIndex++;
         }
 
-        // Count total
+        // Count total (tanpa filter search/status)
         const totalRes = await pool.query(
-            `SELECT COUNT(*) FROM monitoring_e_warranty_links mel
-            JOIN detail_monitoring_data dmd
-                ON mel.id_monitoring_data = dmd.id_monitoring_data
-                AND mel.no_catalog = dmd.no_catalog
-            WHERE mel.id_monitoring_data = $1 AND dmd.no_catalog = $2`,
+            `SELECT COUNT(*) 
+       FROM monitoring_e_warranty_links mel
+       JOIN detail_monitoring_data dmd
+         ON mel.id_monitoring_data = dmd.id_monitoring_data
+        AND mel.no_catalog = dmd.no_catalog
+       WHERE mel.id_monitoring_data = $1 AND dmd.no_catalog = $2`,
             [id, catalog]
         );
 
-        // Count filtered
+        // Count filtered (dengan filter status + search)
         const filteredRes = await pool.query(
-            `SELECT COUNT(*) FROM monitoring_e_warranty_links mel
-            JOIN detail_monitoring_data dmd
-                ON mel.id_monitoring_data = dmd.id_monitoring_data
-                AND mel.no_catalog = dmd.no_catalog
-            WHERE ${where}`,
+            `SELECT COUNT(*) 
+       FROM monitoring_e_warranty_links mel
+       JOIN detail_monitoring_data dmd
+         ON mel.id_monitoring_data = dmd.id_monitoring_data
+        AND mel.no_catalog = dmd.no_catalog
+       WHERE ${where}`,
             params
         );
 
-        // Ambil data
-        params.push(length, start);
+        // Data query
+        params.push(lengthInt, startInt);
         const dataRes = await pool.query(
             `SELECT mel.uuid, dmd.serial_number, mel.expired_at, mel.is_claimed
-            FROM monitoring_e_warranty_links mel
-            JOIN detail_monitoring_data dmd
-                ON mel.id_monitoring_data = dmd.id_monitoring_data
-                AND mel.no_catalog = dmd.no_catalog
-            WHERE ${where}
-            ORDER BY dmd.serial_number
-            LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
+       FROM monitoring_e_warranty_links mel
+       JOIN detail_monitoring_data dmd
+         ON mel.id_monitoring_data = dmd.id_monitoring_data
+        AND mel.no_catalog = dmd.no_catalog
+       WHERE ${where}
+       ORDER BY dmd.serial_number
+       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
             params
         );
 
-        // Format untuk DataTables
+        // Format DataTables
+        const data = dataRes.rows.map((row, i) => [
+            startInt + i + 1,
+            row.serial_number,
+            row.expired_at ?
+            new Date(row.expired_at).toLocaleDateString("id-ID") :
+            "-",
+            row.is_claimed ?
+            `<span class="badge bg-secondary">Claimed</span>` :
+            `<input type="checkbox" class="barcode-check" value="${row.uuid}" />`,
+            `<button class="btn btn-sm btn-secondary btn-extend"
+           data-uuid="${row.uuid}"
+           ${row.is_claimed ? "disabled" : ""}>Extend</button>`
+        ]);
+
         res.json({
             draw,
             recordsTotal: totalRes.rows[0].count,
             recordsFiltered: filteredRes.rows[0].count,
-            data: dataRes.rows.map((row, i) => [
-                parseInt(start) + i + 1,
-                row.serial_number,
-                row.expired_at ? new Date(row.expired_at).toLocaleDateString("id-ID") : "-",
-                row.is_claimed ?
-                `<span class="badge bg-secondary">Claimed</span>` :
-                `<input type="checkbox" class="barcode-check" value="${row.uuid}" />`,
-                `<button class="btn btn-sm btn-secondary btn-extend" 
-                    data-uuid="${row.uuid}" 
-                    ${row.is_claimed ? "disabled" : ""}>Extend</button>`
-            ])
+            data
         });
     } catch (err) {
         console.error("❌ Error fetching barcodes by catalog:", err);

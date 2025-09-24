@@ -237,19 +237,19 @@
                       <input type="hidden" name="id_detail_monitoring_data" value="<%= d.id_detail_monitoring_data %>"/>
                       <input type="text" class="form-control" 
                             value="<%= d.no_catalog %>" 
-                            <%= d.claimed_count >= d.qty_product ? 'disabled' : '' %> />
+                            <%= d.claimed_count >= d.qty_product || ![1,15,16].includes(userRole) ? 'disabled' : '' %> />
                     </td>
 
                     <td style="width: 15%;">
                       <input type="text" class="form-control" 
                             value="<%= d.serial_number %>" 
-                            <%= d.claimed_count >= d.qty_product ? 'disabled' : '' %> />
+                            <%= d.claimed_count >= d.qty_product || ![1,15,16].includes(userRole) ? 'disabled' : '' %> />
                     </td>
 
                     <td style="width: 40%;">
                       <input type="text" class="form-control" 
                             value="<%= d.product_name %>" 
-                            <%= d.claimed_count >= d.qty_product ? 'disabled' : '' %> />
+                            <%= d.claimed_count >= d.qty_product || ![1,15,16].includes(userRole) ? 'disabled' : '' %> />
                     </td>
 
                     <td style="width: 15%;">
@@ -261,7 +261,9 @@
                       <% } else { %>
                         <input type="number" class="form-control" 
                               value="<%= d.qty_product %>" 
-                              min="<%= d.claimed_count || 0 %>" />
+                              min="<%= d.claimed_count || 0 %>" 
+                              <%= ![1,15,16].includes(userRole) ? 'disabled' : '' %>
+                              />
                         <% if (d.claimed_count > 0) { %>
                           <small class="text-muted d-block mt-1">
                             Sudah Claim: <%= d.claimed_count %> | Sisa <strong> <%= d.qty_product - d.claimed_count %> </strong> Barcode yang tersedia.
@@ -273,7 +275,7 @@
 
                     <td style="width: 20%;">
                       <select class="form-control" name="detail_keterangan[]"
-                              <%= d.claimed_count >= d.qty_product ? 'disabled' : '' %>>
+                              <%= d.claimed_count >= d.qty_product || ![1,15,16].includes(userRole) ? 'disabled' : '' %>>
                         <option value="Pcs"  <%= d.keterangan === 'Pcs' ? 'selected' : '' %>>Pcs</option>
                         <option value="Pack" <%= d.keterangan === 'Pack' ? 'selected' : '' %>>Pack</option>
                         <option value="Unit" <%= d.keterangan === 'Unit' ? 'selected' : '' %>>Unit</option>
@@ -281,6 +283,7 @@
                     </td>
 
                     <td style="width: 10%; text-align: center; vertical-align: middle;">
+                      <% if ([1, 15, 16].includes(userRole)) { %>
                       <a href="/soDo/get-barcode-ewarranty/<%= d.id_detail_monitoring_data %>">
                         <button type="button" class="btn btn-warning btn-sm btn-qrcode"
                               style="text-align: center;" title="Kelola Barcode E-Warranty"
@@ -288,6 +291,9 @@
                           <i class="fa fa-qrcode" aria-hidden="true"></i>
                         </button>
                       </a>
+                      <% } else { %>
+                        <span class="text-muted">Tidak ada akses</span>
+                      <% } %>
                     </td>
                   </tr>
                   <% }) %>
