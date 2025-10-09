@@ -81,7 +81,7 @@ exports.getPinjamAssetList = async (req, res) => {
                 FROM karyawan k
                 JOIN division d ON k.divisi_karyawan = d.id_division
                 JOIN department dep ON k.departemen_karyawan = dep.id_department
-                WHERE d.id_division BETWEEN 16 AND 23 AND is_resign = false`)
+                WHERE d.id_division BETWEEN 16 AND 24 AND is_resign = false`)
         ]);
 
         res.render('pinjamAsset', {
