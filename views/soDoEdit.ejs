@@ -292,6 +292,30 @@
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+  function validateDateMin2020(id, label) {
+    const input = document.querySelector(`[name="${id}"]`);
+    if (!input) return true;
+
+    const value = input.value;
+    if (!value) {
+      Swal.fire('Error', `${label} wajib diisi!`, 'error');
+      return false;
+    }
+
+    const d = new Date(value);
+    if (isNaN(d.getTime())) {
+      Swal.fire('Error', `${label} tidak valid!`, 'error');
+      return false;
+    }
+
+    const year = d.getFullYear();
+    if (year < 2020) {
+      Swal.fire('Error', `${label} tidak boleh sebelum tahun 2020!`, 'error');
+      return false;
+    }
+
+    return true;
+  }
   let tempItems = <%-JSON.stringify(details.map(d => ({
       id_detail_monitoring_data:  d.id_detail_monitoring_data,
       no_catalog: d.no_catalog,
@@ -462,6 +486,16 @@
 
     // Submit form
     $('#editForm').on('submit', async function (e) {
+      // ✅ validasi dulu sebelum jalan
+      if (!validateDateMin2020("sales_order_date", "Sales Order Date")) {
+        e.preventDefault();
+        return;
+      }
+      if (!validateDateMin2020("delivery_order_date", "Delivery Order Date")) {
+        e.preventDefault();
+        return;
+      }
+
         const rows = $('#addedItemsTable tbody tr');
         tempItems = [];
 
