@@ -720,30 +720,38 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     // === validasi tahun minimal 2020 ===
-    function validateSalesOrderDate() {
-      const salesOrderDateInput = document.getElementById("sales_order_date");
-      if (!salesOrderDateInput) return true;
+    function validateDateMin2020(fieldName, label) {
+      const input = document.querySelector(`[name="${fieldName}"]`);
+      if (!input) return true;
 
-      const value = salesOrderDateInput.value;
+      const value = input.value.trim();
       if (!value) {
-        Swal.fire('Error', 'Sales Order Date wajib diisi!', 'error');
+        Swal.fire('Error', `${label} wajib diisi!`, 'error');
+        return false;
+      }
+
+      // ✅ pastikan format DD-MM-YYYY valid secara regex
+      const validFormat = /^\d{4}-\d{2}-\d{2}$/;
+      if (!validFormat.test(value)) {
+        Swal.fire('Error', `${label} harus dalam format DD-MM-YYYY!`, 'error');
+        return false;
+      }
+
+      const [year, month, day] = value.split('-').map(Number);
+      if (year < 2020 || month < 1 || month > 12 || day < 1 || day > 31) {
+        Swal.fire('Error', `${label} tidak valid!`, 'error');
         return false;
       }
 
       const d = new Date(value);
       if (isNaN(d.getTime())) {
-        Swal.fire('Error', 'Format Sales Order Date tidak valid!', 'error');
-        return false;
-      }
-
-      const year = d.getFullYear();
-      if (year < 2020) {
-        Swal.fire('Error', 'Sales Order Date tidak boleh sebelum tahun 2020!', 'error');
+        Swal.fire('Error', `${label} tidak dapat diproses!`, 'error');
         return false;
       }
 
       return true;
     }
+
     document.addEventListener('DOMContentLoaded', function () {
       // Reset Button
       const resetButton = document.getElementById('resetButton');
@@ -759,7 +767,15 @@
       const formCreate = document.querySelector('form[action="/create"]');
       if (confirmBtn && formCreate) {
         confirmBtn.addEventListener('click', function () {
-          if (!validateSalesOrderDate()) return; // ✅ validasi dulu
+        // ✅ validasi dulu sebelum jalan
+        if (!validateDateMin2020("sales_order_date", "Sales Order Date")) {
+          e.preventDefault();
+          return;
+        }
+        if (!validateDateMin2020("delivery_order_date", "Delivery Order Date")) {
+          e.preventDefault();
+          return;
+        }
           Swal.fire({
             title: 'Apakah Anda yakin?',
             text: "Data SO/DO akan disimpan.",
