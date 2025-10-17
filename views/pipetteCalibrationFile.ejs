@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate of Calibration</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Times New Roman', serif;
+            font-size: 11px; /* lebih kecil biar proporsional */
+        }
+
+        .page {
+            position: relative;
+            width: 210mm;
+            height: 297mm;
+            page-break-after: always;
+
+            /* ✅ background diatur di sini, bukan di body */
+            background-image: url('<%= backgroundPath %>');
+            background-repeat: no-repeat;
+            background-size: contain; /* biar tidak meluber */
+            background-position: center;
+
+            /* beri ruang aman */
+            padding: 30mm 25mm 25mm 25mm;
+            box-sizing: border-box;
+        }
+
+        h1, h2, h3, h4 {
+            margin: 0;
+            padding: 0;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 18px;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+
+        .table td {
+            padding: 2px 5px;
+            vertical-align: top;
+        }
+
+        .table-info td:first-child {
+            width: 35%;
+            font-weight: bold;
+        }
+
+        .table-border,
+        .table-border th,
+        .table-border td {
+            border: 1px solid black;
+            text-align: center;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 25mm;
+            left: 25mm;
+            right: 25mm;
+            font-size: 10px;
+        }
+
+        @media print {
+            body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- PAGE 1 -->
+    <div class="page">
+        <div class="title"><%= item.certificate_number %></div>
+        <table class="table table-info">
+            <tr><td>Calibration Number</td><td><%= item.calibration_number %></td></tr>
+            <tr><td>Calibration Name</td><td><%= item.calibration_name %></td></tr>
+            <tr><td>Manufacturer</td><td><%= item.manufacturer %></td></tr>
+            <tr><td>Serial Number</td><td><%= item.serial_number %></td></tr>
+            <tr><td>Pipette Type</td><td><%= item.pipette_type %></td></tr>
+            <tr><td>Volume Range</td><td><%= item.volume_range %> µL</td></tr>
+            <tr><td>Resolution</td><td><%= item.resolution %> µL</td></tr>
+        </table>
+
+        <div class="section-title">Owner Identity</div>
+        <table class="table table-info">
+            <tr><td>Name</td><td><%= item.name_owner %></td></tr>
+            <tr><td>Address</td><td><%= item.address_owner %></td></tr>
+        </table>
+
+        <div class="section-title">Standard Identity</div>
+        <table class="table table-info">
+            <tr><td>Traceability</td><td><%= item.traceability %></td></tr>
+            <tr><td>Date of Acceptance</td><td><%= item.acceptance_date %></td></tr>
+            <tr><td>Date of Calibration</td><td><%= item.calibration_date %></td></tr>
+        </table>
+
+        <div class="section-title">Environment Condition</div>
+        <table class="table table-info">
+            <tr><td>Temperature</td><td><%= item.environment_temp1 %> ± <%= item.environment_temp2 %> °C</td></tr>
+            <tr><td>Air Pressure</td><td><%= item.air_pressure1 %> ± <%= item.air_pressure2 %> hPa</td></tr>
+            <tr><td>Humidity</td><td><%= item.environment_humidity1 %> ± <%= item.environment_humidity2 %> %RH</td></tr>
+        </table>
+
+        <div class="footer">
+            <div>Date of Issue: <%= item.issued_date %></div>
+            <div>Head of Laboratory: <strong>Raynaldi Syarief Armanzah</strong></div>
+        </div>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div class="page">
+        <div class="title">CERTIFICATE OF CALIBRATION</div>
+
+        <div class="section-title">Calibration Result</div>
+        <table class="table table-border">
+            <thead>
+                <tr>
+                    <th>Channel</th>
+                    <th>Volume (µL)</th>
+                    <th>Correction (µL)</th>
+                    <th>Uncertainty (µL)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% item.channels.forEach((channel, i) => { %>
+                    <% channel.results.forEach((res, j) => { %>
+                        <tr>
+                            <% if (j === 0) { %>
+                                <td rowspan="<%= channel.results.length %>"><%= i + 1 %></td>
+                            <% } %>
+                            <td><%= res.volume %></td>
+                            <td><%= res.correction %></td>
+                            <% if (j === 0) { %>
+                                <td rowspan="<%= channel.results.length %>"><%= channel.uncertainty || item.uncertainty %></td>
+                                <td rowspan="<%= channel.results.length %>"><%= channel.status || item.status %></td>
+                            <% } %>
+                        </tr>
+                    <% }) %>
+                <% }) %>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <p><strong>Note:</strong> Volume ≤ 5 µL is outside the lab measurement range.</p>
+            <p>Date of Issue: <%= item.issued_date %></p>
+            <p>Head of Laboratory: <strong>Raynaldi Syarief Armanzah</strong></p>
+        </div>
+    </div>
+</body>
+</html>

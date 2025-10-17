@@ -23,7 +23,8 @@ const protectedPaths = [
   '/karyawan',
   '/asset',
   '/pinjamAsset',
-  '/pinjamAssetEdit/:id'
+  '/pinjamAssetEdit/:id',
+  '/pipette/'
 ];
 router.use(protectedPaths, verifyToken, verifySessionToken);
 

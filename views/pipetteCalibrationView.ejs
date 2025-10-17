@@ -1,0 +1,238 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+
+<div class="container">
+    <h2 class="mb-4">Pipette Calibration Form</h2>
+    <%
+    function formatDateInput(date) {
+      if (!date) return '';
+      const d = new Date(date);
+      const y = d.getFullYear();
+      const m = ('0' + (d.getMonth() + 1)).slice(-2);
+      const da = ('0' + d.getDate()).slice(-2);
+      return `${y}-${m}-${da}`;
+    }
+  %>
+
+    <form id="calibrationForm" method="POST">
+        <!-- Certificate Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">Certificate Information</div>
+            <div class="card-body row g-3">
+                <input type="hidden" name="id_certificate" value="<%= item.id_certificate %>">
+                <div class="col-md-6">
+                    <label>Calibration Number</label>
+                    <input type="text" name="calibration_number" class="form-control"
+                        value="<%= item.calibration_number %>" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label>Measure Type</label>
+                    <select name="measure_type" class="form-control" disabled>
+                        <option value="T1" <%= item.measure_type === 'T1' ? 'selected' : '' %>>T1</option>
+                        <option value="T2" <%= item.measure_type === 'T2' ? 'selected' : '' %>>T2</option>
+                        <option value="T3" <%= item.measure_type === 'T3' ? 'selected' : '' %>>T3</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label>Calibration Name</label>
+                    <select name="calibration_name" class="form-control" disabled>
+                        <option value="Micropipette" <%= item.calibration_name === 'Micropipette' ? 'selected' : '' %>>
+                            Micropipette</option>
+                        <option value="Macropipette" <%= item.calibration_name === 'Macropipette' ? 'selected' : '' %>>
+                            Macropipette</option>
+                        <option value="Multipette" <%= item.calibration_name === 'Multipette' ? 'selected' : '' %>>
+                            Multipette</option>
+                        <option value="Dispenser" <%= item.calibration_name === 'Dispenser' ? 'selected' : '' %>>
+                            Dispenser</option>
+                        <option value="MultiChannel" <%= item.calibration_name === 'MultiChannel' ? 'selected' : '' %>>
+                            MultiChannel</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label>Manufacturer</label>
+                    <input type="text" name="manufacturer" class="form-control" value="<%= item.manufacturer %>"
+                        readonly>
+                </div>
+                <div class="col-md-6">
+                    <label>Serial Number</label>
+                    <input type="text" name="serial_number" class="form-control" value="<%= item.serial_number %>"
+                        readonly>
+                </div>
+                <div class="col-md-6">
+                    <label>Pipette Type</label>
+                    <input type="text" name="pipette_type" class="form-control" value="<%= item.pipette_type %>"
+                        readonly>
+                </div>
+                <div class="col-md-6">
+                    <label>Volume Range</label>
+                    <input type="text" name="volume_range" class="form-control" value="<%= item.volume_range %>"
+                        readonly>
+                </div>
+                <div class="col-md-6">
+                    <label>Resolution</label>
+                    <input type="text" name="resolution" class="form-control" value="<%= item.resolution %>" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label>Unit</label>
+                    <select name="unit" class="form-control" disabled>
+                        <option value="Ml" <%= item.unit === 'Ml' ? 'selected' : '' %>>Ml</option>
+                        <option value="µL" <%= item.unit === 'µL' ? 'selected' : '' %>>µL</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Owner Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">Owner Information & Standard Identity</div>
+            <div class="card-body row g-3">
+                <div class="col-md-6">
+                    <label>Name Owner</label>
+                    <input type="text" name="name_owner" class="form-control" value="<%= item.name_owner %>" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label>Address Owner</label>
+                    <input type="text" name="address_owner" class="form-control" value="<%= item.address_owner %>"
+                        readonly>
+                </div>
+                <div class="col-md-6">
+                    <label>Traceability</label>
+                    <input type="text" name="traceability" class="form-control" value="<%= item.traceability %>"
+                        readonly>
+                </div>
+                <div class="col-md-6">
+                    <label>Acceptance Date</label>
+                    <input type="date" name="acceptance_date" class="form-control"
+                        value="<%= formatDateInput(item.acceptance_date) %>" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label>Calibration Date</label>
+                    <input type="date" name="calibration_date" class="form-control"
+                        value="<%= formatDateInput(item.calibration_date) %>" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label>Issued Date</label>
+                    <input type="date" name="issued_date" class="form-control"
+                        value="<%= formatDateInput(item.issued_date) %>" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calibration Environment -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">Calibration Environment</div>
+            <div class="card-body row g-3">
+                <div class="col-md-3">
+                    <label>Temperature 1 (°C)</label>
+                    <input type="number" name="environment_temp1" class="form-control"
+                        value="<%= item.environment_temp1 %>" readonly>
+                </div>
+                <div class="col-md-3">
+                    <label>Temperature 2 (°C)</label>
+                    <input type="number" name="environment_temp2" class="form-control"
+                        value="<%= item.environment_temp2 %>" readonly>
+                </div>
+                <div class="col-md-3">
+                    <label>Air Pressure 1 (mbar)</label>
+                    <input type="number" name="air_pressure1" class="form-control" value="<%= item.air_pressure1 %>"
+                        readonly>
+                </div>
+                <div class="col-md-3">
+                    <label>Air Pressure 2 (mbar)</label>
+                    <input type="number" name="air_pressure2" class="form-control" value="<%= item.air_pressure2 %>"
+                        readonly>
+                </div>
+                <div class="col-md-3">
+                    <label>Humidity 1 (%)</label>
+                    <input type="number" name="environment_humidity1" class="form-control"
+                        value="<%= item.environment_humidity1 %>" readonly>
+                </div>
+                <div class="col-md-3">
+                    <label>Humidity 2 (%)</label>
+                    <input type="number" name="environment_humidity2" class="form-control"
+                        value="<%= item.environment_humidity2 %>" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Channels -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning">Channels Configuration</div>
+            
+            <div class="card-body" id="channelsContainer"></div>
+
+            <div class="mt-4">
+                <div class="card-body">
+                    <h5>Overall Calibration Info</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label>Uncertainty (µL)</label>
+                            <input type="text" name="uncertainty" class="form-control" value="<%= item.uncertainty || '' %>"
+                                readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Status</label>
+                            <select name="status" class="form-control" disabled>
+                                <option value="OK" <%= item.status === 'OK' ? 'selected' : '' %>>OK</option>
+                                <option value="NOK" <%= item.status === 'NOK' ? 'selected' : '' %>>NOT OK</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group text-end">
+            <a href="/pipette" class="btn btn-secondary">Back</a>
+        </div>
+    </form>
+</div>
+
+<%- include('layout/footer') %>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('channelsContainer');
+    container.innerHTML = "";
+
+    // ✅ Ambil data dari backend
+    const data = <%- JSON.stringify(item.channels || []) %>;
+
+    if (!data || data.length === 0) {
+        container.innerHTML = `<div class="alert alert-warning">No channel data found.</div>`;
+        return;
+    }
+
+    // ✅ Loop setiap channel
+    data.forEach((ch, idx) => {
+        const results = Array.isArray(ch.results) ? ch.results : [];
+        let rows = "";
+
+        if (results.length === 0) {
+        rows = `<tr><td colspan="2" class="text-center text-muted">No volume data</td></tr>`;
+        } else {
+        rows = results.map((r, i) => `
+            <tr>
+            <td><input type="text" class="form-control" value="${r.volume || ''}" readonly></td>
+            <td><input type="text" class="form-control" value="${r.correction || ''}" readonly></td>
+            </tr>
+        `).join('');
+        }
+
+        const block = document.createElement('div');
+        block.classList.add('channel-block', 'mb-3', 'p-3', 'border', 'rounded');
+        block.innerHTML = `
+        <h5 class="mb-3">Channel ${idx + 1}</h5>
+        <table class="table table-bordered">
+            <thead class="table-light">
+            <tr>
+                <th>Volume (µL)</th>
+                <th>Correction (µL)</th>
+            </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+        `;
+        container.appendChild(block);
+    });
+    });
+</script>

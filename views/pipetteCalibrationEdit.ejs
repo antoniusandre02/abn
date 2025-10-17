@@ -1,0 +1,320 @@
+<%- include('layout/header') %>
+<%- include('layout/sidebar') %>
+
+<div class="container">
+    <h2 class="mb-4">Pippete Calibration Form</h2>
+    <%
+        function formatDateInput(date) {
+        if (!date) return '';
+        const d = new Date(date);
+        const y = d.getFullYear();
+        const m = ('0' + (d.getMonth() + 1)).slice(-2);
+        const da = ('0' + d.getDate()).slice(-2);
+        return `${y}-${m}-${da}`;
+        }
+    %>
+    <form action="/pipette/editPipetteCalibration" method="POST" id="calibrationForm">
+        <!-- Certificate Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">Certificate Information</div>
+            <div class="card-body row g-3">
+                <input type="hidden" name="id_certificate" value="<%= item.id_certificate %>">
+                <div class="col-md-6">
+                    <label class="form-label">Calibration Number</label>
+                    <input type="text" name="calibration_number" class="form-control" value="<%= item.calibration_number %>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Measure Type</label>
+                    <select class="form-control" id="measure_type" name="measure_type" >
+                        <option value="">-- Choose Measure --</option>
+                        <option value="T1" <%= item.measure_type === 'T1' ? 'selected' : '' %>>T1</option>
+                        <option value="T2" <%= item.measure_type === 'T2' ? 'selected' : '' %>>T2</option>
+                        <option value="T3" <%= item.measure_type === 'T3' ? 'selected' : '' %>>T3</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Calibration Name</label>
+                    <select class="form-control" id="calibration_name" name="calibration_name" >
+                        <option value="">-- Choose Calibration Name --</option>
+                        <option value="Micropipette" <%= item.calibration_name === 'Micropipette' ? 'selected' : '' %>>Micropipette</option>
+                        <option value="Macropipette" <%= item.calibration_name === 'Macropipette' ? 'selected' : '' %>>Macropipette</option>
+                        <option value="Multipette" <%= item.calibration_name === 'Multipette' ? 'selected' : '' %>>Multipette</option>
+                        <option value="Dispenser" <%= item.calibration_name === 'Dispenser' ? 'selected' : '' %>>Dispenser</option>
+                        <option value="MultiChannel" <%= item.calibration_name === 'MultiChannel' ? 'selected' : '' %>>MultiChannel</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Manufacturer</label>
+                    <input type="text" name="manufacturer" class="form-control" value="<%= item.manufacturer %>" >
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Serial Number</label>
+                    <input type="text" name="serial_number" class="form-control" value="<%= item.serial_number %>" >
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Pipette Type</label>
+                    <input type="text" name="pipette_type" class="form-control" value="<%= item.pipette_type %>" >
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Volume Range</label>
+                    <input type="text" name="volume_range" class="form-control" value="<%= item.volume_range %>" >
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Resolution</label>
+                    <input type="text" name="resolution" class="form-control" value="<%= item.resolution %>" >
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Unit</label>
+                    <select class="form-control" id="unit" name="unit" >
+                        <option value="">-- Choose Unit --</option>
+                        <option value="Ml" <%= item.unit === 'Ml' ? 'selected' : '' %>>Ml</option>
+                        <option value="µL" <%= item.unit === 'µL' ? 'selected' : '' %>>µL</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Owner Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">Owner Information & Standart Identity</div>
+            <div class="card-body row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Name Owner</label>
+                    <input type="text" name="name_owner" class="form-control" value="<%= item.name_owner %>" >
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Address Owner</label>
+                    <input type="text" name="address_owner" class="form-control" value="<%= item.address_owner %>" >
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Traceability</label>
+                    <input type="text" name="traceability" class="form-control" value="<%= item.traceability %>" >
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Acceptance Date</label>
+                    <input type="date" name="acceptance_date" class="form-control" value="<%= formatDateInput(item.acceptance_date) %>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Calibration Date</label>
+                    <input type="date" name="calibration_date" class="form-control" value="<%= formatDateInput(item.calibration_date) %>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Issue Date</label>
+                    <input type="date" name="issued_date" class="form-control" value="<%= formatDateInput(item.issued_date) %>">
+                </div>
+            </div>
+        </div>
+
+        <!-- Calibration Environment -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">Calibration Environment</div>
+            <div class="card-body row g-3">
+                <div class="col-md-3">
+                    <label>Temperature 1 (°C)</label>
+                    <input type="number" step="any" name="environment_temp1" class="form-control" value="<%= item.environment_temp1 %>">
+                </div>
+                <div class="col-md-3">
+                    <label>Temperature 2 (°C)</label>
+                    <input type="number" step="any" name="environment_temp2" class="form-control" value="<%= item.environment_temp2 %>">
+                </div>
+                <div class="col-md-3">
+                    <label>Air Pressure 1 (mbar)</label>
+                    <input type="number" step="any" name="air_pressure1" class="form-control" value="<%= item.air_pressure1 %>">
+                </div>
+                <div class="col-md-3">
+                    <label>Air Pressure 2 (mbar)</label>
+                    <input type="number" step="any" name="air_pressure2" class="form-control" value="<%= item.air_pressure2 %>">
+                </div>
+                <div class="col-md-3">
+                    <label>Humidity 1 (%)</label>
+                    <input type="number" step="any" name="environment_humidity1" class="form-control" value="<%= item.environment_humidity1 %>">
+                </div>
+                <div class="col-md-3">
+                    <label>Humidity 2 (%)</label>
+                    <input type="number" step="any" name="environment_humidity2" class="form-control" value="<%= item.environment_humidity2 %>">
+                </div>
+            </div>
+        </div>
+
+        <!-- Channels -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning">Channels Configuration</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Default Volumes (comma separated)</label>
+                    <input type="text" id="defaultVolumes" class="form-control" placeholder="e.g. 10,100,1000" value="<%= item.defaultVolumes ? item.defaultVolumes.join(',') : '' %>">
+                    <small class="text-muted">Pisahkan dengan koma — misal: 10, 100, 1000</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Number of Channels</label>
+                    <input type="number" id="channelCount" min="1" max="12" class="form-control"
+                        style="width: 150px;" value="<%= item.numberOfChannels || '' %>">
+                    <button type="button" class="btn btn-secondary mt-2" id="generateChannels">Generate
+                        Channels</button>
+                </div>
+
+                <div id="channelsContainer"></div>
+
+                <!-- Uncertainty dan Status (1x saja untuk semua channel) -->
+                <div class="mt-4">
+                    <h5>Overall Calibration Info</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label>Uncertainty (µL)</label>
+                            <input type="text" step="any" name="uncertainty" class="form-control" value="<%= item.uncertainty || '' %>">
+                        </div>
+                        <div class="col-md-6">
+                            <label>Status</label>
+                            <select class="form-control" id="status" name="status" >
+                                <option value="">-- Choose Status --</option>
+                                <option value="OK"  <%= item.status === 'OK' ? 'selected' : '' %>>OK</option>
+                                <option value="NOK"  <%= item.status === 'NOK' ? 'selected' : '' %>>NOT OK</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group text-right">
+            <a href="/pipette" class="btn btn-secondary">Cancel</a>
+            <button type="submit" id="submitBtn" class="btn btn-primary">Save Calibration Data</button>
+        </div>
+    </form>
+</div>
+
+<%- include('layout/footer') %>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const data = <%- JSON.stringify(item.channels || []) %>;
+    const container = document.getElementById('channelsContainer');
+
+    // Ambil semua unique volume dari seluruh channel
+    const allVolumes = new Set();
+    data.forEach(ch => {
+        ch.results?.forEach(r => allVolumes.add(r.volume));
+    });
+
+    // 🧩 Prefill default volumes dan number of channels
+    document.getElementById('defaultVolumes').value = [...allVolumes].sort((a,b)=>a-b).join(',');
+    document.getElementById('channelCount').value = data.length;
+
+    // Generate channel blocks dari DB
+    data.forEach((ch) => {
+        addChannelBlock(ch.channel_number, ch.results);
+    });
+
+    // Prefill uncertainty dan status dari channel pertama
+    if (data.length > 0) {
+        document.querySelector('input[name="uncertainty"]').value = data[0].uncertainty || '';
+        document.querySelector('select[name="status"]').value = data[0].status || '';
+    }
+});
+
+document.getElementById('generateChannels').addEventListener('click', () => {
+    const container = document.getElementById('channelsContainer');
+    const total = parseInt(document.getElementById('channelCount').value);
+    const defaultVolumesInput = document.getElementById('defaultVolumes').value;
+    const defaultVolumes = defaultVolumesInput.split(',').map(v => v.trim()).filter(v => v !== "");
+
+    const existingBlocks = container.querySelectorAll('.channel-block').length;
+
+    // Kalau jumlah baru lebih sedikit → hapus sisanya
+    if (total < existingBlocks) {
+        for (let i = existingBlocks; i > total; i--) {
+            const block = container.querySelector(`.channel-block[data-channel="${i}"]`);
+            if (block) block.remove();
+        }
+    }
+
+    // Kalau jumlah baru lebih banyak → tambahkan channel baru kosong dengan default volumes
+    for (let i = existingBlocks + 1; i <= total; i++) {
+        const results = defaultVolumes.map(v => ({ volume: v, correction: '' }));
+        addChannelBlock(i, results);
+    }
+});
+
+function addChannelBlock(i, results = []) {
+    const container = document.getElementById('channelsContainer');
+    const block = document.createElement('div');
+    block.classList.add('channel-block', 'mb-3', 'p-3', 'border', 'rounded');
+    block.setAttribute('data-channel', i);
+
+    let rows = '';
+    if (results && results.length > 0) {
+        results.forEach((r, idx) => {
+            rows += `
+                <tr>
+                    <td><input type="text" step="any" name="channels[${i}][results][${idx}][volume]" class="form-control" value="${r.volume || ''}" required></td>
+                    <td><input type="text" step="any" name="channels[${i}][results][${idx}][correction]" class="form-control" value="${r.correction || ''}" required></td>
+                    <td><button type="button" class="btn btn-danger btn-sm removeVolume">×</button></td>
+                </tr>`;
+        });
+    }
+
+    block.innerHTML = `
+        <h5>Channel ${i} 
+            <button type="button" class="btn btn-danger btn-sm btn-delete-channel">Delete Channel</button>
+        </h5>
+        <table class="table table-bordered volume-table" data-channel="${i}">
+            <thead class="table-light">
+                <tr>
+                    <th>Volume (µL)</th>
+                    <th>Correction (µL)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+        <button type="button" class="btn btn-outline-primary btn-sm addVolume" data-channel="${i}">+ Add Volume</button>
+    `;
+    container.appendChild(block);
+}
+
+// --- Event Delegation untuk Add/Delete Volume/Channel ---
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('addVolume')) {
+        const ch = e.target.dataset.channel;
+        const tbody = document.querySelector(`.volume-table[data-channel="${ch}"] tbody`);
+        const idx = tbody.querySelectorAll('tr').length;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="text" step="any" name="channels[${ch}][results][${idx}][volume]" class="form-control" ></td>
+            <td><input type="text" step="any" name="channels[${ch}][results][${idx}][correction]" class="form-control" ></td>
+            <td><button type="button" class="btn btn-danger btn-sm removeVolume">×</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    if (e.target.classList.contains('removeVolume')) {
+        e.target.closest('tr').remove();
+    }
+
+    if (e.target.classList.contains('btn-delete-channel')) {
+        e.target.closest('.channel-block').remove();
+        reindexChannels();
+    }
+});
+
+function reindexChannels() {
+    const blocks = document.querySelectorAll('.channel-block');
+    blocks.forEach((block, index) => {
+        const newIndex = index + 1;
+        block.setAttribute('data-channel', newIndex);
+
+        block.querySelector('h5').childNodes[0].textContent = `Channel ${newIndex} `;
+        const table = block.querySelector('.volume-table');
+        table.setAttribute('data-channel', newIndex);
+        const addButton = block.querySelector('.addVolume');
+        addButton.setAttribute('data-channel', newIndex);
+
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach((row, rIndex) => {
+            const inputs = row.querySelectorAll('input');
+            inputs[0].name = `channels[${newIndex}][results][${rIndex}][volume]`;
+            inputs[1].name = `channels[${newIndex}][results][${rIndex}][correction]`;
+        });
+    });
+}
+</script>

@@ -117,23 +117,33 @@
                 <p>E-Warranty</p>
               </a>
             </li>
-            <% if ([1].includes(user.role)) { %>
-            <li class="nav-item">
-              <a href="/eWarranty/registerAdmin" class="nav-link">
-                <i class="nav-icon fas fa-file"></i>
-                <p>E-Warranty Form</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/eWarranty/templateAdmin" class="nav-link">
-                <i class="nav-icon fas fa-file"></i>
-                <p>E-Warranty Template</p>
-              </a>
-            </li>
-            <% } %>
           </ul>
         </li>
-
+        <% } %>
+        <% if ([1, 17, 18].includes(user.role)) { %>
+          <li class="nav-item has-treeview">
+          <a href="#" class="nav-link">
+            <i class="nav-icon fas fa-cogs"></i>
+            <p>
+              Callibration Pipette
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="/pipette" class="nav-link">
+                <i class="nav-icon fas fa-file"></i>
+                <p>Pipette Calibration</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/pipette/calibrationForm" class="nav-link">
+                <i class="nav-icon fas fa-file"></i>
+                <p>Pipette Calibration form</p>
+              </a>
+            </li>
+          </ul>
+        </li>
         <% } %>
       </ul>
     </nav>
